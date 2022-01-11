@@ -1,5 +1,5 @@
 # CheckMeIn
-TLDR; an app that lets you check into places ahead of time, with generated qr code/id to match the place, and pre-fill in any COVID related questions. can be used for restaurants and hospitals. answers refresh/update every 12 hours.
+TLDR; a mobile app that lets you check into places ahead of time, with generated qr code/id to match the place, and pre-fill in any COVID related questions. can be used for restaurants and hospitals. answers refresh/update every 12 hours.
 
 the user facing one to check in and then a side for like the establishment so like when I check in, it will generate a QR code and the establishment just has to scan it and then they’ll see all my information on their side, therefore less contact and wait time for both parties
 
