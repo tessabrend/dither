@@ -1,5 +1,5 @@
 import { React, Component } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, Button, StyleSheet } from 'react-native';
 import Swiper from 'react-native-deck-swiper';
 
 class CardDeck extends Component {
@@ -17,10 +17,29 @@ class CardDeck extends Component {
                 }}
                 onSwiped={(cardIndex) => {console.log(cardIndex)}}
                 onSwipedAll={() => {console.log('onSwipedAll')}}
+                onSwipedLeft={() => {console.log('card swiped no')}}
+                onSwipedRight={() => {console.log('card swiped like')}}
+                onSwipedTop={() => {console.log('card swiped crave')}}
+                onSwipedBottom={() => {console.log('card swiped hard no')}}
+                onTapCard={() => {console.log('card tapped, display more info')}}
                 cardIndex={0}
                 backgroundColor={'#4FD0E9'}
                 stackSize= {3}>
             </Swiper>
+            <View style={styles.buttonRow}>
+                <Button title="No" onPress={() => console.log('No Pressed')}>
+                    No
+                </Button>
+                <Button title="Hard No" onPress={() => console.log('Hard No Pressed')}>
+                    Hard No
+                </Button>
+                <Button title="Crave" onPress={() => console.log('Crave Pressed')}>
+                    Crave
+                </Button>
+                <Button title="Like" onPress={() => console.log('Like Pressed')}>
+                    Like
+                </Button>
+            </View>
         </View>
         );
     }
@@ -31,7 +50,7 @@ export default CardDeck;
 const styles = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: "#ffffff"
+      backgroundColor: "#ffffff",
     },
     card: {
       flex: 0.8,
@@ -45,6 +64,10 @@ const styles = StyleSheet.create({
     text: {
       textAlign: "center",
       fontSize: 50,
-      backgroundColor: "transparent"
-    }
+      backgroundColor: "transparent",
+    },
+    buttonRow: {
+        justifyContent: "center",
+        flexDirection: "row",
+    },
   });
