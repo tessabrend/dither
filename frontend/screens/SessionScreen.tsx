@@ -1,7 +1,7 @@
-import CardDeck from '../components/ResturantOverviewCard';
+import Session from '../components/ResturantOverviewCard';
 
 export default function SessionScreen() {
   return (
-      <CardDeck/>
+      <Session/>
   );
 }

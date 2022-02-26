@@ -4,9 +4,9 @@ import Swiper from 'react-native-deck-swiper';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 
 
-class CardDeck extends Component {
+class Session extends Component {
     data = ['this', 'is', 'a', 'resturant', 'overview', 'card', 'almost', 'at', 'the', 'end'];
-
+    
     render () {
         return (
             <View style={styles.container}>
@@ -55,7 +55,7 @@ class CardDeck extends Component {
     }
 };
 
-export default CardDeck;
+export default Session;
 
 const styles = StyleSheet.create({
     container: {
