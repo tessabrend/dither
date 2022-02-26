@@ -22,14 +22,16 @@ class CardDeck extends Component {
                 }}
                 onSwiped={(cardIndex) => {console.log(cardIndex)}}
                 onSwipedAll={() => {console.log('onSwipedAll')}}
-                onSwipedLeft={() => {console.log('card swiped no')}}
-                onSwipedRight={() => {console.log('card swiped like')}}
-                onSwipedTop={() => {console.log('card swiped crave')}}
-                onSwipedBottom={() => {console.log('card swiped hard no')}}
-                onTapCard={() => {console.log('card tapped, display more info')}}
+                onSwipedLeft={(cardIndex) => {console.log('card at index ' + cardIndex +' swiped no')}}
+                onSwipedRight={(cardIndex) => {console.log('card at index ' + cardIndex +' swiped like')}}
+                onSwipedTop={(cardIndex) => {console.log('card at index ' + cardIndex +' swiped crave')}}
+                onSwipedBottom={(cardIndex) => {console.log('card at index ' + cardIndex +' swiped hard no')}}
+                onTapCard={(cardIndex) => {console.log('card at index ' + cardIndex +' tapped, display more info')}}
                 cardIndex={0}
-                backgroundColor={'#4FD0E9'}
-                stackSize= {3}>
+                backgroundColor={'#ffffff'}
+                stackSize= {3}
+                marginBottom={100}
+                marginTop={30}>
             </Swiper>
             <View style={styles.buttonRow}>
                 <Button title="No" onPress={() => this.swiper.swipeLeft()}>
@@ -72,8 +74,8 @@ const styles = StyleSheet.create({
       backgroundColor: "transparent",
     },
     buttonRow: {
-        justifyContent: "center",
+        justifyContent: "space-between",
         flexDirection: "row",
-        //paddingTop: 200,
+        marginTop: 690,
     },
   });
