@@ -6,7 +6,6 @@ load_dotenv()
 
 db = Database()
 
-
 class User(db.Entity):
     Name = Required(str)
     Location = Optional(LongStr)
