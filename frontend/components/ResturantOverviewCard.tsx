@@ -1,9 +1,12 @@
 import { React, Component } from 'react';
-import { View, Text, Pressable, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, Pressable, StyleSheet, Dimensions, Platform } from 'react-native';
 import Swiper from 'react-native-deck-swiper';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import ProgressBarAnimated from 'react-native-progress-bar-animated';
 import CountDown from 'react-native-countdown-component';
+
+const window = Dimensions.get("window");
+const screen = Dimensions.get("screen");
 
 class Session extends Component {
     data = ['this', 'is', 'a', 'resturant', 'overview', 'card', 'almost', 'at', 'the', 'end'];
@@ -20,7 +23,7 @@ class Session extends Component {
     }
 
     render () {
-        const barWidth = Dimensions.get('screen').width - 50;
+        const barWidth = screen.width - 50;
 
         return (
             <View style={styles.container}>
@@ -67,8 +70,8 @@ class Session extends Component {
                     cardIndex={0}
                     backgroundColor={'#ffffff'}
                     stackSize= {3}
-                    marginBottom={100}
-                    marginTop={100}>
+                    marginBottom={screen.width / 5}
+                    marginTop={screen.width / 5}>
                 </Swiper>
                 <View style={styles.buttonRow}>
                     <Pressable onPress={() => this.swiper.swipeLeft()}>
@@ -113,14 +116,14 @@ const styles = StyleSheet.create({
     buttonRow: {
         justifyContent: "space-between",
         flexDirection: "row",
-        marginTop: 580,
+        marginTop: Platform.OS === 'ios' ? screen.width + 180 : screen.width + 90,
         paddingRight: 30,
         paddingLeft: 30,
     },
     progressBar: {
         justifyContent: "center",
         alignItems: "center",
-        marginTop: 30
+        marginTop: screen.width / 30
     },
     timer: {
         justifyContent: "center",
