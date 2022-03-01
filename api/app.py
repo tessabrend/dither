@@ -23,7 +23,7 @@ def find_groups():
         # If searching by user, return all the groups of which the user is a member
         groups = select(group_member for group_member in GroupMembers if group_member.UserId == request.args.get('User'))
         for group_id in groups:
-            to_return.append(render_object(select(group for group in Group if group.id == group_id)))
+            to_return.append(render_object(get(group for group in Group if group.id == group_id)))
     elif 'id' in request.args.keys():
         # If searching by ID, return the group with the corresponding ID
         to_return.append(render_object(get(group for group in Group if group.id == request.args.get('id'))))
@@ -34,8 +34,8 @@ def find_groups():
         # If searching by code, return the group with the corresponding entry code
         to_return.append(render_object(get(group for group in Group if group.GroupEntryCode == request.args.get('GroupEntryCode'))))
     else:
-        # Otherwise, return all groups
-        for group in select(group for group in Group):
+        # Otherwise, return the first 50 groups
+        for group in Group.select()[:request.args.get('MaxGroupsToReturn', 50)]:
             to_return.append(render_object(group))
     return { "groups": to_return }
 
