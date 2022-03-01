@@ -3,7 +3,7 @@ import { View, Text, Pressable, StyleSheet, Dimensions } from 'react-native';
 import Swiper from 'react-native-deck-swiper';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import ProgressBarAnimated from 'react-native-progress-bar-animated';
-import ProgressBar from 'react-native-animated-progress';
+import CountDown from 'react-native-countdown-component';
 
 class Session extends Component {
     data = ['this', 'is', 'a', 'resturant', 'overview', 'card', 'almost', 'at', 'the', 'end'];
@@ -24,7 +24,20 @@ class Session extends Component {
 
         return (
             <View style={styles.container}>
-                <Text>This is where the timer will go</Text>
+                <View style={styles.timer}>
+                    <CountDown
+                    size={15}
+                    until={300} //time in seconds
+                    onFinish={() => alert('Finished')} //this needs to change to disable swiping
+                    digitStyle={{backgroundColor: '#FFF', borderWidth: 2, borderColor: '#000000'}}
+                    digitTxtStyle={{color: '#000000'}}
+                    timeLabelStyle={{color: 'red', fontWeight: 'bold'}}
+                    separatorStyle={{color: '#000000'}}
+                    timeToShow={['H', 'M', 'S']}
+                    timeLabels={{m: null, s: null}}
+                    showSeparator
+                    />
+                </View>
                 <View style={styles.progressBar}>
                     <ProgressBarAnimated
                         width={barWidth}
@@ -45,7 +58,7 @@ class Session extends Component {
                         )
                     }}
                     onSwiped={() =>  {this.increment()}}
-                    onSwipedAll={() => {console.log('onSwipedAll')}}
+                    onSwipedAll={() => {console.log('onSwipedAll')}} //this needs to change to disable swiping
                     onSwipedLeft={(cardIndex) => {console.log('card at index ' + cardIndex +' swiped no')}}
                     onSwipedRight={(cardIndex) => {console.log('card at index ' + cardIndex +' swiped like')}}
                     onSwipedTop={(cardIndex) => {console.log('card at index ' + cardIndex +' swiped crave')}}
@@ -100,13 +113,19 @@ const styles = StyleSheet.create({
     buttonRow: {
         justifyContent: "space-between",
         flexDirection: "row",
-        marginTop: 600,
+        marginTop: 580,
         paddingRight: 30,
         paddingLeft: 30,
     },
     progressBar: {
         justifyContent: "center",
         alignItems: "center",
-        marginTop: 60
+        marginTop: 30
+    },
+    timer: {
+        justifyContent: "center",
+        alignItems: "flex-end",
+        marginTop: 10,
+        marginRight: 20
     },
   });
