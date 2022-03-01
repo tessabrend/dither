@@ -2,8 +2,8 @@ import { React, Component } from 'react';
 import { View, Text, Pressable, StyleSheet, Dimensions, Platform } from 'react-native';
 import Swiper from 'react-native-deck-swiper';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import ProgressBarAnimated from 'react-native-progress-bar-animated';
 import CountDown from 'react-native-countdown-component';
+import ProgressBar from "react-native-animated-progress";
 
 const window = Dimensions.get("window");
 const screen = Dimensions.get("screen");
@@ -23,7 +23,6 @@ class Session extends Component {
     }
 
     render () {
-        const barWidth = screen.width - 50;
 
         return (
             <View style={styles.container}>
@@ -42,13 +41,9 @@ class Session extends Component {
                     />
                 </View>
                 <View style={styles.progressBar}>
-                    <ProgressBarAnimated
-                        width={barWidth}
-                        value={this.state.progress}
-                        backgroundColorOnComplete="#6CC644"
-                    />
+                    <ProgressBar progress={this.state.progress} height={10} backgroundColor="#1167b1" />
                 </View>
-                    <Swiper
+                <Swiper
                     ref={swiper => {
                         this.swiper = swiper;
                     }}
@@ -122,8 +117,10 @@ const styles = StyleSheet.create({
     },
     progressBar: {
         justifyContent: "center",
-        alignItems: "center",
-        marginTop: screen.width / 30
+        //alignItems: "center",
+         marginTop: 20,
+        marginRight: 20,
+        marginLeft: 20,
     },
     timer: {
         justifyContent: "center",
