@@ -7,7 +7,7 @@ import CountDown from 'react-native-countdown-component';
 
 class Session extends Component {
     data = ['this', 'is', 'a', 'resturant', 'overview', 'card', 'almost', 'at', 'the', 'end'];
-    //{console.log('card at index ' + cardIndex +' swiped')}
+
     state = {
         progress: 0,
     }
