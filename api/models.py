@@ -11,14 +11,14 @@ class User(db.Entity):
     Location = Optional(LongStr)
     Password = Required(str) # need to store hashed passwords not plain text
     PhoneNumber = Optional(str)
-    Email = Required(str, unique=True)
+    Email = Optional(str, unique=True)
     UserAccessibleUI = Required(bool, default=False)
     GroupMembers = Optional('GroupMembers') # this is needed to make a foreign key in the groupmembers table
     Selections = Optional('SessionSelections') # this is needed to make a foreign key in the sessionselections table
 
 class Group(db.Entity):
-    GroupName = Required(str)
-    GroupEntryCode = Required(str)
+    GroupName = Required(str, unique=True)
+    GroupEntryCode = Required(str, unique=True)
     TimeLimit = Required(int)
     GroupMembers = Optional('GroupMembers') # this is needed to make a foreign key in the groupmembers table
     Session = Optional('SelectionSession') # this is needed to make a foreign key in the selectionsession table
