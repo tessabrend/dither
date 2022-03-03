@@ -1,3 +1,4 @@
 api/env/
 node_modules
 api/.env
+api/__pycache__
