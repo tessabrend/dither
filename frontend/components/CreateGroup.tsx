@@ -16,13 +16,11 @@ export default function CreateGroup() {
         })
         .then(response => {
             response.json().then(data => {
-                if(response.ok) {
-                    if(data['message']) {
-                        setError(data['message']);
-                    } else {
-                        setError('');
-                        alert(`Group Created Successfully: ${data}`);
-                    }
+                if(data['message']) {
+                    setError(data['message']);
+                } else {
+                    setError('');
+                    alert(`Group Created Successfully: ${JSON.stringify(data)}`);
                 }
             }).catch(error => {
                 setError('Incorrect response format: likely due to internal error');
