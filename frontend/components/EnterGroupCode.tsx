@@ -1,9 +1,8 @@
 import { Text, View } from './Themed';
-import { TouchableOpacity, StyleSheet, TextInput, KeyboardAvoidingView, ScrollView } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { TouchableOpacity, StyleSheet, TextInput } from 'react-native';
 import React, { useState } from 'react';
 
-export default function EnterGroupCode({ path }: { path: string }) {
+export default function EnterGroupCode() {
     const [groupCode, setGroupCode] = useState("");
     const [error, setError] = useState(false);
 
@@ -13,15 +12,7 @@ export default function EnterGroupCode({ path }: { path: string }) {
         // call setError if group code is invalid
     }
     
-    return <View style={styles.popupContainer}>
-        <View style={styles.actionButtonWrapper}>
-            <View style={styles.backButton}>
-                <Ionicons name="md-arrow-back" size={32}/>
-            </View>
-            <View style={styles.closeButton}>
-                <Ionicons name="md-close" size={32}/>
-            </View>
-        </View>
+    return <>
         <View style={styles.headerWrapper}>
             <Text style={styles.header}>Join Group</Text>
         </View>
@@ -44,38 +35,16 @@ export default function EnterGroupCode({ path }: { path: string }) {
                     submitGroupCode();
                 }}
             >
-                <Text style={styles.buttonText}>Enter</Text>
+            <Text style={styles.buttonText}>Enter</Text>
             </TouchableOpacity>
         </View>
-    </View>
+    </>;
 }
 
 const styles = StyleSheet.create({
-    popupContainer: {
-        width: "75%",
-        height: "40%",
-    },
-    actionButtonWrapper: {
-        height: "15%",
-        flexDirection: "row",
-        alignItems: "center",
-        marginBottom: 0,
-    },
-    backButton: {
-        flex: 1,
-        flexDirection: "row",
-        paddingLeft: "4%"
-    },
-    closeButton: {
-        justifyContent: "space-evenly",
-        paddingRight: "4%"
-    },
     headerWrapper: {
         flex: 1,
-        width: "100%",
-        height: "25%",
-        maxHeight: "25%",
-        justifyContent: "center",
+        maxHeight: '25%'
     },
     header: {
         textAlign: "center",
@@ -114,7 +83,6 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         borderRadius: 4
-        
     },
     buttonText: {
         fontSize: 25,
@@ -124,5 +92,4 @@ const styles = StyleSheet.create({
         color: "red",
         textAlign: "center"
     }
-
 });
