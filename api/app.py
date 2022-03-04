@@ -34,5 +34,29 @@ def create_group():
 
 ### End Groups ###
 
+@app.route("/session/selection", methods=["POST"])
+def setSessionSelection():
+    provided_fields = ['id']
+    if not confirm_fields(request.form, SessionSelections, exceptions=provided_fields):
+        return {'message': f"Required form item(s) not present: {', '.join(field_difference(request.form, SessionSelections, exceptions=provided_fields))}"}, 400
+
+    sessionSelection = SessionSelections(UserId=request.form["UserId"], 
+        SessionId=request.form["SessionId"], RestaurantId=request.form["RestaurantId"],
+        GroupId=request.form["GroupId"], TypeOfFeedback=request.form["TypeOfFeedback"])
+
+    try:
+        commit()
+    except TransactionIntegrityError as e:
+        return {'message': f"Could not add user choice to database: {str(e).split('DETAIL:')[1]}".replace('\n', '')}, 400
+        
+    if(request.form["TypeOfFeedback"] == 'like' or request.form["TypeOfFeedback"] == 'crave'): # if the user didn't like/crave no need to check
+        restaurantLikes = select(count(ss.id) for ss in SessionSelections if (int(ss.SessionId) == 
+            int(request.form["SessionId"]) and int(ss.RestaurantId) == int(request.form["RestaurantId"]) and 
+            (ss.TypeOfFeedback == 'like' or ss.TypeOfFeedback == 'crave'))) # get the number of likes/craves on the restaurant in the session
+        numGroupMembers = select(count(gm.id) for gm in GroupMembers if (int(gm.GroupId) == int(request.form["GroupId"]))) # get the number of members in the group
+        if(restaurantLikes.first() >= numGroupMembers.first()):
+            return jsonify({"match": True})
+    return jsonify({"match": False})
+
 if __name__ == "__main__":
     app.run(debug=True)

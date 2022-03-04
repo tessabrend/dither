@@ -13,20 +13,21 @@ class User(db.Entity):
     PhoneNumber = Optional(str)
     Email = Optional(str, unique=True)
     UserAccessibleUI = Required(bool, default=False)
-    GroupMembers = Optional('GroupMembers') # this is needed to make a foreign key in the groupmembers table
-    Selections = Optional('SessionSelections') # this is needed to make a foreign key in the sessionselections table
+    GroupMembers = Set('GroupMembers') # this is needed to make a foreign key in the groupmembers table
+    Selections = Set('SessionSelections') # this is needed to make a foreign key in the sessionselections table
 
 class Group(db.Entity):
     GroupName = Required(str, unique=True)
     GroupEntryCode = Required(str, unique=True)
     TimeLimit = Required(int)
-    GroupMembers = Optional('GroupMembers') # this is needed to make a foreign key in the groupmembers table
-    Session = Optional('SelectionSession') # this is needed to make a foreign key in the selectionsession table
-
+    GroupMembers = Set('GroupMembers') # this is needed to make a foreign key in the groupmembers table
+    Session = Set('SelectionSession') # this is needed to make a foreign key in the selectionsession table
+    Selection = Set('SessionSelections') # this is needed to make a foreign key in the sessionselections table
 
 class GroupMembers(db.Entity):
-    GroupId = Required(Group)
-    UserId = Required(User)
+    GroupId = Required(Group, unique=False)
+    UserId = Required(User, unique=False)
+    composite_key(GroupId, UserId)
     
 class SelectionSession(db.Entity):
     Rating = Optional(str)
@@ -36,7 +37,7 @@ class SelectionSession(db.Entity):
     DietaryRestrictions = Optional(StrArray) # an array of all dietary restrictions
     CuisineType = Optional(StrArray) # an array of all cuisine preferences
     GroupId = Required(Group)
-    Selection = Optional('SessionSelections') # this is needed to make a foreign key in the sessionselections table
+    Selection = Set('SessionSelections') # this is needed to make a foreign key in the sessionselections table
     
 class Restaurant(db.Entity):
     Name = Required(str)
@@ -47,14 +48,15 @@ class Restaurant(db.Entity):
     Sponsored = Optional(bool, default=False)
     BookingSite = Optional(str)
     PictureLocation = Required(LongStr) # Do we need to store date taken and type?
-    Selection = Optional('SessionSelections') # this is needed to make a foreign key in the sessionselections table
+    Selection = Set('SessionSelections') # this is needed to make a foreign key in the sessionselections table
 
 class SessionSelections(db.Entity):
-    # I wasn't really seeing how each user in a group could provide feedback to each restaurant, I think this might alieviate that
-    SessionId = Required(SelectionSession)
-    UserId = Required(User)
-    RestaurantId = Required(Restaurant)
+    GroupId = Required(Group, unique=False)
+    SessionId = Required(SelectionSession, unique=False)
+    UserId = Required(User, unique=False)
+    RestaurantId = Required(Restaurant, unique=False)
     TypeOfFeedback = Required(str)
+    composite_key(SessionId, UserId, RestaurantId)
 
 db.bind(provider='postgres', user=os.environ["DB_USER"], password=os.environ["PASSWORD"], host=os.environ["DB_HOST"], database=os.environ["DB"])
 db.generate_mapping(create_tables=True)
