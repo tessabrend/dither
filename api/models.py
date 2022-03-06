@@ -20,7 +20,7 @@ class Group(db.Entity):
     GroupName = Required(str, unique=True)
     GroupEntryCode = Required(str, unique=True)
     TimeLimit = Required(int)
-    GroupMembers = Optional('GroupMembers') # this is needed to make a foreign key in the groupmembers table
+    GroupMembers = Set('GroupMembers') # this is needed to make a foreign key in the groupmembers table
     Session = Optional('SelectionSession') # this is needed to make a foreign key in the selectionsession table
 
 
@@ -41,6 +41,7 @@ class SelectionSession(db.Entity):
 class Restaurant(db.Entity):
     Name = Required(str)
     Location = Required(LongStr)
+    Cuisine = Required(StrArray)
     HoursOfOperation = Optional(str)
     Website = Optional(str)
     PhoneNumber = Optional(str)

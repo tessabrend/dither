@@ -16,6 +16,18 @@ def test():
 
 ### Groups ###
 
+@app.route('/group/join', methods=["PUT"])
+def add_to_group():
+    # check if user already in group
+    if select(group_member for group_member in GroupMembers if group_member.GroupID in Group).exists():
+        return
+    # if user exists in group, say they are already a member of group
+    # need to  use set() to add, 
+    # 
+    # then flush() to update/save the add
+    #if not in, add user to group
+    return
+
 @app.route('/group/find', methods=["GET"])
 def find_groups():
     to_return = []
