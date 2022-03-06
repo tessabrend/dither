@@ -37,6 +37,7 @@ class SelectionSession(db.Entity):
     DietaryRestrictions = Optional(StrArray) # an array of all dietary restrictions
     CuisineType = Optional(StrArray) # an array of all cuisine preferences
     GroupId = Required(Group)
+    Active = Required(bool, default=True) # needed to ensure that session is not already in progress and to close a session
     Selection = Set('SessionSelections') # this is needed to make a foreign key in the sessionselections table
     
 class Restaurant(db.Entity):

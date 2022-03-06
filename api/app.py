@@ -57,6 +57,15 @@ def create_group():
 
 ### End Groups ###
 
+@app.route('/session/<id>/deactivate', methods=["PUT"])
+def deactivateSession(id):
+    try:
+        SelectionSession[id].Active = False
+        commit()
+    except TransactionIntegrityError as e:
+        return {'message': f"Could not create group in database: {str(e).split('DETAIL:')[1]}".replace('\n', '')}, 400
+    return jsonify({"session": id, "active": SelectionSession[id].Active})
+
 @app.route("/session/selection", methods=["POST"])
 def setSessionSelection():
     provided_fields = ['id']
