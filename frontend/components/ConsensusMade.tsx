@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   }, 
   title: {
-    fontSize: 25,
+    fontSize: 32,
     fontWeight: 'bold',
     justifyContent: "center",
     alignSelf: "center"
