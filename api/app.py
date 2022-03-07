@@ -68,7 +68,6 @@ def deactivateSession(id):
 
 @app.route("/session/<id>/results", methods=["GET"])
 def getSessionResults(id):
-    set_sql_debug(True)
     query = list(select((count(s.id), s.TypeOfFeedback, r.Name, r.id) for s in SessionSelections for r in Restaurant if s.RestaurantId == r).order_by(3))
     result = {}
     for obj in query:  # obj will be a tuple of (count, typeOfFeedback, restaurant name, restaurant id) 
