@@ -16,6 +16,7 @@ import JoinByGroupCode from '../screens/JoinByGroupCode';
 import NotFoundScreen from '../screens/NotFoundScreen';
 import TabOneScreen from '../screens/TabOneScreen';
 import TabTwoScreen from '../screens/SessionScreen';
+import SearchOverScreen from '../screens/SearchOverScreen'
 import { RootStackParamList, RootTabParamList, RootTabScreenProps } from '../types';
 import LinkingConfiguration from './LinkingConfiguration';
 
