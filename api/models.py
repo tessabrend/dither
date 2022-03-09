@@ -44,7 +44,7 @@ class SelectionSession(db.Entity):
 class Restaurant(db.Entity):
     Name = Required(str)
     Location = Required(LongStr)
-    Cuisine = Required(StrArray)
+    #CuisineType = Required(StrArray)
     HoursOfOperation = Optional(str)
     Website = Optional(str)
     PhoneNumber = Optional(str)
