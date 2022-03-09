@@ -36,6 +36,7 @@ class SelectionSession(db.Entity):
     PriceLow = Optional(float)
     DietaryRestrictions = Optional(StrArray) # an array of all dietary restrictions
     CuisineType = Optional(StrArray) # an array of all cuisine preferences
+    DiningType = Optional(str) # should be 'dine in', 'check out', or 'both', but is dependant on what the places api provides
     GroupId = Required(Group)
     Active = Required(bool, default=True) # needed to ensure that session is not already in progress and to close a session
     Selection = Set('SessionSelections') # this is needed to make a foreign key in the sessionselections table
@@ -46,6 +47,8 @@ class Restaurant(db.Entity):
     HoursOfOperation = Optional(str)
     Website = Optional(str)
     PhoneNumber = Optional(str)
+    CuisineType = Optional(StrArray) # an array of cuisine types
+    DiningType = Optional(str) # should be 'dine in', 'check out', or 'both', but is dependant on what the places api (or other data source) provides
     Sponsored = Optional(bool, default=False)
     BookingSite = Optional(str)
     PictureLocation = Required(LongStr) # Do we need to store date taken and type?
