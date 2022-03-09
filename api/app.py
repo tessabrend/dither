@@ -81,6 +81,27 @@ def deactivateSession(id):
         return {'message': f"Could not create group in database: {str(e).split('DETAIL:')[1]}".replace('\n', '')}, 400
     return jsonify({"session": id, "active": SelectionSession[id].Active})
 
+@app.route("/session/<id>/results", methods=["GET"])
+def getSessionResults(id):
+    query = list(select((count(s.id), s.TypeOfFeedback, r.Name, r.id) for s in SessionSelections for r in Restaurant if s.RestaurantId == r).order_by(3))
+    result = {}
+    for obj in query:  # obj will be a tuple of (count, typeOfFeedback, restaurant name, restaurant id) 
+        if obj[3] not in result:  # if the restaurant is not already in the results add it
+            result[obj[3]] = {obj[1]: obj[0], 'name': obj[2]}
+        else:  # otherwise add the response to the restaurant
+            result[obj[3]][obj[1]] = obj[0]
+        if 'points' not in result[obj[3]]:
+            result[obj[3]]['points'] = 0
+        if obj[1] == 'crave':
+            result[obj[3]]['points'] += obj[0] * 2
+        elif obj[1] == 'like':
+            result[obj[3]]['points'] += obj[0] * 1
+        elif obj[1] == 'dislike':
+            result[obj[3]]['points'] -= obj[0] * 1
+        elif obj[1] == 'hard no':
+            result[obj[3]]['points'] -= obj[0] * 2
+    return jsonify(result)
+
 @app.route("/session/selection", methods=["POST"])
 def setSessionSelection():
     provided_fields = ['id']
