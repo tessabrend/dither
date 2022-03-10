@@ -5,7 +5,7 @@ import { Text, View } from '../components/Themed';
 import { RootTabScreenProps } from '../types';
 import ModalScreen from './ModalScreen';
 
-export default function JoinByGroupCode({ navigation }: RootTabScreenProps<'TabOne'>) {
+export default function JoinByGroupCode() {
   return (
     <View style={styles.container}>
       <EnterGroupCode/>

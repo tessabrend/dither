@@ -3,7 +3,7 @@ import ConsensusMade from '../components/ConsensusMade';
 
 import { RootTabScreenProps } from '../types';
 
-export default function JoinByGroupCode() {
+export default function ConsensusReveal() {
   return (
       <ConsensusMade/>
   );
