@@ -57,6 +57,18 @@ def create_group():
 
 ### End Groups ###
 
+### Resturants ###
+
+@app.route('/resturant/query', methods=["GET"])
+def getResturantInfo():
+    to_return = []
+    restaurants = select(restaurant for restaurant in Restaurant if request.args.get('cuisine') in restaurant.CuisineType)
+    return {"resturants": to_return}
+
+### End Resturants ###
+
+### Sessions ###
+
 @app.route('/session/<id>/deactivate', methods=["PUT"])
 def deactivateSession(id):
     try:
@@ -110,6 +122,8 @@ def setSessionSelection():
         if(restaurantLikes.first() >= numGroupMembers.first()):
             return jsonify({"match": True})
     return jsonify({"match": False})
+
+### End Sessions ###
 
 if __name__ == "__main__":
     app.run(debug=True)
