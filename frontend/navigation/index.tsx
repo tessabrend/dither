@@ -20,6 +20,7 @@ import SearchOverScreen from '../screens/SearchOverScreen'
 import { RootStackParamList, RootTabParamList, RootTabScreenProps } from '../types';
 import LinkingConfiguration from './LinkingConfiguration';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import GroupPopup from '../components/GroupPopup';
 
 export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }) {
   return (
@@ -68,10 +69,10 @@ function BottomTabNavigator() {
         name="Homepage"
         component={Homepage}
         options={({ navigation }: RootTabScreenProps<'Homepage'>) => ({
-          title: 'User Name',
+          title: '', //show username?
           tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
           headerLeft: () => (
-            <Pressable></Pressable>
+            <GroupPopup/>
           ),
           headerRight: () => (
             <Pressable
