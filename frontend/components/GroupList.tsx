@@ -26,8 +26,8 @@ const DATA: Restaurant[] = [
 const Item = ({ data }: { data: Restaurant }) => (
   <Pressable 
     onPress={() => {
-      // setTimesPressed((current) => current + 1);
-    }} 
+    // setTimesPressed((current) => current + 1);
+  }} 
     style={styles.container}>
     <Text style={styles.name}>{data.name}</Text>
   </Pressable>
@@ -73,7 +73,7 @@ export default function GroupList() {
 
 const styles = StyleSheet.create({
   background: {
-    backgroundColor: "#AAA", //Colors.light.background,
+    backgroundColor: "#DDD", //Colors.light.background,
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
@@ -95,28 +95,24 @@ const styles = StyleSheet.create({
     borderColor: Colors.dark.background,
     borderStyle: "solid",
     justifyContent: "center",
-    width: "85%",
-    margin: "6%"
+    width: "75%",
+    height: 10,
+    margin: "3%"
   },
   container: {
     flex: 1.3,
     flexDirection: 'row',
     marginTop: StatusBar.currentHeight || 0,
     backgroundColor: Colors.light.background,
-    borderRadius: 25,
+    borderRadius: 17,
     borderWidth: 1,
     borderColor: Colors.dark.background,
     borderStyle: "solid",
     justifyContent: "center",
-    width: "85%",
+    alignContent: "center",
+    width: "90%",
+    height: 50,
     margin: "6%"
   }, 
-  // item: {
-  //   padding: 20,
-  //   marginVertical: 8,
-  //   marginHorizontal: 16,
-  //   color: Colors.light.background,
-  // },
-
 });
 
