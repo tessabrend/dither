@@ -19,20 +19,31 @@ def test():
 @app.route('/group/join', methods=["PUT"])
 def add_to_group():
     set_sql_debug(True)
+    query = select(u for u in User)
+    print(query.show())
+    query = select(u for u in Group)
+    print(query.show())
     query = select(u for u in GroupMembers)
     print(query.show())
-    group = select(group for group in Group if group.GroupEntryCode == request.form['groupEntryCode'])
-    print(group)
-    # check if user already in group
-    if not select(group_member for group_member in GroupMembers if group_member.UserId == request.form['User'] and group_member.GroupId == group.id).exists():
-        # if not in, add user to group 
-        # need to  use set() to add, 
-        try: 
-            group = Group(GroupMembers=request.form['User'])
-            commit()
-        except TransactionIntegrityError as e:
-            return {'message': f"Could not add user to group in database: {str(e).split('DETAIL:')[1]}".replace('\n', '')}, 400
-    return
+    # check find if group exists
+    group = Group.get(GroupEntryCode=request.form['groupEntryCode'])
+
+    if group is not None:
+        # check if user already in group
+        if not select(group_member for group_member in GroupMembers if group_member.UserId.id == request.form['UserId'] and group_member.GroupId.id == group.id).exists():
+            # if not in, add user to group 
+            try: 
+                user = User(Name=request.form['UserName'], Password="NO_ACCOUNT")
+                flush()
+                group_member = GroupMembers(GroupId=group, UserId=user)
+                commit()
+            except TransactionIntegrityError as e:
+                return {'message': f"Could not add user to group in database: {str(e).split('DETAIL:')[1]}".replace('\n', '')}, 400
+        else:
+            return {'message': f"User already in group in database"}, 400
+    else:
+        return {'message': f"Group does not exist in database"}, 400
+    return {'message': f"User added in group in database"}, 400
 
 @app.route('/group/find', methods=["GET"])
 def find_groups():
