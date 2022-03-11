@@ -84,9 +84,7 @@ def create_group():
 @app.route('/resturant/query', methods=["GET"])
 def getResturantInfo():
     to_return = []
-    set_sql_debug(True)
-    query = select(r for r in User)
-    print(query.show())
+
     restaurants = select(restaurant for restaurant in Restaurant if restaurant.PriceHigh >= float(request.args.get('price-high')) \
         and restaurant.PriceLow <= float(request.args.get('price-low')) and restaurant.Rating >= float(request.args.get('rating')) \
         and request.args.get('cuisine') in restaurant.CuisineType)[:]
