@@ -30,7 +30,7 @@ class GroupMembers(db.Entity):
     composite_key(GroupId, UserId)
     
 class SelectionSession(db.Entity):
-    Rating = Optional(str)
+    Rating = Optional(float)
     Radius = Required(int)
     PriceHigh = Optional(float)
     PriceLow = Optional(float)
@@ -46,6 +46,9 @@ class Restaurant(db.Entity):
     Location = Required(LongStr)
     HoursOfOperation = Optional(str)
     Website = Optional(str)
+    Rating = Optional(float)
+    PriceHigh = Optional(float)
+    PriceLow = Optional(float)
     PhoneNumber = Optional(str)
     CuisineType = Optional(StrArray) # an array of cuisine types
     DiningType = Optional(str) # should be 'dine in', 'check out', or 'both', but is dependant on what the places api (or other data source) provides
