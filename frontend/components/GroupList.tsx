@@ -1,3 +1,4 @@
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import React, { useState } from "react";
 import { ListRenderItem, FlatList, SafeAreaView, StyleSheet, TouchableOpacity, Pressable, StatusBar } from "react-native";
 import Colors from '../constants/Colors';
@@ -21,6 +22,22 @@ const DATA: Restaurant[] = [
     id: "58694a0f",
     name: "Dev Team",
   },
+  // {
+  //   id: "ghc69a34",
+  //   name: "Dream Team",
+  // },
+  // {
+  //   id: "55578a0f",
+  //   name: "Michael",
+  // },
+  // {
+  //   id: "3asdfg45c",
+  //   name: "350 Bloor",
+  // },
+  // {
+  //   id: "58694a0f",
+  //   name: "Cabin Seven",
+  // },
 ];
 
 const Item = ({ data }: { data: Restaurant }) => (
@@ -30,45 +47,34 @@ const Item = ({ data }: { data: Restaurant }) => (
   }} 
     style={styles.container}>
     <Text style={styles.name}>{data.name}</Text>
+    <FontAwesomeIcon style={styles.name} icon="angle-right" size={30}/>
   </Pressable>
 ); 
 
+const renderItem: ListRenderItem<Restaurant> = ({ item }) => (
+  <Item 
+    data={item} 
+    // select={() => setSelectedId(item.id)}
+  />
+);
+
 export default function GroupList() {
   const [selectedId, setSelectedId] = useState(null);
-
-  const renderItem: ListRenderItem<Restaurant> = ({ item }) => (
-    <Item 
-      data={item} 
-      // select={() => setSelectedId(item.id)}
-    />
-  );
-
+  const alone: Restaurant[] = [  {
+    id: "456ghjjh",
+    name: "Table for One",
+  },]
+  
   return (
     <SafeAreaView style={styles.background}>
-      <Pressable 
-        style={styles.alone}
-        onPress={() => {
-          // setTimesPressed((current) => current + 1);
-        }} >
-        <Text style={styles.name}>Table for One</Text>
-      </Pressable>
       <FlatList 
-        data={DATA}
+        data={alone.concat(DATA)}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
         extraData={selectedId}
       />
     </SafeAreaView>
   );
-    
-
-  // return (
-  //   <View style={styles.background}
-  //     <View style={styles.container}>
-  //       <Text style={styles.name}>{groupNames[1]}</Text>
-  //     </View>
-  //   </View>
-  // );
 }
 
 const styles = StyleSheet.create({
@@ -81,38 +87,26 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 25,
     fontWeight: 'bold',
-    justifyContent: 'flex-start',
+    justifyContent: 'center',
     alignSelf: "center",
-    color: Colors.light.text
+    color: Colors.light.text,
+    marginLeft: "10%"
   },
-  alone: {
+  container: {
     flex: 1,
     flexDirection: 'row',
     marginTop: StatusBar.currentHeight || 0,
     backgroundColor: Colors.light.background,
-    borderRadius: 25,
+    borderRadius: 20,
     borderWidth: 1,
     borderColor: Colors.dark.background,
     borderStyle: "solid",
-    justifyContent: "center",
-    width: "75%",
-    height: 10,
-    margin: "3%"
-  },
-  container: {
-    flex: 1.3,
-    flexDirection: 'row',
-    marginTop: StatusBar.currentHeight || 0,
-    backgroundColor: Colors.light.background,
-    borderRadius: 17,
-    borderWidth: 1,
-    borderColor: Colors.dark.background,
-    borderStyle: "solid",
-    justifyContent: "center",
+    justifyContent: "space-between",
     alignContent: "center",
-    width: "90%",
-    height: 50,
-    margin: "6%"
+    width: 250,
+    height: 73,
+    padding: "6%",
+    // margin: "6%",
   }, 
 });
 
