@@ -27,6 +27,7 @@ class Group(db.Entity):
 class GroupMembers(db.Entity):
     GroupId = Required(Group, unique=False)
     UserId = Required(User, unique=False)
+    GroupLeader = Required(bool, default=False)
     composite_key(GroupId, UserId)
     
 class SelectionSession(db.Entity):

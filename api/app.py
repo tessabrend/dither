@@ -71,6 +71,8 @@ def create_group():
     group = Group(GroupName=request.form['GroupName'], 
                 GroupEntryCode=''.join(random.choice(string.ascii_letters) for _ in range(8)),
                 TimeLimit=request.form.get('TimeLimit', 30))
+    flush()
+    group_member = GroupMembers(GroupId=group.id, UserId=request.form.get('UserId'), GroupLeader=True)
     try:
         commit()
     except TransactionIntegrityError as e:
