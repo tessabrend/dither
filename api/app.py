@@ -89,7 +89,7 @@ def getResturantInfo():
 
     restaurants = select(restaurant for restaurant in Restaurant if restaurant.PriceHigh >= float(request.args.get('price-high')) \
         and restaurant.PriceLow <= float(request.args.get('price-low')) and restaurant.Rating >= float(request.args.get('rating')) \
-        and request.args.get('cuisine') in restaurant.CuisineType)[request.args.get('start-index'):request.args.get('end-index')]
+        and request.args.get('cuisine') in restaurant.CuisineType)[int(request.args.get('start-index')):int(request.args.get('end-index'))]
 
     for resturant in restaurants:
         to_return.append({"name": resturant.Name, "location": resturant.Location, "hours": resturant.HoursOfOperation,
