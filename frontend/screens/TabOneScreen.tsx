@@ -7,7 +7,7 @@ import { RootTabScreenProps } from '../types';
 import JoinByGroupCode from './JoinByGroupCode';
 import { MoreDetails } from '../components/RestaurantInfo';
 
-export default function TabOneScreen({ navigation }: RootTabScreenProps<'TabOne'>) {
+export default function TabOneScreen() {
   return (
    <MoreDetails/>
   );
