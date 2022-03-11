@@ -5,12 +5,11 @@ import GroupPopup from '../components/GroupPopup';
 import { Text, View } from '../components/Themed';
 import { RootTabScreenProps } from '../types';
 import JoinByGroupCode from './JoinByGroupCode';
+import { MoreDetails } from '../components/RestaurantInfo';
 
 export default function TabOneScreen({ navigation }: RootTabScreenProps<'TabOne'>) {
   return (
-    <View style={styles.container}>
-      <GroupPopup></GroupPopup>
-    </View>
+   <MoreDetails/>
   );
 }
 

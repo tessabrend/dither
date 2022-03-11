@@ -1,4 +1,4 @@
-import { React, Component } from 'react';
+import  React, { Component } from 'react';
 import { View, Text, Pressable, StyleSheet, Dimensions, Platform } from 'react-native';
 import Swiper from 'react-native-deck-swiper';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
