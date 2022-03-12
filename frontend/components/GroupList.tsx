@@ -22,28 +22,27 @@ const DATA: Restaurant[] = [
     id: "58694a0f",
     name: "Dev Team",
   },
-  // {
-  //   id: "ghc69a34",
-  //   name: "Dream Team",
-  // },
-  // {
-  //   id: "55578a0f",
-  //   name: "Michael",
-  // },
-  // {
-  //   id: "3asdfg45c",
-  //   name: "350 Bloor",
-  // },
-  // {
-  //   id: "58694a0f",
-  //   name: "Cabin Seven",
-  // },
+  {
+    id: "ghc69a34",
+    name: "Dream Team",
+  },
+  {
+    id: "55578a0f",
+    name: "Michael",
+  },
+  {
+    id: "3asdfg45c",
+    name: "350 Bloor",
+  },
+  {
+    id: "58694a0f",
+    name: "Cabin Seven",
+  },
 ];
 
 const Item = ({ data }: { data: Restaurant }) => (
   <Pressable 
     onPress={() => {
-    // setTimesPressed((current) => current + 1);
   }} 
     style={styles.container}>
     <Text style={styles.name}>{data.name}</Text>
@@ -87,10 +86,11 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 25,
     fontWeight: 'bold',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     alignSelf: "center",
     color: Colors.light.text,
-    marginLeft: "10%"
+    marginLeft: "10%",
+    marginRight: "10%",
   },
   container: {
     flex: 1,
@@ -103,10 +103,9 @@ const styles = StyleSheet.create({
     borderStyle: "solid",
     justifyContent: "space-between",
     alignContent: "center",
-    width: 250,
+    width: "80%",
     height: 73,
-    padding: "6%",
-    // margin: "6%",
+    marginHorizontal: "5%",
   }, 
 });
 
