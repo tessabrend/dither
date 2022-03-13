@@ -1,18 +1,45 @@
 import { Text, View } from './Themed';
-import { TouchableOpacity, StyleSheet, TextInput } from 'react-native';
+import { 
+    StyleSheet, 
+    TextInput, 
+    Pressable
+ } from 'react-native';
+import { KeyboardAvoidingScrollView } from 'react-native-keyboard-avoiding-scroll-view';
 import React, { useState } from 'react';
 
 export default function EnterGroupCode() {
     const [groupCode, setGroupCode] = useState("");
+    const [userName, setUserName] = useState("")
     const [error, setError] = useState(false);
-
-    function submitGroupCode() {
-        alert(groupCode);
-        // ajax call here
-        // call setError if group code is invalid
+    let submit = () => {
+        alert("submitting!")
+        fetch('http://131.104.49.71:5001/group/join', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: `groupEntryCode=${groupCode}&UserName=${userName}`
+        })
+        .then(response => {
+            response.json().then(data => {
+                if(data['message']) {
+                    setError(data['message']);
+                } else {
+                    setError('');
+                    alert(`Group Created Successfully: ${JSON.stringify(data)}`);
+                }
+            }).catch(error => {
+                setError('Incorrect response format: likely due to internal error');
+            });
+        }).catch(reason => {
+            console.log("error")
+            console.log(reason)
+            setError(reason.toString().split(':')[1]);
+        });
     }
     
-    return <>
+    return (<KeyboardAvoidingScrollView 
+        style={styles.container}>
         <View style={styles.headerWrapper}>
             <Text style={styles.header}>Join Group</Text>
         </View>
@@ -22,74 +49,80 @@ export default function EnterGroupCode() {
                 nativeID='groupCode' 
                 style={styles.textBox}
                 placeholder="Group Code"
-                onChangeText={(text) => {
+                onChangeText={(text: string) => {
                     setGroupCode(text);
                 }}
             ></TextInput>
-        </View>
-        <View style={styles.buttonWrapper}>
-            <TouchableOpacity 
-                style={styles.buttonArea} 
-                activeOpacity={0.8}
-                onPress={() => {
-                    submitGroupCode();
+            <TextInput
+                nativeID="userName"
+                style={styles.textBox}
+                placeholder="Your name"
+                onChangeText={(text: string) => {
+                    setUserName(text);
                 }}
-            >
-            <Text style={styles.buttonText}>Enter</Text>
-            </TouchableOpacity>
+            ></TextInput>
         </View>
-    </>;
+        <Pressable 
+            style={styles.submitButton} 
+            onPress={submit}>
+            <Text style={styles.buttonText}>Enter</Text>
+        </Pressable>
+    </KeyboardAvoidingScrollView>);
 }
 
 const styles = StyleSheet.create({
+    container: {
+        height: "100%",
+        minHeight: 200,
+        backgroundColor: "white",
+    },
     headerWrapper: {
         flex: 1,
-        maxHeight: '25%'
+        maxHeight: '20%',
+        height: "20%",
     },
     header: {
         textAlign: "center",
         fontSize: 25,
         fontWeight: 'bold',
-        height: "60%",
-        maxHeight: "60%",
+        height: "95%",
+        maxHeight: "95%",
+        marginBottom: "5%"
     },
     input: {
         flex: 1,
         width: "100%",
-        maxHeight: "20%",
-        height: "20%",
+        maxHeight: "40%",
+        height: "40%",
         justifyContent: "center",
         alignItems: "center"
     },
     textBox: {
         flex: 1,
         width: "80%",
-        height: "70%",
+        height: "100%",
         borderWidth: 1,
         borderRadius: 5,
         paddingLeft: 20,
-        fontSize: 20
-    },
-    buttonWrapper: {
-        height: "25%",
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center"
-    },
-    buttonArea: {
-        width: "50%",
-        height: "45%",
-        backgroundColor: "#2196F3",
-        justifyContent: "center",
-        alignItems: "center",
-        borderRadius: 4
+        fontSize: 20,
+        marginBottom: "2%"
     },
     buttonText: {
-        fontSize: 25,
+        fontSize: 24,
         color: "white",
     },
     invalidCode: {
         color: "red",
         textAlign: "center"
+    },
+    submitButton: {
+        backgroundColor: "#2196F3",
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: 4,
+        flex: 1,
+        margin: 8,
+        height: "20%",
+        maxHeight: "20%"
     }
 });

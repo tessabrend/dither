@@ -1,4 +1,4 @@
-from crypt import methods
+# from crypt import methods
 import random
 import string
 from flask import Flask, jsonify, request
@@ -20,10 +20,10 @@ def test():
 def add_to_group():
     # check find if group exists
     group = Group.get(GroupEntryCode=request.form['groupEntryCode'])
-
+    userId = request.form.get('UserId', None)
     if group is not None:
         # check if user already in group
-        if not select(group_member for group_member in GroupMembers if group_member.UserId.id == request.form['UserId'] and group_member.GroupId.id == group.id).exists():
+        if not select(group_member for group_member in GroupMembers if group_member.UserId.id == userId and group_member.GroupId.id == group.id).exists():
             # if not in, add user to group 
             try: 
                 user = User(Name=request.form['UserName'], Password="NO_ACCOUNT")
@@ -134,4 +134,4 @@ def setSessionSelection():
     return jsonify({"match": False})
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=80)

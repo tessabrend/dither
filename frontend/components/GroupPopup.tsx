@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: 'transparent'
+        backgroundColor: '#33333398',
     },
     popupContainer: {
         width: "75%",
