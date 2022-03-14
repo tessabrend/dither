@@ -20,6 +20,7 @@ def test():
 def add_to_group():
     # check find if group exists
     group = Group.get(GroupEntryCode=request.form['groupEntryCode'])
+
     userId = request.form.get('UserId', None)
     if group is not None:
         # check if user already in group
@@ -36,7 +37,7 @@ def add_to_group():
             return {'message': f"User already in group in database"}, 400
     else:
         return {'message': f"Group does not exist in database"}, 400
-    return {'message': f"User added in group in database"}, 400
+    return {'message': f"User added in group in database", 'groupName': group.GroupName}
 
 @app.route('/group/find', methods=["GET"])
 def find_groups():

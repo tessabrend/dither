@@ -21,7 +21,7 @@ export default function GroupPopup() {
                     </Pressable>
                 </View>,
         create: CreateGroup(),
-        join: EnterGroupCode(),
+        join: EnterGroupCode(setModalOpen),
     }
 
     return  <>

@@ -6,14 +6,14 @@ import {
  } from 'react-native';
 import { KeyboardAvoidingScrollView } from 'react-native-keyboard-avoiding-scroll-view';
 import React, { useState } from 'react';
+import { useLinkProps } from '@react-navigation/native';
 
-export default function EnterGroupCode() {
+export default function EnterGroupCode(setModalOpen) {
     const [groupCode, setGroupCode] = useState("");
     const [userName, setUserName] = useState("")
-    const [error, setError] = useState(false);
+    const [error, setError] = useState("");
     let submit = () => {
-        alert("submitting!")
-        fetch('http://131.104.49.71:5001/group/join', {
+        fetch('http://131.104.49.71:80/group/join', {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
@@ -22,17 +22,18 @@ export default function EnterGroupCode() {
         })
         .then(response => {
             response.json().then(data => {
-                if(data['message']) {
-                    setError(data['message']);
+                if(data['message'] == "User added in group in database") {
+                    alert("You have successfully joined the group " + data["groupName"])
+                    setError(null);
+                    setModalOpen(false);
                 } else {
-                    setError('');
-                    alert(`Group Created Successfully: ${JSON.stringify(data)}`);
+                    setError(data['message']);
                 }
             }).catch(error => {
+                console.log(error)
                 setError('Incorrect response format: likely due to internal error');
             });
         }).catch(reason => {
-            console.log("error")
             console.log(reason)
             setError(reason.toString().split(':')[1]);
         });
@@ -43,7 +44,7 @@ export default function EnterGroupCode() {
         <View style={styles.headerWrapper}>
             <Text style={styles.header}>Join Group</Text>
         </View>
-        {error ? <Text style={styles.invalidCode}>Invalid Group Code</Text> : null}
+        {error ? <Text style={styles.invalidCode}>{error}</Text> : null}
         <View style={styles.input}>
             <TextInput 
                 nativeID='groupCode' 
