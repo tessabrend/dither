@@ -17,6 +17,7 @@ import NotFoundScreen from '../screens/NotFoundScreen';
 import Homepage from '../screens/HomepageScreen';
 import TabTwoScreen from '../screens/SessionScreen';
 import SearchOverScreen from '../screens/SearchOverScreen'
+import GroupHome from '../screens/GroupDetailsScreen';
 import { RootStackParamList, RootTabParamList, RootTabScreenProps } from '../types';
 import LinkingConfiguration from './LinkingConfiguration';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -93,7 +94,7 @@ function BottomTabNavigator() {
       />
       <BottomTab.Screen
         name="TabTwo"
-        component={SearchOverScreen}
+        component={GroupHome}
         options={{
           title: 'Tab Two',
           tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
