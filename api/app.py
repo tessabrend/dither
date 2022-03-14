@@ -21,9 +21,10 @@ def add_to_group():
     # check find if group exists
     group = Group.get(GroupEntryCode=request.form['groupEntryCode'])
 
+    userId = request.form.get('UserId', None)
     if group is not None:
         # check if user already in group
-        if not select(group_member for group_member in GroupMembers if group_member.UserId.id == request.form['UserId'] and group_member.GroupId.id == group.id).exists():
+        if not select(group_member for group_member in GroupMembers if group_member.UserId.id == userId and group_member.GroupId.id == group.id).exists():
             # if not in, add user to group 
             try: 
                 user = User(Name=request.form['UserName'], Password="NO_ACCOUNT")
@@ -36,7 +37,7 @@ def add_to_group():
             return {'message': f"User already in group in database"}, 400
     else:
         return {'message': f"Group does not exist in database"}, 400
-    return {'message': f"User added in group in database"}, 400
+    return {'message': f"User added in group in database", 'groupName': group.GroupName}
 
 @app.route('/group/find', methods=["GET"])
 def find_groups():
