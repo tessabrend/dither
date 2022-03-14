@@ -1,4 +1,4 @@
-# from crypt import methods
+from crypt import methods
 import random
 import string
 from flask import Flask, jsonify, request
