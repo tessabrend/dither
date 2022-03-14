@@ -18,7 +18,6 @@ def test():
 
 @app.route('/group/join', methods=["PUT"])
 def add_to_group():
-    set_sql_debug(True)
     # check find if group exists
     group = Group.get(GroupEntryCode=request.form['groupEntryCode'])
 
