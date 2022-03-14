@@ -74,7 +74,7 @@ export default function EnterGroupCode(setModalOpen) {
 const styles = StyleSheet.create({
     container: {
         height: "100%",
-        minHeight: 200,
+        minHeight: 182,
         backgroundColor: "white",
     },
     headerWrapper: {
