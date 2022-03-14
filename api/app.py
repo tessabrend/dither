@@ -169,7 +169,6 @@ def createUser():
     try:
         user = User(Name="User", Location="", Password="NO_ACCOUNT", PhoneNumber="", Email=None)
         commit()
-        print(user.id)        
         return jsonify({"userId": str(user.id)})
     except TransactionIntegrityError as e:
         print(e)
