@@ -18,6 +18,7 @@ def test():
 
 @app.route('/group/join', methods=["PUT"])
 def add_to_group():
+    set_sql_debug(True)
     # check find if group exists
     group = Group.get(GroupEntryCode=request.form['groupEntryCode'])
 
@@ -26,8 +27,11 @@ def add_to_group():
         # check if user already in group
         if not select(group_member for group_member in GroupMembers if group_member.UserId.id == userId and group_member.GroupId.id == group.id).exists():
             # if not in, add user to group 
-            try: 
-                user = User(Name=request.form['UserName'], Password="NO_ACCOUNT")
+            try:
+                if(userId is None):
+                    user = User(Name=request.form['UserName'], Password="NO_ACCOUNT")
+                else:
+                    user = User.get(id=userId)
                 flush()
                 group_member = GroupMembers(GroupId=group, UserId=user)
                 commit()
@@ -158,6 +162,21 @@ def setSessionSelection():
     return jsonify({"match": False})
 
 ### End Sessions ###
+
+### User ###
+
+@app.route('/user/create', methods=["POST"])
+def createUser():
+    try:
+        user = User(Name="User", Location="", Password="NO_ACCOUNT", PhoneNumber="", Email=None)
+        commit()
+        print(user.id)        
+        return jsonify({"userId": str(user.id)})
+    except TransactionIntegrityError as e:
+        print(e)
+        return {"message": "Could not create a user"}, 400
+        
+### End User ###
 
 if __name__ == "__main__":
     app.run(debug=True)
