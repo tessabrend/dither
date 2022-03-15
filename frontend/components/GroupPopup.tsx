@@ -20,7 +20,7 @@ export default function GroupPopup() {
                         <Text style={styles.buttonText}>Join Existing</Text>
                     </Pressable>
                 </View>,
-        create: CreateGroup(),
+        create: CreateGroup(setModalOpen),
         join: EnterGroupCode(setModalOpen),
     }
 
