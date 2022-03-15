@@ -1,8 +1,8 @@
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import React, { useState } from "react";
-import { ListRenderItem, FlatList, SafeAreaView, StyleSheet, TouchableOpacity, Pressable, StatusBar } from "react-native";
+import { ListRenderItem, FlatList, SafeAreaView, StyleSheet, Pressable, StatusBar } from "react-native";
 import Colors from '../constants/Colors';
-import { Text, View } from './Themed';
+import { Text } from './Themed';
 
 export interface Restaurant {
   id: string;
@@ -63,6 +63,16 @@ export default function GroupList() {
     id: "456ghjjh",
     name: "Table for One",
   },]
+
+  let retrieveGroups = () => {
+    fetch("//131.104.49.71:80/group", {
+      method:'GET'
+    })
+    .then(response =>response.json())
+    .then(data =>{
+      useState({data:data})
+    })
+  }
   
   return (
     <SafeAreaView style={styles.background}>
