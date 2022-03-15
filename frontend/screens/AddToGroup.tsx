@@ -27,7 +27,7 @@ export default function AddToGroup(groupID : Number) {
         }
 
         // Then, send the invitation request
-        fetch('http://131.104.49.71:80/group/invitation', {
+        fetch('http://131.104.49.71:80/group/invite', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'

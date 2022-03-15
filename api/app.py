@@ -67,7 +67,23 @@ def find_groups():
             to_return.append(render_object(group))
     return { "groups": to_return }
 
-@app.route('/group/join', methods=['GET'])
+@app.route('/group/invite', methods=['POST'])
+def send_group_invitation():
+    if not 'GroupID' in request.form.keys() or not 'InviteEmail' in request.form.keys():
+        return {'message': f"Required form item(s) not present: {', '.join(set(request.form.keys()) - set(['GroupID', 'InviteEmail']))}"}, 400
+    
+    user_to_invite = get(user for user in User if user.email and user.email == request.form.get('InviteEmail'))
+    if not user_to_invite:
+        return {'message': f"Sending the invitation email failed, because the user with email {request.form.get('InviteEmail')} was not found"}, 400
+
+    content = Content("text/plain", f"You've been invited to join a group - click this link to complete the process: {SERVER_URL}/group/accept_invitation?UserID={user_to_invite}&GroupID={request.form.get('GroupID')}")
+    mail = Mail(Email("dreti@uoguelph.ca"), To(request.form.get('InviteEmail')), "Group Invitation", content)
+    response = sg.client.mail.send.post(request_body=mail.get())
+    if response.status_code >= 300:
+        return {'message': f'Sending the invite email failed with the following error: {response.status_code}'}, 500
+    return {'message': 'Invitation email send successfully'}
+
+@app.route('/group/accept_invitation', methods=['GET'])
 def join_group_link():
     if not 'GroupID' in request.args.keys() or not 'UserID' in request.args.keys():
         return f"Required arg item(s) not present: {', '.join(set(request.args.keys()) - set(['GroupID', 'UserID']))}", 400
@@ -79,22 +95,6 @@ def join_group_link():
         return f"Could not add member to group in database: {str(e).split('DETAIL:')[1]}".replace('\n', ''), 400
 
     return "Successfully registered for group"
-
-@app.route('/group/invitation', methods=['POST'])
-def send_group_invitation():
-    if not 'GroupID' in request.form.keys() or not 'InviteEmail' in request.form.keys():
-        return {'message': f"Required form item(s) not present: {', '.join(set(request.form.keys()) - set(['GroupID', 'InviteEmail']))}"}, 400
-    
-    user_to_invite = get(user for user in User if user.email and user.email == request.form.get('InviteEmail'))
-    if not user_to_invite:
-        return {'message': f"Sending the invite email failed, because the user with email {request.form.get('InviteEmail')} was not found"}, 400
-
-    content = Content("text/plain", f"You've been invited for a group - click this link to join: {SERVER_URL}/group/join?UserID=1&GroupID={request.form.get('GroupID')}")
-    mail = Mail(Email("dreti@uoguelph.ca"), To(request.form.get('InviteEmail')), "Group Invitation", content)
-    response = sg.client.mail.send.post(request_body=mail.get())
-    if response.status_code >= 300:
-        return {'message': f'Sending the invite email failed with the following error: {response.status_code}'}, 500
-    return {'message': 'Invitation email send successfully'}
 
 @app.route('/group/create', methods=["POST"])
 def create_group():
