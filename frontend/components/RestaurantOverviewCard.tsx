@@ -1,19 +1,22 @@
 import  React, { Component } from 'react';
-import { View, Text, Pressable, StyleSheet, Dimensions, Platform } from 'react-native';
+import { View, Text, Pressable, StyleSheet, Dimensions, Platform, Alert, Modal } from 'react-native';
 import Swiper from 'react-native-deck-swiper';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import CountDown from 'react-native-countdown-component';
 import ProgressBar from "react-native-animated-progress";
+//import { MoreDetails } from './RestaurantInfo';
+//import Modal from "react-native-modal";
 
 const window = Dimensions.get("window");
 const screen = Dimensions.get("screen");
 
 class Session extends Component {
-    data = ['this', 'is', 'a', 'resturant', 'overview', 'card', 'almost', 'at', 'the', 'end'];
-
     state = {
         progress: 0,
+        modalVisible: false
     }
+    
+    data = ['this', 'is', 'a', 'resturant', 'overview', 'card', 'almost', 'at', 'the', 'end'];
 
     increment() {
         this.setState((state) => {
@@ -21,6 +24,33 @@ class Session extends Component {
         }), () => 
         console.log(this.state.progress);
     }
+
+
+    toggleModal = (visible) => {
+        this.setState({ modalVisible: visible });
+      }    
+
+    moreDetails = () => {
+         //<View style={styles.centeredView}>
+            // <Modal
+            // animationType="slide"
+            // transparent={true}
+            // visible={this.state.modalVisible}
+            // presentationStyle="pageSheet"
+            // onRequestClose={() => {this.setModalVisible(!this.state.modalVisible)}}
+            // >
+            // <View style={styles.centeredView}>
+            //     <View style={styles.modalView}>
+            //     <Text style={styles.modalText}>Hello World!</Text>
+            //     </View>
+            // </View>
+            // </Modal>
+        //</View>
+    Alert.alert('More details requested')   
+    //console.log(this.state.modalVisible)
+    this.toggleModal(!this.state.modalVisible)
+    console.log(this.state.modalVisible)
+    };
 
     render () {
 
@@ -30,7 +60,7 @@ class Session extends Component {
                     <CountDown
                     size={15}
                     until={300} //time in seconds
-                    onFinish={() => alert('Finished')} //this needs to change to disable swiping
+                    onFinish={() => Alert.alert('Finished')} //this needs to change to disable swiping
                     digitStyle={{backgroundColor: '#FFF', borderWidth: 2, borderColor: '#000000'}}
                     digitTxtStyle={{color: '#000000'}}
                     timeLabelStyle={{color: 'red', fontWeight: 'bold'}}
@@ -61,7 +91,7 @@ class Session extends Component {
                     onSwipedRight={(cardIndex) => {console.log('card at index ' + cardIndex +' swiped like')}}
                     onSwipedTop={(cardIndex) => {console.log('card at index ' + cardIndex +' swiped crave')}}
                     onSwipedBottom={(cardIndex) => {console.log('card at index ' + cardIndex +' swiped hard no')}}
-                    onTapCard={(cardIndex) => {console.log('card at index ' + cardIndex +' tapped, display more info')}}
+                    onTapCard={() => {this.moreDetails()}}
                     cardIndex={0}
                     backgroundColor={'#ffffff'}
                     stackSize= {3}
@@ -128,4 +158,29 @@ const styles = StyleSheet.create({
         marginTop: 10,
         marginRight: 20
     },
+    centeredView: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        marginTop: 22
+      },
+      modalView: {
+        margin: 20,
+        backgroundColor: "white",
+        borderRadius: 20,
+        padding: 35,
+        alignItems: "center",
+        shadowColor: "#000",
+        shadowOffset: {
+          width: 0,
+          height: 2
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5
+      },
+      modalText: {
+        marginBottom: 15,
+        textAlign: "center"
+      }
   });

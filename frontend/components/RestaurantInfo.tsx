@@ -1,40 +1,35 @@
-import React, { Component, useState } from "react";
+import React, { useState } from "react";
 import { StyleSheet, Pressable, Text, Modal, View, Alert } from 'react-native';
 import GestureRecognizer from 'react-native-swipe-gestures';
 
-export class datials extends Component {
-
-    constructor(props) {
-      super(props);
-      this.more = this.more.bind(this);
-  }
-
-  more() {    
-    this.props.show;
-  }
-
-  render() {
-    return (
-      <>
+export const MoreDetails = () => {
+  const [modalVisible, setModalVisible] = useState(false);
+  return (
+    <View style={styles.centeredView}>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          Alert.alert("Modal has been closed.");
+          setModalVisible(!modalVisible);
+        }}
+      >
         <View style={styles.centeredView}>
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={this.more}
-          presentationStyle="pageSheet"
-          onRequestClose={this.more}
-        >
-          <View style={styles.centeredView}>
-            <View style={styles.modalView}>
-              <Text style={styles.modalText}>Hello World!</Text>
-            </View>
+          <View style={styles.modalView}>
+            <Text style={styles.modalText}>Hello World!</Text>
+            <Pressable
+              style={[styles.button, styles.buttonClose]}
+              onPress={() => setModalVisible(!modalVisible)}
+            >
+              <Text style={styles.textStyle}>Hide Modal</Text>
+            </Pressable>
           </View>
-        </Modal>
-      </View>
-      </>
-    )
-  };
-}
+        </View>
+      </Modal>
+    </View>
+  );
+};
 
 export const AllDetails = () => {
 
