@@ -96,8 +96,23 @@ function BottomTabNavigator() {
         name="TabTwo"
         component={GroupHome}
         options={{
-          title: 'Tab Two',
+          title: '',
           tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          headerLeft: () => (
+            <Pressable
+              onPress={() => {
+              }}
+              style={({ pressed }) => ({
+                opacity: pressed ? 0.5 : 1,
+              })}>
+              <FontAwesomeIcon
+                icon="long-arrow-left"
+                size={25}
+                color={Colors[colorScheme].text}
+                style={{ marginLeft: 15 }}
+              />
+            </Pressable>
+          ),
         }}
       />
     </BottomTab.Navigator>
