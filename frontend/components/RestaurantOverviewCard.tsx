@@ -1,11 +1,10 @@
 import  React, { Component } from 'react';
-import { View, Text, Pressable, StyleSheet, Dimensions, Platform, Alert, Modal } from 'react-native';
+import { View, Text, Pressable, StyleSheet, Dimensions, Platform, Alert } from 'react-native';
 import Swiper from 'react-native-deck-swiper';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import CountDown from 'react-native-countdown-component';
 import ProgressBar from "react-native-animated-progress";
-//import { MoreDetails } from './RestaurantInfo';
-//import Modal from "react-native-modal";
+import Modal from "react-native-modal";
 
 const window = Dimensions.get("window");
 const screen = Dimensions.get("screen");
@@ -28,31 +27,28 @@ class Session extends Component {
 
     toggleModal = (visible) => {
         this.setState({ modalVisible: visible });
-      }    
+    }    
 
-    moreDetails = () => {
-         //<View style={styles.centeredView}>
-            // <Modal
-            // animationType="slide"
-            // transparent={true}
-            // visible={this.state.modalVisible}
-            // presentationStyle="pageSheet"
-            // onRequestClose={() => {this.setModalVisible(!this.state.modalVisible)}}
-            // >
-            // <View style={styles.centeredView}>
-            //     <View style={styles.modalView}>
-            //     <Text style={styles.modalText}>Hello World!</Text>
-            //     </View>
-            // </View>
-            // </Modal>
-        //</View>
-    Alert.alert('More details requested')   
-    //console.log(this.state.modalVisible)
-    this.toggleModal(!this.state.modalVisible)
-    console.log(this.state.modalVisible)
-    };
+    restaurantData = () => {
+        fetch('http://131.104.49.71:80/restaurant/query' + new URLSearchParams({
+            "cuisine": "Pub",
+            "rating": "3.0",
+            "price-high": "80",
+            "price-low": "20",
+            "start-index": "0",
+            "end-index": "50",
+        }))
+        .then((response) => response.json())
+        .then((json) => {
+        return json.restaurants;
+        })
+        .catch((error) => {
+        console.error(error);
+        });
+    }
 
     render () {
+        console.log(this.restaurantData)
 
         return (
             <View style={styles.container}>
@@ -73,6 +69,21 @@ class Session extends Component {
                 <View style={styles.progressBar}>
                     <ProgressBar progress={this.state.progress} height={10} backgroundColor="#1167b1" />
                 </View>
+                <View style={styles.centeredView}>
+                     <Modal
+                     coverScreen={true}
+                     isVisible={this.state.modalVisible}
+                     //presentationStyle="overFullScreen"
+                     onSwipeComplete={() => this.toggleModal(!this.state.modalVisible)}
+                     swipeDirection="down"
+                     >
+                     <View style={styles.centeredView}>
+                         <View style={styles.modalView}>
+                         <Text style={styles.modalText}>Hello World!</Text>
+                         </View>
+                     </View>
+                    </Modal>
+                </View>
                 <Swiper
                     ref={swiper => {
                         this.swiper = swiper;
@@ -91,7 +102,7 @@ class Session extends Component {
                     onSwipedRight={(cardIndex) => {console.log('card at index ' + cardIndex +' swiped like')}}
                     onSwipedTop={(cardIndex) => {console.log('card at index ' + cardIndex +' swiped crave')}}
                     onSwipedBottom={(cardIndex) => {console.log('card at index ' + cardIndex +' swiped hard no')}}
-                    onTapCard={() => {this.moreDetails()}}
+                    onTapCard={() => {this.toggleModal(!this.state.modalVisible)}}
                     cardIndex={0}
                     backgroundColor={'#ffffff'}
                     stackSize= {3}
@@ -167,8 +178,10 @@ const styles = StyleSheet.create({
       modalView: {
         margin: 20,
         backgroundColor: "white",
-        borderRadius: 20,
-        padding: 35,
+        borderRadius: 5,
+        padding: 50,
+        width: screen.width - 50,
+        height: screen.height / 2,
         alignItems: "center",
         shadowColor: "#000",
         shadowOffset: {
