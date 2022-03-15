@@ -7,7 +7,7 @@ import { RootTabScreenProps } from '../types';
 import JoinByGroupCode from './JoinByGroupCode';
 import AddToGroup from './AddToGroup';
 
-export default function TabOneScreen({ navigation }: RootTabScreenProps<'TabOne'>) {
+export default function TabOneScreen() {
   return (
     <View style={styles.container}>
       <AddToGroup></AddToGroup>
