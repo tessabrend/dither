@@ -21,7 +21,7 @@ export default function GroupPopup() {
                     </Pressable>
                 </View>,
         create: CreateGroup(),
-        join: EnterGroupCode(),
+        join: EnterGroupCode(setModalOpen),
     }
 
     return  <>
@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: 'transparent'
+        backgroundColor: '#33333398',
     },
     popupContainer: {
         width: "75%",
