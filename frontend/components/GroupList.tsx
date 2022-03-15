@@ -35,7 +35,7 @@ const DATA: Restaurant[] = [
     name: "350 Bloor",
   },
   {
-    id: "58694a0f",
+    id: "545b7an8",
     name: "Cabin Seven",
   },
 ];

@@ -3,6 +3,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import React, { useState } from "react";
 import { ListRenderItem, FlatList, SafeAreaView, StyleSheet, Pressable, } from "react-native";
 import { Slider } from '@miblanchard/react-native-slider';
+import { MultiSelect } from 'react-native-element-dropdown';
 import Colors from '../constants/Colors';
 import { Text, View } from './Themed';
 
@@ -24,6 +25,17 @@ const DATA: GroupMembers[] = [
     id: "sd9a7654",
     name: "Wil",
   },
+];
+
+const dropdownContent = [
+  { label: 'Item 1', value: '1' },
+  { label: 'Item 2', value: '2' },
+  { label: 'Item 3', value: '3' },
+  { label: 'Item 4', value: '4' },
+  { label: 'Item 5', value: '5' },
+  { label: 'Item 6', value: '6' },
+  { label: 'Item 7', value: '7' },
+  { label: 'Item 8', value: '8' },
 ];
 
 enum dineType {
@@ -79,12 +91,35 @@ const SliderContainer = (props: {
       <Text style={styles.label}>{Array.isArray(value) ? value.join(" - ") : value}</Text>
       <Text style={styles.label}>{unit}</Text>
     </View>
-    <View style={styles.slidersWrapper}>
+    <View style={styles.elementWrapper}>
       {renderSlide()}
     </View>
     </>
   );
 }
+
+const DropdownComponent = () => {
+  const [selected, setSelected] = useState([]);
+  return (
+    <MultiSelect
+      style={styles.dropdown}
+      placeholderStyle={styles.detailText}
+      selectedTextStyle={styles.detailText}
+      inputSearchStyle={styles.inputSearchStyle}
+      search
+      data={dropdownContent}
+      labelField="label"
+      valueField="value"
+      placeholder="Select item"
+      searchPlaceholder="Search..."
+      value={selected}
+      onChange={item => {
+        setSelected(item);
+      }}
+      selectedStyle={styles.selectedStyle}
+      />
+  );
+};
 
 export default function GroupDetails() {
   let rating = 0;
@@ -150,6 +185,9 @@ export default function GroupDetails() {
       <View style={styles.labelWrapper}>
         <Text style={styles.label}>Cuisine</Text>
       </View>
+      <View style={styles.elementWrapper}>
+        {DropdownComponent()}
+      </View>
 
       <View style={styles.labelWrapper}>
         <Text style={styles.label}>Price</Text>
@@ -188,7 +226,6 @@ export default function GroupDetails() {
           return(
               <Pressable 
                 key={i}
-                // onPress={rating=i}
                 >
                 <MaterialIcons name="star" size={30} color="#FFA000"/>
               </Pressable>
@@ -196,7 +233,11 @@ export default function GroupDetails() {
           })
       }
       </View>
-
+      <View style={styles.submitWrapper}>
+        <Pressable style={styles.buttonCard}>
+          <Text style={styles.submitText}>Go Eat!</Text>
+        </Pressable>
+      </View>
     </SafeAreaView>
   );
 }
@@ -216,8 +257,8 @@ const styles = StyleSheet.create({
   },
   membersWrapper: {
     width: "100%",
-    height: "12%",
-    maxHeight: "12%",
+    height: "10%",
+    maxHeight: "10%",
     justifyContent: "space-between",
     alignItems: "center",
     backgroundColor: "transparent",
@@ -238,7 +279,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-evenly",
     flexDirection: "row",
     alignItems: "center",
-    padding: "2%",
+    padding: "1%",
   },
   buttonCard: {
     borderColor: Colors.dark.background,
@@ -265,7 +306,7 @@ const styles = StyleSheet.create({
     alignContent: "center",
     paddingHorizontal: "4%",
   },
-  slidersWrapper: {
+  elementWrapper: {
     width: "80%",
     flex: 1,
     marginLeft: "1%",
@@ -278,6 +319,31 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-  }
+  },
+  submitWrapper: {
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
+  },
+  submitText: {
+    justifyContent: "center",
+    textAlign: "center",
+    fontSize: 33,
+  },
+  dropdown: {
+    height: 50,
+    backgroundColor: 'transparent',
+    borderBottomColor: 'gray',
+    borderBottomWidth: 0.5,
+  },
+  inputSearchStyle: {
+    height: 40,
+    fontSize: 16,
+  },
+  selectedStyle: {
+    borderRadius: 12,
+  },
 });
 
