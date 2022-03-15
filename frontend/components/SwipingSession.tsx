@@ -20,7 +20,7 @@ class Session extends Component {
 
     increment() {
         this.setState((state) => {
-            return {progress: state.progress + this.data.length}
+            return {progress: state.progress + this.data1.length}
         }), () => 
         console.log(this.state.progress)
     }
