@@ -12,43 +12,46 @@ const screen = Dimensions.get("screen");
 class Session extends Component {
     state = {
         progress: 0,
-        modalVisible: false
+        modalVisible: false,
+        data: [],
     }
     
-    data = ['this', 'is', 'a', 'resturant', 'overview', 'card', 'almost', 'at', 'the', 'end'];
+    data1 = ['this', 'is', 'a', 'resturant', 'overview', 'card', 'almost', 'at', 'the', 'end'];
 
     increment() {
         this.setState((state) => {
             return {progress: state.progress + this.data.length}
         }), () => 
-        console.log(this.state.progress);
+        console.log(this.state.progress)
     }
 
-
-    toggleModal = (visible) => {
-        this.setState({ modalVisible: visible });
+    toggleModal(visible) {
+        this.setState({ modalVisible: visible })
     }    
 
-    restaurantData = () => {
-        fetch('http://131.104.49.71:80/restaurant/query' + new URLSearchParams({
+    async getRestaurants() {
+        try {
+            const response = await fetch('http://131.104.49.71:80/restaurant/query' + new URLSearchParams({
             "cuisine": "Pub",
             "rating": "3.0",
             "price-high": "80",
             "price-low": "20",
             "start-index": "0",
             "end-index": "50",
-        }))
-        .then((response) => response.json())
-        .then((json) => {
-        return json.restaurants;
-        })
-        .catch((error) => {
-        console.error(error);
-        });
+            }))
+            const json = await response.json()
+            this.setState({ data: json.restaurants })
+        } catch(error) {
+            console.error(error)
+        }  
     }
 
+    componentDidMount() {
+        this.getRestaurants()
+      }
+
     render () {
-        console.log(this.restaurantData)
+        console.log(this.state.data)
 
         return (
             <View style={styles.container}>
@@ -88,7 +91,7 @@ class Session extends Component {
                     ref={swiper => {
                         this.swiper = swiper;
                     }}
-                    cards={this.data}
+                    cards={this.data1}
                     renderCard={(card) => {
                         return (
                             <View style={styles.card}>
