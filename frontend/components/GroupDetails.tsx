@@ -1,7 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { MaterialIcons } from '@expo/vector-icons'; 
 import React, { useState } from "react";
-import { ListRenderItem, FlatList, SafeAreaView, StyleSheet, Pressable, } from "react-native";
+import { ListRenderItem, FlatList, SafeAreaView, StyleSheet, Pressable, Touchable, TouchableOpacity, } from "react-native";
 import { Slider } from '@miblanchard/react-native-slider';
 import { MultiSelect } from 'react-native-element-dropdown';
 import Colors from '../constants/Colors';
@@ -121,8 +120,31 @@ const DropdownComponent = () => {
   );
 };
 
+const RatingComponent = () => {
+  const [rating, setRating] = useState<any | null>(null);
+    return(
+      <View style={{flexDirection: "row"}}>
+      {[...Array(5)].map((star, i) => {
+        const ratingValue = i + 1;
+        return (
+          <View>
+            <Pressable
+              key={i}
+              onPress={() => setRating(ratingValue)}
+            >
+            <FontAwesomeIcon
+              icon="star"
+              color={ratingValue <= (rating) ? "#ffc107" : "#e4e5e9"}
+              size={30} />
+            </Pressable>
+          </View>
+        );
+      })}
+    </View>
+  );
+};
+
 export default function GroupDetails() {
-  let rating = 0;
   const [selectedId, setSelectedId] = useState(null);
   const [selected, setSelected] = useState(false);
 
@@ -130,7 +152,6 @@ export default function GroupDetails() {
     id: "456ghjjh",
     name: "Leader",
   },]
-  
 
   return (
     <SafeAreaView style={styles.background}>
@@ -221,18 +242,9 @@ export default function GroupDetails() {
         <Text style={styles.label}>Rating</Text>
       </View>
       <View style={styles.ratingWrapper}>
-      {
-        Array.from({length: 5}, (x, i) => {
-          return(
-              <Pressable 
-                key={i}
-                >
-                <MaterialIcons name="star" size={30} color="#FFA000"/>
-              </Pressable>
-            )
-          })
-      }
+        {RatingComponent()}
       </View>
+      
       <View style={styles.submitWrapper}>
         <Pressable style={styles.buttonCard}>
           <Text style={styles.submitText}>Go Eat!</Text>
@@ -319,6 +331,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
+    height: "8%",
   },
   submitWrapper: {
     flex: 1,
@@ -346,4 +359,3 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
 });
-
