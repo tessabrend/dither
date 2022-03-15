@@ -21,6 +21,29 @@ def test():
 
 ### Groups ###
 
+@app.route('/group/find', methods=["GET"])
+def find_groups():
+    to_return = []
+    if 'User' in request.args.keys():
+        # If searching by user, return all the groups of which the user is a member
+        groups = select(group_member for group_member in GroupMembers if group_member.UserId == request.args.get('User'))
+        for group_id in groups:
+            to_return.append(render_object(get(group for group in Group if group.id == group_id)))
+    elif 'GroupID' in request.args.keys():
+        # If searching by ID, return the group with the corresponding ID
+        to_return.append(render_object(get(group for group in Group if group.id == request.args.get('GroupID'))))
+    elif 'GroupName' in request.args.keys():
+        # If searching by name, return all groups with the corresponding name
+        to_return.append(render_object(get(group for group in Group if group.GroupName == request.args.get('GroupName'))))
+    elif 'GroupEntryCode' in request.args.keys():
+        # If searching by code, return the group with the corresponding entry code
+        to_return.append(render_object(get(group for group in Group if group.GroupEntryCode == request.args.get('GroupEntryCode'))))
+    else:
+        # Otherwise, return the first 50 groups
+        for group in Group.select()[:request.args.get('MaxGroupsToReturn', 50)]:
+            to_return.append(render_object(group))
+    return { "groups": to_return }
+
 @app.route('/group/join', methods=['GET'])
 def join_group_link():
     if not 'GroupID' in request.args.keys() or not 'UserID' in request.args.keys():
