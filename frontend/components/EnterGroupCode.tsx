@@ -5,20 +5,30 @@ import {
     Pressable
  } from 'react-native';
 import { KeyboardAvoidingScrollView } from 'react-native-keyboard-avoiding-scroll-view';
-import React, { useState } from 'react';
-import { useLinkProps } from '@react-navigation/native';
+import React, { useEffect, useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function EnterGroupCode(setModalOpen) {
     const [groupCode, setGroupCode] = useState("");
-    const [userName, setUserName] = useState("")
+    const [userName, setUserName] = useState("");
     const [error, setError] = useState("");
+    const [userId, setUserId] = useState("");
+
+    useEffect(() => {
+        async function retrieveUserId() {
+            let userID = await AsyncStorage.getItem("@userId");
+            setUserId(userID);
+        }
+        retrieveUserId();
+    }, [])
+
     let submit = () => {
         fetch('http://131.104.49.71:80/group/join', {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
-            body: `groupEntryCode=${groupCode}&UserName=${userName}`
+            body: `groupEntryCode=${groupCode}&UserName=${userName}&UserId=${userId}`
         })
         .then(response => {
             response.json().then(data => {
