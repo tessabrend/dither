@@ -11,7 +11,7 @@ class User(db.Entity):
     Location = Optional(LongStr)
     Password = Required(str) # need to store hashed passwords not plain text
     PhoneNumber = Optional(str)
-    Email = Optional(str, unique=True)
+    Email = Optional(str, unique=True, nullable=True)
     UserAccessibleUI = Required(bool, default=False)
     GroupMembers = Set('GroupMembers') # this is needed to make a foreign key in the groupmembers table
     Selections = Set('SessionSelections') # this is needed to make a foreign key in the sessionselections table

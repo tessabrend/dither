@@ -27,6 +27,7 @@
         "backgroundColor": "#ffffff"
       },
       "softwareKeyboardLayoutMode": "pan"
+      }
     },
     "web": {
       "favicon": "./assets/images/favicon.png"
@@ -37,4 +38,4 @@
       "ios"
     ]
   }
-}
+

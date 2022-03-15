@@ -21,12 +21,16 @@ def add_to_group():
     # check find if group exists
     group = Group.get(GroupEntryCode=request.form['groupEntryCode'])
 
+    userId = request.form.get('UserId', None)
     if group is not None:
         # check if user already in group
-        if not select(group_member for group_member in GroupMembers if group_member.UserId.id == request.form['UserId'] and group_member.GroupId.id == group.id).exists():
+        if not select(group_member for group_member in GroupMembers if group_member.UserId.id == userId and group_member.GroupId.id == group.id).exists():
             # if not in, add user to group 
-            try: 
-                user = User(Name=request.form['UserName'], Password="NO_ACCOUNT")
+            try:
+                if(userId is None):
+                    user = User(Name=request.form['UserName'], Password="NO_ACCOUNT")
+                else:
+                    user = User.get(id=userId)
                 flush()
                 group_member = GroupMembers(GroupId=group, UserId=user)
                 commit()
@@ -36,7 +40,7 @@ def add_to_group():
             return {'message': f"User already in group in database"}, 400
     else:
         return {'message': f"Group does not exist in database"}, 400
-    return {'message': f"User added in group in database"}, 400
+    return {'message': f"User added in group in database", 'groupName': group.GroupName}
 
 @app.route('/group/find', methods=["GET"])
 def find_groups():
@@ -157,6 +161,20 @@ def setSessionSelection():
     return jsonify({"match": False})
 
 ### End Sessions ###
+
+### User ###
+
+@app.route('/user/create', methods=["POST"])
+def createUser():
+    try:
+        user = User(Name="User", Location="", Password="NO_ACCOUNT", PhoneNumber="", Email=None)
+        commit()
+        return jsonify({"userId": str(user.id)})
+    except TransactionIntegrityError as e:
+        print(e)
+        return {"message": "Could not create a user"}, 400
+        
+### End User ###
 
 if __name__ == "__main__":
     app.run(debug=True)
