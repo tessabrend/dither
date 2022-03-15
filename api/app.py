@@ -87,7 +87,7 @@ def create_group():
 
 ### Restaurants ###
 
-@app.route('/resturant/query', methods=["GET"])
+@app.route('/restaurant/query', methods=["GET"])
 def getResturantInfo():
     to_return = []
 
