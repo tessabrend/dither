@@ -31,7 +31,7 @@ class Session extends Component {
 
     async getRestaurants() {
         try {
-            const response = await fetch('http://131.104.49.71:80/restaurant/query' + new URLSearchParams({
+            const response = await fetch('http://131.104.49.71:80/restaurant/query?' + new URLSearchParams({
             "cuisine": "Pub",
             "rating": "3.0",
             "price-high": "80",
