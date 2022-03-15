@@ -33,7 +33,7 @@ def send_group_invitation():
     content = Content("text/plain", f"You've been invited for a group - click this link to join: {SERVER_URL}/group/join?user=test&group={request.form.get('GroupID')}")
     mail = Mail(Email("dreti@uoguelph.ca"), To(request.form.get('InviteEmail')), "Group Invitation", content)
     response = sg.client.mail.send.post(request_body=mail.get())
-    if response.status_code != 200:
+    if response.status_code >= 300:
         return {'message': f'Sending the invite email failed with the following error: {response.status_code}'}, 500
     return {'message': 'Invitation email send successfully'}
 
