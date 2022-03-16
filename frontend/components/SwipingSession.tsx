@@ -13,7 +13,7 @@ class Session extends Component {
     state = {
         progress: 0,
         modalVisible: false,
-        data: [],
+        data: [] as any[],
     }
     
     data1 = ['this', 'is', 'a', 'resturant', 'overview', 'card', 'almost', 'at', 'the', 'end'];
@@ -51,7 +51,7 @@ class Session extends Component {
       }
 
     render () {
-        console.log(this.state.data)
+        console.log(this.state.data[0]?.name)
 
         return (
             <View style={styles.container}>
@@ -99,7 +99,7 @@ class Session extends Component {
                                     data={card}
                                     keyExtractor={({ id }, index) => id}
                                     renderItem={({ item }) => (
-                                    <Text>{item["name"]}, {item["rating"]}</Text>
+                                    <Text>{item?.name}, {item?.rating}</Text>
                                     )}
                                 />
                             </View>
