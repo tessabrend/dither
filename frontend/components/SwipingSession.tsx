@@ -1,10 +1,11 @@
 import  React, { Component } from 'react';
-import { View, Text, Pressable, StyleSheet, Dimensions, Platform, Alert, FlatList } from 'react-native';
+import { View, Text, Pressable, StyleSheet, Dimensions, Platform, Alert, Image } from 'react-native';
 import Swiper from 'react-native-deck-swiper';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import CountDown from 'react-native-countdown-component';
 import ProgressBar from "react-native-animated-progress";
 import Modal from "react-native-modal";
+import  { Rating } from 'react-native-elements';
 
 const window = Dimensions.get("window");
 const screen = Dimensions.get("screen");
@@ -14,20 +15,22 @@ class Session extends Component {
         progress: 0,
         modalVisible: false,
         data: [] as any[],
+        index: 0
     }
-    
-    data1 = ['this', 'is', 'a', 'resturant', 'overview', 'card', 'almost', 'at', 'the', 'end'];
 
     increment() {
         this.setState((state) => {
-            return {progress: state.progress + this.data1.length}
-        }), () => 
-        console.log(this.state.progress)
+            return {progress: state.progress + this.state.data?.length}
+        })
     }
 
     toggleModal(visible) {
         this.setState({ modalVisible: visible })
-    }    
+    } 
+    
+    showMoreDetails(index) {
+        this.setState({ index: index })
+    } 
 
     async getRestaurants() {
         try {
@@ -51,27 +54,16 @@ class Session extends Component {
       }
 
     render () {
-        console.log(this.state.data[0]?.name)
+        console.log(this.state.data)
+        // <Rating
+        // rating={card?.rating}
+        // max={card?.rating}
+        // iconWidth={30}
+        // iconHeight={20}
+        // editable={false}/>
 
         return (
             <View style={styles.container}>
-                <View style={styles.timer}>
-                    <CountDown
-                    size={15}
-                    until={300} //time in seconds
-                    onFinish={() => Alert.alert('Finished')} //this needs to change to disable swiping
-                    digitStyle={{backgroundColor: '#FFF', borderWidth: 2, borderColor: '#000000'}}
-                    digitTxtStyle={{color: '#000000'}}
-                    timeLabelStyle={{color: 'red', fontWeight: 'bold'}}
-                    separatorStyle={{color: '#000000'}}
-                    timeToShow={['H', 'M', 'S']}
-                    timeLabels={{m: null, s: null}}
-                    showSeparator
-                    />
-                </View>
-                <View style={styles.progressBar}>
-                    <ProgressBar progress={this.state.progress} height={10} backgroundColor="#1167b1" />
-                </View>
                 <View style={styles.centeredView}>
                      <Modal
                      coverScreen={true}
@@ -82,7 +74,15 @@ class Session extends Component {
                      >
                      <View style={styles.centeredView}>
                          <View style={styles.modalView}>
-                         <Text style={styles.modalText}>Hello World!</Text>
+                            <Text style={styles.modalText}>{this.state.data[this.state.index]?.hours}</Text>
+                            <View style={styles.moreDetailsTags}>
+                                <View style={styles.moreDetailsTagItem}>
+                                    <Text style={styles.modalText}>{this.state.data[this.state.index]?.cuisine}</Text>
+                                </View>
+                                <View style={styles.moreDetailsTagItem}>
+                                    <Text style={styles.modalText}>{this.state.data[this.state.index]?.dining_option}</Text>
+                                </View>
+                            </View>
                          </View>
                      </View>
                     </Modal>
@@ -95,29 +95,54 @@ class Session extends Component {
                     renderCard={(card) => {
                         return (
                             <View style={styles.card}>
-                                <FlatList
-                                    data={card}
-                                    keyExtractor={({ id }, index) => id}
-                                    renderItem={({ item }) => (
-                                    <Text>{item?.name}, {item?.rating}</Text>
-                                    )}
+                                <Image
+                                style={styles.restaurantImage}
+                                source={{uri: card?.picture}}
                                 />
+                                <Text style={styles.cardName}>{card?.name}</Text>
+                                <Rating
+                                    type='custom'
+                                    fractions={1}
+                                    startingValue={card?.rating}
+                                    readonly
+                                    imageSize={30}
+                                    tintColor="#E8E8E8"
+                                    style={{alignSelf: "left"}}
+                                />
+                                <Text>{card?.location}</Text>
                             </View>
                         )
                     }}
                     onSwiped={() =>  {this.increment()}}
-                    onSwipedAll={() => {console.log('onSwipedAll')}} //this needs to change to disable swiping
+                    onSwipedAll={() => {!this.swiper.horizontalSwipe;}} //this needs to change to disable swiping
                     onSwipedLeft={(cardIndex) => {console.log('card at index ' + cardIndex +' swiped no')}}
                     onSwipedRight={(cardIndex) => {console.log('card at index ' + cardIndex +' swiped like')}}
                     onSwipedTop={(cardIndex) => {console.log('card at index ' + cardIndex +' swiped crave')}}
                     onSwipedBottom={(cardIndex) => {console.log('card at index ' + cardIndex +' swiped hard no')}}
-                    onTapCard={() => {this.toggleModal(!this.state.modalVisible)}}
+                    onTapCard={(cardIndex) => {this.toggleModal(!this.state.modalVisible); this.showMoreDetails(cardIndex)}}
                     cardIndex={0}
                     backgroundColor={'#ffffff'}
                     stackSize= {3}
                     marginBottom={screen.width / 5}
                     marginTop={screen.width / 5}>
                 </Swiper>
+                <View style={styles.timer}>
+                    <CountDown
+                    size={15}
+                    until={300} //time in seconds
+                    onFinish={() => {!this.swiper.horizontalSwipe; !this.swiper.verticalSwipe;}} //not currently working
+                    digitStyle={{backgroundColor: '#FFF', borderWidth: 2, borderColor: '#000000'}}
+                    digitTxtStyle={{color: '#000000'}}
+                    timeLabelStyle={{color: 'red', fontWeight: 'bold'}}
+                    separatorStyle={{color: '#000000'}}
+                    timeToShow={['H', 'M', 'S']}
+                    timeLabels={{m: null, s: null}}
+                    showSeparator
+                    />
+                </View>
+                <View style={styles.progressBar}>
+                    <ProgressBar progress={this.state.progress} height={10} backgroundColor="#1167b1" />
+                </View>
                 <View style={styles.buttonRow}>
                     <Pressable onPress={() => this.swiper.swipeLeft()}>
                         <FontAwesomeIcon icon="circle-xmark" size={50}/>
@@ -161,14 +186,14 @@ const styles = StyleSheet.create({
     buttonRow: {
         justifyContent: "space-between",
         flexDirection: "row",
-        marginTop: Platform.OS === 'ios' ? screen.width + 180 : screen.width + 90,
+        marginTop: Platform.OS === 'ios' ? screen.width + 160 : screen.width + 90,
         paddingRight: 30,
         paddingLeft: 30,
     },
     progressBar: {
         justifyContent: "center",
         //alignItems: "center",
-         marginTop: 20,
+        marginTop: 20,
         marginRight: 20,
         marginLeft: 20,
     },
@@ -204,5 +229,30 @@ const styles = StyleSheet.create({
       modalText: {
         marginBottom: 15,
         textAlign: "center"
-      }
+      },
+      cardName: {
+          fontSize: 50,
+      },
+      moreDetailsTagItem: {
+        //backgroundColor: '#B3B3B3',
+       // width: 70,
+        //height: 40,
+        //borderColor: '#000000',
+        //borderWidth: 2,
+        //alignItems: "center",
+        //textAlign: "center",
+      },
+      moreDetailsTags: {
+        flexDirection: "row",
+        justifyContent: "space-evenly",
+        padding: 20,
+      },
+      restaurantImage: {
+          borderColor: '#000000',
+          borderWidth: 2,
+          width: 320,
+          height: 300,
+          alignSelf: "center",
+          marginBottom: 20,
+      },
   });
