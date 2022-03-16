@@ -160,6 +160,36 @@ def setSessionSelection():
             return jsonify({"match": True})
     return jsonify({"match": False})
 
+@app.route("/session/<id>/ismatch", methods=["GET"])
+def pollForMatch(id):
+    # set_sql_debug(True)
+    currentSession = SelectionSession[id]
+    try:
+        mostLikedRestaurant = list(select((count(ss), ss.RestaurantId, ss.SessionId, ss.GroupId, r.id,
+            r.Name, r.Location, r.HoursOfOperation, r.Website, r.Rating, r.PhoneNumber, r.DiningType) 
+            for ss in SessionSelections for r in ss.RestaurantId if (r == ss.RestaurantId) and
+            (ss.TypeOfFeedback == 'like' or ss.TypeOfFeedback == 'crave') and 
+            ss.SessionId == currentSession).order_by(lambda: desc(count(ss))).limit(1))[0]
+    except IndexError as e:
+        print(e)
+        return jsonify({"match": False})
+    currentGroup = mostLikedRestaurant[3]
+    numGroupMembers = list(select(count(gm.id) for gm in GroupMembers if (gm.GroupId == currentGroup)))[0] # get the number of members in the group
+    if mostLikedRestaurant[0] >= numGroupMembers:
+        return jsonify({
+            "match": True,
+            "restaurantId": mostLikedRestaurant[4],
+            "restaurantName": mostLikedRestaurant[5],
+            "restaurantLocation": mostLikedRestaurant[6],
+            "restaurantHours": mostLikedRestaurant[7],
+            "restaurantWebsite": mostLikedRestaurant[8],
+            "restaurantRating": mostLikedRestaurant[9],
+            "restaurantPhoneNumber": mostLikedRestaurant[10],
+            "restaurantDiningType": mostLikedRestaurant[11]
+        })
+    return jsonify({"match": False})
+
+
 ### End Sessions ###
 
 ### User ###
@@ -177,4 +207,4 @@ def createUser():
 ### End User ###
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=5001)
