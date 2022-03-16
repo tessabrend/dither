@@ -76,13 +76,14 @@ export default function GroupList() {
   let list: Group[]
   
   let retrieveGroups = () => {
-    fetch("//131.104.49.71:5003/group/find", {
+    fetch("//131.104.49.71:80/group/find", {
       method:'GET'
     })
-    .then(response =>response.json())
+    .then(response => response.json()
+    )
     .then(data => {
       setGroupList(data.groups)
-      console.log(grouplist)
+      console.log(data.groups.GroupName)
     })
   }
 
