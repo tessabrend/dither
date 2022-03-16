@@ -96,10 +96,12 @@ def getRestaurantInfo():
         and request.args.get('cuisine') in restaurant.CuisineType)[int(request.args.get('start-index')):int(request.args.get('end-index'))]
 
     for restaurant in restaurants:
-        to_return.append({"name": restaurant.Name, "location": restaurant.Location, "hours": restaurant.HoursOfOperation,
+        i = 0
+        to_return.append({"id": i, "name": restaurant.Name, "location": restaurant.Location, "hours": restaurant.HoursOfOperation,
          "website": restaurant.Website, "phone": restaurant.PhoneNumber, "dining-option": restaurant.DiningType, "bookingsite": restaurant.BookingSite,
          "picture": restaurant.PictureLocation, "sponsored": restaurant.Sponsored, "cuisine": restaurant.CuisineType, "rating": restaurant.Rating, 
          "price-low": restaurant.PriceLow, "price-high": restaurant.PriceHigh,})
+        i = i + 1
     return {"restaurants": to_return}
 
 ### End Restaurants ###
