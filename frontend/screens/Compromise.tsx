@@ -5,13 +5,24 @@ import { FlatList, StyleSheet, Text, View } from "react-native";
 
 export default function Compromise(sessionID) {
     let [fetchError, setFetchError] = useState("");
-    let [compromiseListItems, setCompromiseListItems] = useState([]);
+    let [compromiseListItems, setCompromiseListItems] = useState([
+            {
+                id: 1,
+                name: 'Thai Tanic', 
+                numLikes: 2,
+                numDislikes: 1,
+                numCraves: 0
+            }]);
 
     let fetchCompromiseListItems = () => {
         fetch(`http://131.104.49.71:80/session/<${sessionID}>/results`, { method: 'GET'})
         .then(response => {
             response.json().then(data => {
-                setCompromiseListItems(data);
+                let items = [];
+                for(let item in data) {
+                    items.push({id: item, name: data[item]['name'], numLikes: data[item]['like'], numDislikes: data[item]['dislike'], numCraves: data[item]['crave']});
+                }
+                setCompromiseListItems(items);
             });
         })
         .catch(reason => {
@@ -19,64 +30,85 @@ export default function Compromise(sessionID) {
         });
     }
 
-    // Session/results 
-    setCompromiseListItems([
-        {
-            name: 'Thai Tanic', 
-            numLikes: 2,
-            numDislikes: 1,
-            numCraves: 0
-        }
-    ]);
+    fetchCompromiseListItems();
 
-    let compromiseListItem = item => 
-        <View style={styles.listItemView}>
-            <Text>{item.name}</Text>
+    let compromiseListItem = item => {
+        return (<View style={styles.listItemView}>
+            <Text style={styles.restaurantTitle}>{item.item.name}</Text>
             <View>
                 <View style={styles.iconIndicator}>
-                    <Text>{item.numCraves}</Text>
-                    <Ionicons name="heart"></Ionicons>
+                    <Text style={styles.restaurantDetailText}>{item.item.numCraves}</Text>
+                    <Ionicons size={14} name="heart"></Ionicons>
                 </View>
                 <View style={styles.iconIndicator}>
-                    <Text>{item.numLikes}</Text>
-                    <Ionicons name="thumbs-up"></Ionicons>
+                    <Text style={styles.restaurantDetailText}>{item.item.numLikes}</Text>
+                    <Ionicons size={14} name="thumbs-up"></Ionicons>
                 </View>
                 <View style={styles.iconIndicator}>
-                    <Text>{item.numDislikes}</Text>
-                    <Ionicons name="thumbs-down"></Ionicons>
+                    <Text style={styles.restaurantDetailText}>{item.item.numDislikes}</Text>
+                    <Ionicons size={14} name="thumbs-down"></Ionicons>
                 </View>
             </View>
-            <Link to={'/home'}>Choice Made</Link>
-        </View>;
+        </View>);
+    }
+    
 
-    return <>
+    return <View style={styles.screen}>
         <Text style={styles.headerText}>Time's Up!</Text>
-        <View>
-            <View>
-                <Text style={styles.subHeaderSm}>Now Let's</Text>
-                <Text style={styles.subHeaderLg}>COMPROMISE</Text>
-            </View>
-            <FlatList data={compromiseListItems} renderItem={compromiseListItem}></FlatList>
-            <Text>Choice Made</Text>
+        <View style={styles.subHeaderView}>
+            <Text style={styles.subHeaderSm}>Now Let's</Text>
+            <Text style={styles.subHeaderLg}>COMPROMISE</Text>
         </View>
-    </>
+        <FlatList data={compromiseListItems} renderItem={compromiseListItem}></FlatList>
+        <Link to={'/home'} style={styles.linkText}>Choice Made -></Link>
+    </View>
 }
 
 const styles = StyleSheet.create({
+    screen: {
+        justifyContent: 'space-between',
+        height: '100%'
+    },
     headerText: {
-        fontSize: 32
+        fontSize: 32,
+        textAlign: 'center',
+        marginTop: 20,
+    },
+    subHeaderView: {
+        marginTop: '15%'
+    },
+    restaurantDetailText: {
+        marginRight: 5
     },
     subHeaderSm: {
+        fontSize: 20,
+        textAlign: 'center'
+    },
+    restaurantTitle: {
+        textAlignVertical: 'center',
         fontSize: 20
     },
     subHeaderLg: {
-        fontSize: 24
+        fontSize: 24,
+        textAlign: 'center'
     },
     listItemView: {
         flexDirection: 'row',
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
+        margin: 15,
+        padding: 10,
+        borderRadius: 10,
+        backgroundColor: 'white',
+        borderStyle: 'solid',
+        borderWidth: 1,
+        borderColor: 'black'
     },
     iconIndicator: {
-        flexDirection: 'row'
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    linkText: {
+        textAlign: 'right',
+        margin: 8
     }
 });
