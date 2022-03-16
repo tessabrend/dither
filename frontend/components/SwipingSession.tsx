@@ -1,5 +1,5 @@
 import  React, { Component } from 'react';
-import { View, Text, Pressable, StyleSheet, Dimensions, Platform, Alert } from 'react-native';
+import { View, Text, Pressable, StyleSheet, Dimensions, Platform, Alert, FlatList } from 'react-native';
 import Swiper from 'react-native-deck-swiper';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import CountDown from 'react-native-countdown-component';
@@ -91,11 +91,17 @@ class Session extends Component {
                     ref={swiper => {
                         this.swiper = swiper;
                     }}
-                    cards={this.data1}
+                    cards={this.state.data}
                     renderCard={(card) => {
                         return (
                             <View style={styles.card}>
-                                <Text style={styles.text}>{card}</Text>
+                                <FlatList
+                                    data={card}
+                                    keyExtractor={({ id }, index) => id}
+                                    renderItem={({ item }) => (
+                                    <Text>{item["name"]}, {item["rating"]}</Text>
+                                    )}
+                                />
                             </View>
                         )
                     }}
