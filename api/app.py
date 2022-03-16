@@ -98,9 +98,9 @@ def getRestaurantInfo():
     for restaurant in restaurants:
         i = 0
         to_return.append({"id": i, "name": restaurant.Name, "location": restaurant.Location, "hours": restaurant.HoursOfOperation,
-         "website": restaurant.Website, "phone": restaurant.PhoneNumber, "dining-option": restaurant.DiningType, "bookingsite": restaurant.BookingSite,
+         "website": restaurant.Website, "phone": restaurant.PhoneNumber, "dining_option": restaurant.DiningType, "bookingsite": restaurant.BookingSite,
          "picture": restaurant.PictureLocation, "sponsored": restaurant.Sponsored, "cuisine": restaurant.CuisineType, "rating": restaurant.Rating, 
-         "price-low": restaurant.PriceLow, "price-high": restaurant.PriceHigh,})
+         "price_low": restaurant.PriceLow, "price_high": restaurant.PriceHigh,})
         i = i + 1
     return {"restaurants": to_return}
 
