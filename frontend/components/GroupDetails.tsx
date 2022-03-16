@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import React, { useState } from "react";
-import { ListRenderItem, FlatList, SafeAreaView, StyleSheet, Pressable, Touchable, TouchableOpacity, } from "react-native";
+import { ListRenderItem, FlatList, SafeAreaView, StyleSheet, Pressable, ScrollView, } from "react-native";
 import { Slider } from '@miblanchard/react-native-slider';
 import { MultiSelect } from 'react-native-element-dropdown';
 import Colors from '../constants/Colors';
@@ -109,7 +109,7 @@ const DropdownComponent = () => {
       data={dropdownContent}
       labelField="label"
       valueField="value"
-      placeholder="Select item"
+      placeholder="Select..."
       searchPlaceholder="Search..."
       value={selected}
       onChange={item => {
@@ -164,6 +164,8 @@ export default function GroupDetails() {
           extraData={selectedId}
         />
       </View>
+
+      <ScrollView style={styles.scrollBox}>
       <View style={styles.buttonRow}>
         <Pressable 
             onPress={() => dineTypeChoice(dineType.Delivery)}
@@ -198,7 +200,7 @@ export default function GroupDetails() {
         <Slider 
           minimumValue={0}
           maximumValue={120}
-          step={0.5}
+          step={1}
           // renderAboveThumbComponent={<></>}
           />
       </SliderContainer>
@@ -244,7 +246,8 @@ export default function GroupDetails() {
       <View style={styles.ratingWrapper}>
         {RatingComponent()}
       </View>
-      
+      </ScrollView>
+
       <View style={styles.submitWrapper}>
         <Pressable style={styles.buttonCard}>
           <Text style={styles.submitText}>Go Eat!</Text>
@@ -269,11 +272,12 @@ const styles = StyleSheet.create({
   },
   membersWrapper: {
     width: "100%",
-    height: "10%",
-    maxHeight: "10%",
+    height: "12%",
+    maxHeight: "12%",
     justifyContent: "space-between",
     alignItems: "center",
     backgroundColor: "transparent",
+    padding: "1%",
   },
   groupMember: {
     backgroundColor: "#eee",
@@ -289,9 +293,10 @@ const styles = StyleSheet.create({
   }, 
   buttonRow: {
     justifyContent: "space-evenly",
+    alignSelf: "center",
     flexDirection: "row",
     alignItems: "center",
-    padding: "1%",
+    padding: "2%",
   },
   buttonCard: {
     borderColor: Colors.dark.background,
@@ -314,9 +319,11 @@ const styles = StyleSheet.create({
   labelWrapper: {
     width: "100%",
     flexDirection: "row",
+    alignSelf: "center",
     justifyContent: "flex-start",
     alignContent: "center",
     paddingHorizontal: "4%",
+    paddingTop: "2%",
   },
   elementWrapper: {
     width: "80%",
@@ -324,21 +331,28 @@ const styles = StyleSheet.create({
     marginLeft: "1%",
     marginRight: "1%",
     alignItems: 'stretch',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    alignSelf: "center",
   },
   ratingWrapper: {
     flex: 1,
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
+    alignSelf: "center",
     height: "8%",
+    marginBottom: "2%",
   },
   submitWrapper: {
     flex: 1,
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
+    alignSelf: "center",
     width: "100%",
+    height: "14%",
+    maxHeight: "14%",
+    padding: "1%",
   },
   submitText: {
     justifyContent: "center",
@@ -353,9 +367,15 @@ const styles = StyleSheet.create({
   },
   inputSearchStyle: {
     height: 40,
-    fontSize: 16,
+    fontSize: 18,
   },
   selectedStyle: {
     borderRadius: 12,
+  },
+  scrollBox: {
+    width: "100%",
+    height: "68%",
+    flexDirection: "column",
+    alignContent: "center",
   },
 });
