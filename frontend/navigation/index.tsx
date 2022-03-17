@@ -47,7 +47,27 @@ const Stack = createNativeStackNavigator();
 function RootNavigator() {
   return (
     <Stack.Navigator>
-      <Stack.Screen name="Home" component={GroupList}></Stack.Screen>
+      <Stack.Screen name="Home" component={Homepage} options={{
+        title: '',
+          headerLeft: () => (
+            <GroupPopup/>
+          ),
+          headerRight: () => (
+            <Pressable
+              onPress={() => {
+              }}
+              style={({ pressed }) => ({
+                opacity: pressed ? 0.5 : 1,
+              })}>
+              <FontAwesomeIcon
+                icon="circle-user"
+                size={25}
+                style={{ marginRight: 15 }}
+              />
+            </Pressable>
+          )
+      }}>
+      </Stack.Screen>
       <Stack.Screen name='Compromise' component={Compromise}></Stack.Screen>
       <Stack.Screen name='Session' component={SessionScreen}></Stack.Screen>
       <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ title: 'Oops!' }} />
