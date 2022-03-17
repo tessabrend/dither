@@ -13,7 +13,7 @@ export interface Group {
 }
 
 const Item = (props: { 
-  data : Group
+  data : any
   }) => {
   const { data } = props;
   let leader 
