@@ -121,20 +121,22 @@ def create_group():
 
 ### Restaurants ###
 
-@app.route('/resturant/query', methods=["GET"])
-def getResturantInfo():
+@app.route('/restaurant/query', methods=["GET"])
+def getRestaurantInfo():
     to_return = []
 
     restaurants = select(restaurant for restaurant in Restaurant if restaurant.PriceHigh >= float(request.args.get('price-high')) \
         and restaurant.PriceLow <= float(request.args.get('price-low')) and restaurant.Rating >= float(request.args.get('rating')) \
         and request.args.get('cuisine') in restaurant.CuisineType)[int(request.args.get('start-index')):int(request.args.get('end-index'))]
 
-    for resturant in restaurants:
-        to_return.append({"name": resturant.Name, "location": resturant.Location, "hours": resturant.HoursOfOperation,
-         "website": resturant.Website, "phone": resturant.PhoneNumber, "dining-option": resturant.DiningType, "bookingsite": resturant.BookingSite,
-         "picture": resturant.PictureLocation, "sponsored": resturant.Sponsored, "cuisine": resturant.CuisineType, "rating": resturant.Rating, 
-         "price-low": resturant.PriceLow, "price-high": resturant.PriceHigh,})
-    return {"resturants": to_return}
+    for restaurant in restaurants:
+        i = 0
+        to_return.append({"id": i, "name": restaurant.Name, "location": restaurant.Location, "hours": restaurant.HoursOfOperation,
+         "website": restaurant.Website, "phone": restaurant.PhoneNumber, "dining_option": restaurant.DiningType, "bookingsite": restaurant.BookingSite,
+         "picture": restaurant.PictureLocation, "sponsored": restaurant.Sponsored, "cuisine": restaurant.CuisineType, "rating": restaurant.Rating, 
+         "price_low": restaurant.PriceLow, "price_high": restaurant.PriceHigh,})
+        i = i + 1
+    return {"restaurants": to_return}
 
 ### End Restaurants ###
 
@@ -151,7 +153,8 @@ def deactivateSession(id):
 
 @app.route("/session/<id>/results", methods=["GET"])
 def getSessionResults(id):
-    query = list(select((count(s.id), s.TypeOfFeedback, r.Name, r.id) for s in SessionSelections for r in Restaurant if s.RestaurantId == r).order_by(3))
+    session = SelectionSession[id]
+    query = list(select((count(s.id), s.TypeOfFeedback, r.Name, r.id) for s in SessionSelections for r in Restaurant if s.RestaurantId == r and session.id == int(s.SessionId)).order_by(3))
     result = {}
     for obj in query:  # obj will be a tuple of (count, typeOfFeedback, restaurant name, restaurant id) 
         if obj[3] not in result:  # if the restaurant is not already in the results add it
@@ -194,6 +197,36 @@ def setSessionSelection():
             return jsonify({"match": True})
     return jsonify({"match": False})
 
+@app.route("/session/<id>/ismatch", methods=["GET"])
+def pollForMatch(id):
+    # set_sql_debug(True)
+    currentSession = SelectionSession[id]
+    try:
+        mostLikedRestaurant = list(select((count(ss), ss.RestaurantId, ss.SessionId, ss.GroupId, r.id,
+            r.Name, r.Location, r.HoursOfOperation, r.Website, r.Rating, r.PhoneNumber, r.DiningType) 
+            for ss in SessionSelections for r in ss.RestaurantId if (r == ss.RestaurantId) and
+            (ss.TypeOfFeedback == 'like' or ss.TypeOfFeedback == 'crave') and 
+            ss.SessionId == currentSession).order_by(lambda: desc(count(ss))).limit(1))[0]
+    except IndexError as e:
+        print(e)
+        return jsonify({"match": False})
+    currentGroup = mostLikedRestaurant[3]
+    numGroupMembers = list(select(count(gm.id) for gm in GroupMembers if (gm.GroupId == currentGroup)))[0] # get the number of members in the group
+    if mostLikedRestaurant[0] >= numGroupMembers:
+        return jsonify({
+            "match": True,
+            "restaurantId": mostLikedRestaurant[4],
+            "restaurantName": mostLikedRestaurant[5],
+            "restaurantLocation": mostLikedRestaurant[6],
+            "restaurantHours": mostLikedRestaurant[7],
+            "restaurantWebsite": mostLikedRestaurant[8],
+            "restaurantRating": mostLikedRestaurant[9],
+            "restaurantPhoneNumber": mostLikedRestaurant[10],
+            "restaurantDiningType": mostLikedRestaurant[11]
+        })
+    return jsonify({"match": False})
+
+
 ### End Sessions ###
 
 ### User ###
@@ -221,7 +254,7 @@ def getUserGroups(id):
             "isGroupLeader": query[group][0]
         })
     return jsonify(response)
-    
+
 ### End User ###
 
 if __name__ == "__main__":
