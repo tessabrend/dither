@@ -15,7 +15,7 @@ export interface GroupMembers {
 const DATA: GroupMembers[] = [
   {
     id: "bd7acbea",
-    name: "David",
+    name: "Tessa",
   },
   {
     id: "63tiy0iu",
@@ -28,14 +28,12 @@ const DATA: GroupMembers[] = [
 ];
 
 const dropdownContent = [
-  { label: 'Item 1', value: '1' },
-  { label: 'Item 2', value: '2' },
-  { label: 'Item 3', value: '3' },
-  { label: 'Item 4', value: '4' },
-  { label: 'Item 5', value: '5' },
-  { label: 'Item 6', value: '6' },
-  { label: 'Item 7', value: '7' },
-  { label: 'Item 8', value: '8' },
+  { label: 'Thai', value: '1' },
+  { label: 'Chinese', value: '2' },
+  { label: 'Pub', value: '3' },
+  { label: 'French', value: '4' },
+  { label: 'Italian', value: '5' },
+  { label: 'Asian Fusion', value: '6' },
 ];
 
 enum dineType {
@@ -59,8 +57,8 @@ const renderItem: ListRenderItem<GroupMembers> = ({ item }) => (
   />
 );
 
-const dineTypeChoice = (_dineType: dineType) => {
-  console.log('pressed');
+const dineTypeChoice = (_dineType: string | dineType) => {
+  console.log(_dineType);
 };
 
 const SliderContainer = (props: {
@@ -146,18 +144,43 @@ const RatingComponent = () => {
 };
 
 export default function GroupDetails() {
+  const [groupData, setGroupData] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
+  const [dineTypeSelected, setdtSelected] = useState(false);
   const [selected, setSelected] = useState(false);
+  let dineStyle = "All"
+
+//bad but temp button option
+const [deliverySel, setDelivery] = useState(false);
+const [pickUpSel, setPickUp] = useState(false);
+const [dineInSel, setDineIn] = useState(false);
+const [lowSel, setPriceLow] = useState(false);
+const [midSel, setPriceMid] = useState(false);
+const [highSel, setPricehigh] = useState(false);
+
 
   const leader: GroupMembers[] = [  {
     id: "456ghjjh",
-    name: "Leader",
+    name: "David",
   },]
 
+  let groupCode = "wcBwxbzx"
+  let url = "//131.104.49.71:80/groups/find/"
+  
+  let retrieveGroups = () => {
+    fetch(url, {
+      method:'GET'
+    })
+    .then(response => response.json())
+    .then(data => {
+        setGroupData(data) 
+    })
+  }
   const navigation = useNavigation();
 
   return (
     <SafeAreaView style={styles.background}>
+      {retrieveGroups}
       <View style={styles.membersWrapper}>
         <FlatList 
           horizontal
@@ -171,21 +194,20 @@ export default function GroupDetails() {
       <ScrollView style={styles.scrollBox}>
       <View style={styles.buttonRow}>
         <Pressable 
-            onPress={() => dineTypeChoice(dineType.Delivery)}
-            onLongPress={() => setSelected(!selected)}
-            style={[{ borderWidth: selected ? 2 : 1 }, styles.buttonCard] }
+            onPress={() => setDelivery(!deliverySel)}
+            style={[{ borderWidth: deliverySel ? 2 : 1 }, styles.buttonCard] }
           >
           <Text style={styles.detailText}>DELIVERY</Text>
         </Pressable>
         <Pressable 
-            onPress={() => setSelected(!selected)}
-            style={[{ borderWidth: selected ? 2 : 1 }, styles.buttonCard] }
+            onPress={() => setPickUp(!pickUpSel)}
+            style={[{ borderWidth: pickUpSel ? 2 : 1 }, styles.buttonCard] }
           >
           <Text style={styles.detailText}>PICK UP</Text>
         </Pressable>
         <Pressable 
-            onPress={() => setSelected(!selected)}
-            style={[{ borderWidth: selected ? 2 : 1 }, styles.buttonCard] }
+            onPress={() => setDineIn(!dineInSel)}
+            style={[{ borderWidth: dineInSel ? 2 : 1 }, styles.buttonCard] }
           >
           <Text style={styles.detailText}>DINE IN</Text>
         </Pressable>
@@ -220,22 +242,22 @@ export default function GroupDetails() {
       </View>
       <View style={styles.buttonRow}>
       <Pressable 
-            onPress={() => setSelected(!selected)}
-            onLongPress={() => setSelected(!selected)}
-            style={[{ borderWidth: selected ? 2 : 1 }, styles.buttonCard] }
+            onPress={() => setPriceLow(!lowSel)}
+            // onLongPress={() => setSelected(!selected)}
+            style={[{ borderWidth: lowSel ? 2 : 1 }, styles.buttonCard] }
           >
            <FontAwesomeIcon icon="dollar-sign" size={26}/>
         </Pressable>
         <Pressable 
-            onPress={() => setSelected(!selected)}
-            style={[{ borderWidth: selected ? 2 : 1 }, styles.buttonCard] }
+            onPress={() => setPriceMid(!midSel)}
+            style={[{ borderWidth: midSel ? 2 : 1 }, styles.buttonCard] }
           >
            <FontAwesomeIcon icon="dollar-sign" size={26}/>
            <FontAwesomeIcon icon="dollar-sign" size={26}/>
         </Pressable>
         <Pressable 
-            onPress={() => setSelected(!selected)}
-            style={[{ borderWidth: selected ? 2 : 1 }, styles.buttonCard] }
+            onPress={() => setPricehigh(!highSel)}
+            style={[{ borderWidth: highSel ? 2 : 1 }, styles.buttonCard] }
           >
            <FontAwesomeIcon icon="dollar-sign" size={26}/>
            <FontAwesomeIcon icon="dollar-sign" size={26}/>
