@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import CountDown from 'react-native-countdown-component';
 import ProgressBar from "react-native-animated-progress";
 import Modal from "react-native-modal";
-import  { Rating } from 'react-native-elements';
+import Star from 'react-native-star-view';
 
 const window = Dimensions.get("window");
 const screen = Dimensions.get("screen");
@@ -89,6 +89,7 @@ class Session extends Component {
     }
 
     render () {
+        console.log(screen.width / 10)
         return (
             <View style={styles.container}>
                 <View style={styles.centeredView}>
@@ -126,15 +127,7 @@ class Session extends Component {
                                 source={{uri: card?.picture}}
                                 />
                                 <Text style={styles.cardName}>{card?.name}</Text>
-                                <Rating
-                                    type='custom'
-                                    fractions={1}
-                                    startingValue={card?.rating}
-                                    readonly
-                                    imageSize={30}
-                                    tintColor="#E8E8E8"
-                                    style={{alignSelf: "left"}}
-                                />
+                                <Star score={card?.rating} style={styles.starStyle} />
                                 <Text>{card?.location}</Text>
                                 {this.getPriceBucket(card?.price_low, card?.price_high)}
                             </View>
@@ -157,7 +150,7 @@ class Session extends Component {
                     <CountDown
                     size={15}
                     until={300} //time in seconds
-                    onFinish={() => {this.swiper.horizontalSwipe = false; this.toggleSwiping(this.swiper.verticalSwipe);}} //neither currently working
+                    onFinish={() => {alert("Session Over")}} //neither currently working
                     digitStyle={{backgroundColor: '#FFF', borderWidth: 2, borderColor: '#000000'}}
                     digitTxtStyle={{color: '#000000'}}
                     timeLabelStyle={{color: 'red', fontWeight: 'bold'}}
@@ -213,7 +206,7 @@ const styles = StyleSheet.create({
     buttonRow: {
         justifyContent: "space-between",
         flexDirection: "row",
-        marginTop: Platform.OS === 'ios' ? screen.width + 160 : screen.width + 80,
+        marginTop: Platform.OS === 'ios' ? screen.width + 160 : screen.width,
         paddingRight: 30,
         paddingLeft: 30,
     },
@@ -280,12 +273,16 @@ const styles = StyleSheet.create({
           borderColor: '#000000',
           borderWidth: 2,
           width: 320,
-          height: 300,
+          height: Platform.OS === 'ios' ? screen.height - 650 : screen.height - 600,
           alignSelf: "center",
-          marginBottom: 20,
+          marginBottom: Platform.OS === 'ios' ? 20 : 10,
       },
       bucketRow: {
         flexDirection: "row",
         padding: 5,
-      }
+      },
+      starStyle: {
+        width: 100,
+        height: 20,
+      },
   });
