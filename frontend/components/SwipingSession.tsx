@@ -156,7 +156,7 @@ class Session extends Component {
                 <View style={styles.timer}>
                     <CountDown
                     size={15}
-                    until={30} //time in seconds
+                    until={300} //time in seconds
                     onFinish={() => {this.swiper.horizontalSwipe = false; this.toggleSwiping(this.swiper.verticalSwipe);}} //neither currently working
                     digitStyle={{backgroundColor: '#FFF', borderWidth: 2, borderColor: '#000000'}}
                     digitTxtStyle={{color: '#000000'}}
