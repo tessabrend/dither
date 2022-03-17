@@ -174,7 +174,23 @@ def createUser():
         print(e)
         return {"message": "Could not create a user"}, 400
         
+@app.route('/user/<id>/groups', methods=["GET"])
+def getUserGroups(id):
+    set_sql_debug(True)
+    user = User[id]
+    print(type(user.id))
+    query = list(left_join((gm.GroupLeader, g.GroupName, g.GroupEntryCode, g.id) for gm in GroupMembers for g in gm.GroupId if user.id == int(gm.UserId)))
+    response = []
+    for group in range(len(query)):
+        response.append({
+            "groupId": query[group][3],
+            "groupName": query[group][1],
+            "groupCode": query[group][2],
+            "isGroupLeader": query[group][0]
+        })
+    return jsonify(response)
+    
 ### End User ###
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=5001)
