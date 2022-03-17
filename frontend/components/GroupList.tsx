@@ -73,30 +73,17 @@ export default function GroupList() {
     name: "Table for One",
     members: [""],
   },]
-<<<<<<< HEAD
-
-  let retrieveGroups = () => {
-    fetch("//131.104.49.71:80/group", {
-      method:'GET'
-    })
-    .then(response =>response.json())
-    .then(data =>{
-      useState({data:data})
-    })
-  }
-=======
   let list: Group[]
->>>>>>> 2096279770113087eef4b5546a3fce2a46dac3f3
   
   let retrieveGroups = () => {
-    fetch("//131.104.49.71:5003/group/find", {
-      method:'GET'
-    })
-    .then(response =>response.json())
-    .then(data => {
-      setGroupList(data.groups)
-      console.log(grouplist)
-    })
+    // fetch("//131.104.49.71:80/group/find", {
+    //   method:'GET'
+    // })
+    // .then(response =>response.json())
+    // .then(data => {
+    //   setGroupList(data.groups)
+    //   console.log(grouplist)
+    // })
   }
 
   return (
