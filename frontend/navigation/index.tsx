@@ -87,7 +87,7 @@ function BottomTabNavigator() {
       />
       <BottomTab.Screen
         name="TabTwo"
-        component={TabTwoScreen}
+        component={SearchOverScreen}
         options={{
           title: 'Tab Two',
           tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
