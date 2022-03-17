@@ -12,40 +12,13 @@ export interface Group {
   isGroupLeader: boolean;
 }
 
-// const DATA: Group[] = [
-//   {
-//     groupId: "1",
-//     groupCode: "bd7acbea",
-//     groupName: "Roomies",
-//     isGroupLeader: false,
-//   },
-//   {
-//     groupId: "2",
-//     groupCode: "3ac68afc",
-//     groupName: "Homies",
-//     isGroupLeader: false,
-//   },
-//   {
-//     groupId: "3",
-//     groupCode: "58694a0f",
-//     groupName: "Dev Team",
-//     isGroupLeader: false,
-//   },
-//   {
-//     groupId: "4",
-//     groupCode: "ghc69a34",
-//     groupName: "Dream Team",
-//     isGroupLeader: false,
-//   },
-// ];
-
 const Item = (props: { 
   data : Group
   }) => {
   const { data } = props;
-  let leader = ""
+  let leader 
   if (data.isGroupLeader == true) {
-    let leader = <FontAwesomeIcon style={styles.name} icon="crown" size={26}/>
+    leader = <FontAwesomeIcon style={styles.name} icon="crown" size={26}/>
   };
   return (
     <Pressable 
@@ -94,7 +67,6 @@ export default function GroupList() {
     .then(response =>response.json())
     .then(data => {
       setGroupList(data.groups)
-      console.log(grouplist)
     })
   }
 
