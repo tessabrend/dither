@@ -1,74 +1,102 @@
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import React, { useState } from "react";
-import { ListRenderItem, FlatList, SafeAreaView, StyleSheet, TouchableOpacity, Pressable, StatusBar } from "react-native";
+import { ListRenderItem, FlatList, SafeAreaView, StyleSheet, Pressable, StatusBar } from "react-native";
 import Colors from '../constants/Colors';
-import { Text, View } from './Themed';
+import { Text } from './Themed';
 
-export interface Restaurant {
+export interface Group {
   id: string;
   name: string;
+  members: Array<any>;
 }
 
-const DATA: Restaurant[] = [
+const DATA: Group[] = [
   {
     id: "bd7acbea",
     name: "Roomies",
+    members: [""],
   },
   {
     id: "3ac68afc",
     name: "Homies",
+    members: [""],
   },
   {
     id: "58694a0f",
     name: "Dev Team",
+    members: [""],
+  },
+  {
+    id: "ghc69a34",
+    name: "Dream Team",
+    members: [""],
+  },
+  {
+    id: "55578a0f",
+    name: "Michael",
+    members: [""],
+  },
+  {
+    id: "3asdfg45c",
+    name: "350 Bloor",
+    members: [""],
+  },
+  {
+    id: "58694a0f",
+    name: "Cabin Seven",
+    members: [""],
   },
 ];
 
-const Item = ({ data }: { data: Restaurant }) => (
+const Item = ({ data }: { data: Group }) => (
   <Pressable 
     onPress={() => {
-    // setTimesPressed((current) => current + 1);
   }} 
     style={styles.container}>
     <Text style={styles.name}>{data.name}</Text>
+    <FontAwesomeIcon style={styles.name} icon="angle-right" size={30}/>
   </Pressable>
 ); 
 
-export default function GroupList() {
-  const [selectedId, setSelectedId] = useState(null);
+const renderItem: ListRenderItem<Group> = ({ item }) => (
+  <Item 
+    data={item} 
+    // select={() => setSelectedId(item.id)}
+  />
+);
 
-  const renderItem: ListRenderItem<Restaurant> = ({ item }) => (
-    <Item 
-      data={item} 
-      // select={() => setSelectedId(item.id)}
-    />
-  );
+export default function GroupList() {
+  const [grouplist, setGroupList] = useState([]);
+  const [selectedId, setSelectedId] = useState(null);
+  const alone: Group[] = [  {
+    id: "9999999",
+    name: "Table for One",
+    members: [""],
+  },]
+  let list: Group[]
+  
+  let retrieveGroups = () => {
+    // fetch("//131.104.49.71:80/group/find", {
+    //   method:'GET'
+    // })
+    // .then(response =>response.json())
+    // .then(data => {
+    //   setGroupList(data.groups)
+    //   console.log(grouplist)
+    // })
+  }
 
   return (
     <SafeAreaView style={styles.background}>
-      <Pressable 
-        style={styles.alone}
-        onPress={() => {
-          // setTimesPressed((current) => current + 1);
-        }} >
-        <Text style={styles.name}>Table for One</Text>
-      </Pressable>
       <FlatList 
-        data={DATA}
+        {...retrieveGroups}
+        data={alone.concat(DATA)}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
         extraData={selectedId}
       />
     </SafeAreaView>
   );
-    
-
-  // return (
-  //   <View style={styles.background}
-  //     <View style={styles.container}>
-  //       <Text style={styles.name}>{groupNames[1]}</Text>
-  //     </View>
-  //   </View>
-  // );
 }
 
 const styles = StyleSheet.create({
@@ -81,38 +109,26 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 25,
     fontWeight: 'bold',
-    justifyContent: 'flex-start',
+    justifyContent: 'space-between',
     alignSelf: "center",
-    color: Colors.light.text
+    color: Colors.light.text,
+    marginLeft: "10%",
+    marginRight: "10%",
   },
-  alone: {
+  container: {
     flex: 1,
     flexDirection: 'row',
     marginTop: StatusBar.currentHeight || 0,
     backgroundColor: Colors.light.background,
-    borderRadius: 25,
+    borderRadius: 20,
     borderWidth: 1,
     borderColor: Colors.dark.background,
     borderStyle: "solid",
-    justifyContent: "center",
-    width: "75%",
-    height: 10,
-    margin: "3%"
-  },
-  container: {
-    flex: 1.3,
-    flexDirection: 'row',
-    marginTop: StatusBar.currentHeight || 0,
-    backgroundColor: Colors.light.background,
-    borderRadius: 17,
-    borderWidth: 1,
-    borderColor: Colors.dark.background,
-    borderStyle: "solid",
-    justifyContent: "center",
+    justifyContent: "space-between",
     alignContent: "center",
-    width: "90%",
-    height: 50,
-    margin: "6%"
+    width: "80%",
+    height: 73,
+    marginHorizontal: "5%",
   }, 
 });
 
