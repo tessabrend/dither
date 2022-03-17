@@ -5,6 +5,7 @@ import { Slider } from '@miblanchard/react-native-slider';
 import { MultiSelect } from 'react-native-element-dropdown';
 import Colors from '../constants/Colors';
 import { Text, View } from './Themed';
+import { useNavigation } from '@react-navigation/native';
 
 export interface GroupMembers {
   id: string;
@@ -175,6 +176,7 @@ const [highSel, setPricehigh] = useState(false);
         setGroupData(data) 
     })
   }
+  const navigation = useNavigation();
 
   return (
     <SafeAreaView style={styles.background}>
@@ -272,7 +274,7 @@ const [highSel, setPricehigh] = useState(false);
       </ScrollView>
 
       <View style={styles.submitWrapper}>
-        <Pressable style={styles.buttonCard}>
+        <Pressable style={styles.buttonCard} onPress={() => {navigation.navigate('Session')}}>
           <Text style={styles.submitText}>Go Eat!</Text>
         </Pressable>
       </View>

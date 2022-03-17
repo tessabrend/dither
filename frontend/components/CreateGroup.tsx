@@ -32,7 +32,7 @@ export default function CreateGroup(setModalOpen) {
                 } else {
                     setError('');
                     setModalOpen(false);
-                    alert(`Group Created Successfully: ${JSON.stringify(data)}`);
+                    alert(`Group Created Successfully`);
                 }
             }).catch(error => {
                 setError('Incorrect response format: likely due to internal error');

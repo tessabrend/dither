@@ -22,6 +22,12 @@ import { RootStackParamList, RootTabParamList, RootTabScreenProps } from '../typ
 import LinkingConfiguration from './LinkingConfiguration';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import GroupPopup from '../components/GroupPopup';
+import Compromise from '../screens/Compromise';
+import Session from '../components/SwipingSession';
+import SessionScreen from '../screens/SessionScreen';
+import GroupList from '../components/GroupList';
+import GroupDetails from '../components/GroupDetails';
+import { useNavigation } from '@react-navigation/native';
 
 export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }) {
   return (
@@ -37,42 +43,14 @@ export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeNa
  * A root stack navigator is often used for displaying modals on top of all other content.
  * https://reactnavigation.org/docs/modal
  */
-const Stack = createNativeStackNavigator<RootStackParamList>();
+
+const Stack = createNativeStackNavigator();
 
 function RootNavigator() {
   return (
     <Stack.Navigator>
-      <Stack.Screen name="Root" component={BottomTabNavigator} options={{ headerShown: false }} />
-      <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ title: 'Oops!' }} />
-      <Stack.Group screenOptions={{ presentation: 'modal' }}>
-        <Stack.Screen name="Modal" component={JoinByGroupCode} />
-      </Stack.Group>
-    </Stack.Navigator>
-  );
-}
-
-/**
- * A bottom tab navigator displays tab buttons on the bottom of the display to switch screens.
- * https://reactnavigation.org/docs/bottom-tab-navigator
- */
-const BottomTab = createBottomTabNavigator<RootTabParamList>();
-
-function BottomTabNavigator() {
-  const colorScheme = useColorScheme();
-
-  return (
-    <BottomTab.Navigator
-    //bottom nav to be removed and replaced with internal nav
-      initialRouteName="Homepage"
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme].tint,
-      }}>
-      <BottomTab.Screen
-        name="Homepage"
-        component={Homepage}
-        options={({ navigation }: RootTabScreenProps<'Homepage'>) => ({
-          title: '', //show username?
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+      <Stack.Screen name="Home" component={Homepage} options={{
+        title: '',
           headerLeft: () => (
             <GroupPopup/>
           ),
@@ -86,53 +64,27 @@ function BottomTabNavigator() {
               <FontAwesomeIcon
                 icon="circle-user"
                 size={25}
-                color={Colors[colorScheme].text}
                 style={{ marginRight: 15 }}
               />
             </Pressable>
-          ),
-        })}
-      />
-      <BottomTab.Screen
-        name="TabTwo" //def in types.tsx
-        component={GroupHome}
-        options={{
-          title: '', //replace w/ variable GroupName
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
-          headerLeft: () => (
-            <Pressable
-              onPress={() => {
-              }}
-              style={({ pressed }) => ({
-                opacity: pressed ? 0.5 : 1,
-              })}>
-              <FontAwesomeIcon
-                icon="long-arrow-left"
-                size={25}
-                color={Colors[colorScheme].text}
-                style={{ marginLeft: 15 }}
-              />
-            </Pressable>
-          ),
-          headerRight: () => (
-            //replace with addmember component
-            <Pressable
-              onPress={() => {
-              }}
-              style={({ pressed }) => ({
-                opacity: pressed ? 0.5 : 1,
-              })}>
-              <FontAwesomeIcon
-                icon="ellipsis"
-                size={25}
-                color={Colors[colorScheme].text}
-                style={{ marginRight: 15 }}
-              />
-            </Pressable>
-          ),          
-        }}
-      />
-    </BottomTab.Navigator>
+          )
+      }}>
+      </Stack.Screen>
+      <Stack.Screen name='GroupDetails' component={GroupDetails} options={{title: '', headerRight: () => (
+        <Pressable onPress={() => {
+          let navigation = useNavigation()
+          navigation.navigate('Session');
+        }}>
+          <FontAwesomeIcon size={25} style={{marginRight: 15}} icon="ellipsis"/>
+        </Pressable>
+      )}}></Stack.Screen>
+      <Stack.Screen name='Compromise' component={Compromise}></Stack.Screen>
+      <Stack.Screen name='Session' component={SessionScreen}></Stack.Screen>
+      <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ title: 'Oops!' }} />
+      <Stack.Group screenOptions={{ presentation: 'modal' }}>
+        <Stack.Screen name="Modal" component={JoinByGroupCode} />
+      </Stack.Group>
+    </Stack.Navigator>
   );
 }
 
