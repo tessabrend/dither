@@ -160,7 +160,7 @@ const [highSel, setPricehigh] = useState(false);
 
   const leader: GroupMembers[] = [  {
     id: "456ghjjh",
-    name: "Leader",
+    name: "User",
   },]
 
   let groupCode = "wcBwxbzx"
@@ -172,7 +172,7 @@ const [highSel, setPricehigh] = useState(false);
     })
     .then(response => response.json())
     .then(data => {
-        setGroupData(data.groups.GroupEntryCode[groupCode]) 
+        setGroupData(data) 
     })
   }
 
