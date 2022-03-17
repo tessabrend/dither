@@ -12,7 +12,11 @@ export default function App() {
   const isLoadingComplete = useCachedResources();
   const colorScheme = useColorScheme();
 
+<<<<<<< HEAD
   library.add(faHeart, faCircleXmark, faFaceGrinStars, faFaceFrown, faDollarSign, faCircleUser, faAngleRight, faCrown );
+=======
+  library.add(faHeart, faCircleXmark, faFaceGrinStars, faFaceFrown, faDollarSign, faCircleUser, faAngleRight );
+>>>>>>> f77bff698e74661f5796112e71218fb6a2dbfd9f
 
   const checkUserExists = async () => {
   }
