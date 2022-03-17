@@ -19,8 +19,6 @@ class Session extends Component {
         index: 0,
     }
 
-    data1 = ["this", "is", "a", "test"]
-
     increment = () => {
         this.setState((state) => {
             return {progress: state.progress + (100 / this.state.data?.length)}
