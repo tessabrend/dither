@@ -8,8 +8,7 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "eject": "expo eject",
-    "test": "jest --watchAll",
-    "postinstall": "patch-package"
+    "test": "jest --watchAll"
   },
   "jest": {
     "preset": "jest-expo"
@@ -24,20 +23,17 @@
     "@react-navigation/native-stack": "^6.1.0",
     "expo": "~44.0.0",
     "expo-asset": "~8.4.4",
-    "expo-cli": "^5.2.0",
     "expo-constants": "~13.0.0",
     "expo-font": "~10.0.4",
     "expo-linking": "~3.0.0",
     "expo-splash-screen": "~0.14.0",
     "expo-status-bar": "~1.2.0",
     "expo-web-browser": "~10.1.0",
-    "patch-package": "^6.4.7",
     "react": "17.0.1",
     "react-dom": "17.0.1",
     "react-native": "0.64.3",
-    "react-native-animated-progress": "^1.0.2",
-    "react-native-countdown-component": "^2.7.1",
     "react-native-deck-swiper": "^2.0.5",
+    "react-native-progress-bar-animated": "^1.0.6",
     "react-native-safe-area-context": "3.3.2",
     "react-native-screens": "~3.10.1",
     "react-native-svg": "^12.1.1",
