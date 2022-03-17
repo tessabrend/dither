@@ -176,9 +176,7 @@ def createUser():
         
 @app.route('/user/<id>/groups', methods=["GET"])
 def getUserGroups(id):
-    set_sql_debug(True)
     user = User[id]
-    print(type(user.id))
     query = list(left_join((gm.GroupLeader, g.GroupName, g.GroupEntryCode, g.id) for gm in GroupMembers for g in gm.GroupId if user.id == int(gm.UserId)))
     response = []
     for group in range(len(query)):
@@ -193,4 +191,4 @@ def getUserGroups(id):
 ### End User ###
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5001)
+    app.run(debug=True)
