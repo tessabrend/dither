@@ -46,10 +46,10 @@ class Session extends Component {
     getRestaurants = async () => {
         try {
             const response = await fetch('http://131.104.49.71:80/restaurant/query?' + new URLSearchParams({
-            "cuisine": "Pub",
-            "rating": "3.0",
-            "price-high": "80",
-            "price-low": "20",
+            "cuisine": "pub",
+            "rating": "0",
+            "price-high": "200",
+            "price-low": "19",
             "start-index": "0",
             "end-index": "50",
             }))
@@ -127,7 +127,7 @@ class Session extends Component {
                                 source={{uri: card?.picture}}
                                 />
                                 <Text style={styles.cardName}>{card?.name}</Text>
-                                <Star score={card?.rating} style={styles.starStyle} />
+                                <Star score={card?.rating ? card?.rating : 0} style={styles.starStyle} />
                                 <Text>{card?.location}</Text>
                                 {this.getPriceBucket(card?.price_low, card?.price_high)}
                             </View>
