@@ -1,5 +1,5 @@
 import  React, { Component } from 'react';
-import { View, Text, Pressable, StyleSheet, Dimensions, Platform, Alert, Image } from 'react-native';
+import { View, Text, Pressable, StyleSheet, Dimensions, Platform, Image } from 'react-native';
 import Swiper from 'react-native-deck-swiper';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import CountDown from 'react-native-countdown-component';
@@ -15,24 +15,37 @@ class Session extends Component {
         progress: 0,
         modalVisible: false,
         data: [] as any[],
-        index: 0
+        hours: [] as any[],
+        index: 0,
     }
 
-    increment() {
+    data1 = ["this", "is", "a", "test"]
+
+    increment = () => {
         this.setState((state) => {
-            return {progress: state.progress + this.state.data?.length}
+            return {progress: state.progress + (100 / this.state.data?.length)}
         })
     }
 
-    toggleModal(visible) {
+    toggleModal = (visible) => {
         this.setState({ modalVisible: visible })
     } 
     
-    showMoreDetails(index) {
+    showMoreDetails = (index) => {
         this.setState({ index: index })
-    } 
+    }
 
-    async getRestaurants() {
+    splitHours = (string) => {
+        let days = string?.split(';')
+        this.setState({ hours: days })
+    }
+
+    toggleSwiping = (swiping) => {
+        //this.setState({ canSwipe: !swiping })
+        swiping = false
+    }
+
+    getRestaurants = async () => {
         try {
             const response = await fetch('http://131.104.49.71:80/restaurant/query?' + new URLSearchParams({
             "cuisine": "Pub",
@@ -49,49 +62,64 @@ class Session extends Component {
         }  
     }
 
-    componentDidMount() {
+    getPriceBucket = (low, high) => {
+        if( high > 150 )
+           return (
+            <View style={styles.bucketRow}>
+            <FontAwesomeIcon icon="dollar-sign" size={15}/>
+            <FontAwesomeIcon icon="dollar-sign" size={15}/>
+            <FontAwesomeIcon icon="dollar-sign" size={15}/>
+            </View>
+           ); else if ( low > 75 && high < 150 ) 
+            return (
+                <View style={styles.bucketRow}>
+                <FontAwesomeIcon icon="dollar-sign" size={15}/>
+                <FontAwesomeIcon icon="dollar-sign" size={15}/>
+                </View>
+               );
+            else 
+            return (
+                <View style={styles.bucketRow}>
+                <FontAwesomeIcon icon="dollar-sign" size={15}/>
+                </View>
+               );
+        return null;
+     }
+
+    componentDidMount = () => {
         this.getRestaurants()
-      }
+    }
 
     render () {
-        console.log(this.state.data)
-        // <Rating
-        // rating={card?.rating}
-        // max={card?.rating}
-        // iconWidth={30}
-        // iconHeight={20}
-        // editable={false}/>
-
         return (
             <View style={styles.container}>
                 <View style={styles.centeredView}>
                      <Modal
                      coverScreen={true}
                      isVisible={this.state.modalVisible}
-                     //presentationStyle="overFullScreen"
                      onSwipeComplete={() => this.toggleModal(!this.state.modalVisible)}
                      swipeDirection="down"
+                     // show more details modal
                      >
                      <View style={styles.centeredView}>
                          <View style={styles.modalView}>
-                            <Text style={styles.modalText}>{this.state.data[this.state.index]?.hours}</Text>
-                            <View style={styles.moreDetailsTags}>
-                                <View style={styles.moreDetailsTagItem}>
-                                    <Text style={styles.modalText}>{this.state.data[this.state.index]?.cuisine}</Text>
-                                </View>
-                                <View style={styles.moreDetailsTagItem}>
-                                    <Text style={styles.modalText}>{this.state.data[this.state.index]?.dining_option}</Text>
-                                </View>
-                            </View>
+                             <Text style={styles.modalText}>Hours of Operation:</Text>
+                            { this.state.hours?.map((item, key)=>(
+                            <Text key={key}> { item } </Text>)
+                            )}
+                            <Text style={styles.moreDetailsTagItem}>{this.state.data[this.state.index]?.cuisine}</Text>
+                            <Text style={styles.moreDetailsTagItem}>{this.state.data[this.state.index]?.dining_option}</Text>
                          </View>
                      </View>
                     </Modal>
                 </View>
                 <Swiper
+                // card deck component
                     ref={swiper => {
                         this.swiper = swiper;
                     }}
                     cards={this.state.data}
+                    key={this.state.data?.length}
                     renderCard={(card) => {
                         return (
                             <View style={styles.card}>
@@ -110,16 +138,17 @@ class Session extends Component {
                                     style={{alignSelf: "left"}}
                                 />
                                 <Text>{card?.location}</Text>
+                                {this.getPriceBucket(card?.price_low, card?.price_high)}
                             </View>
                         )
                     }}
                     onSwiped={() =>  {this.increment()}}
-                    onSwipedAll={() => {!this.swiper.horizontalSwipe;}} //this needs to change to disable swiping
+                    onSwipedAll={() => {this.toggleSwiping(this.swiper.horizontalSwipe); this.toggleSwiping(this.swiper.verticalSwipe);}} //this needs to change to disable swiping
                     onSwipedLeft={(cardIndex) => {console.log('card at index ' + cardIndex +' swiped no')}}
                     onSwipedRight={(cardIndex) => {console.log('card at index ' + cardIndex +' swiped like')}}
                     onSwipedTop={(cardIndex) => {console.log('card at index ' + cardIndex +' swiped crave')}}
                     onSwipedBottom={(cardIndex) => {console.log('card at index ' + cardIndex +' swiped hard no')}}
-                    onTapCard={(cardIndex) => {this.toggleModal(!this.state.modalVisible); this.showMoreDetails(cardIndex)}}
+                    onTapCard={(cardIndex) => {this.toggleModal(!this.state.modalVisible); this.showMoreDetails(cardIndex); this.splitHours(this.state.data[this.state.index]?.hours)}}
                     cardIndex={0}
                     backgroundColor={'#ffffff'}
                     stackSize= {3}
@@ -129,8 +158,8 @@ class Session extends Component {
                 <View style={styles.timer}>
                     <CountDown
                     size={15}
-                    until={300} //time in seconds
-                    onFinish={() => {!this.swiper.horizontalSwipe; !this.swiper.verticalSwipe;}} //not currently working
+                    until={30} //time in seconds
+                    onFinish={() => {this.swiper.horizontalSwipe = false; this.toggleSwiping(this.swiper.verticalSwipe);}} //neither currently working
                     digitStyle={{backgroundColor: '#FFF', borderWidth: 2, borderColor: '#000000'}}
                     digitTxtStyle={{color: '#000000'}}
                     timeLabelStyle={{color: 'red', fontWeight: 'bold'}}
@@ -186,7 +215,7 @@ const styles = StyleSheet.create({
     buttonRow: {
         justifyContent: "space-between",
         flexDirection: "row",
-        marginTop: Platform.OS === 'ios' ? screen.width + 160 : screen.width + 90,
+        marginTop: Platform.OS === 'ios' ? screen.width + 160 : screen.width + 80,
         paddingRight: 30,
         paddingLeft: 30,
     },
@@ -234,15 +263,17 @@ const styles = StyleSheet.create({
           fontSize: 50,
       },
       moreDetailsTagItem: {
-        //backgroundColor: '#B3B3B3',
-       // width: 70,
-        //height: 40,
-        //borderColor: '#000000',
-        //borderWidth: 2,
-        //alignItems: "center",
-        //textAlign: "center",
+        backgroundColor: '#B3B3B3',
+       width: 70,
+        height: 40,
+        borderColor: '#000000',
+        borderWidth: 2,
+        alignItems: "center",
+        textAlign: "center",
+        marginBottom: 30
       },
       moreDetailsTags: {
+        flex: 1,
         flexDirection: "row",
         justifyContent: "space-evenly",
         padding: 20,
@@ -255,4 +286,8 @@ const styles = StyleSheet.create({
           alignSelf: "center",
           marginBottom: 20,
       },
+      bucketRow: {
+        flexDirection: "row",
+        padding: 5,
+      }
   });
