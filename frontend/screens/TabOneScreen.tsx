@@ -4,14 +4,14 @@ import EditScreenInfo from '../components/EditScreenInfo';
 import GroupPopup from '../components/GroupPopup';
 import { Text, View } from '../components/Themed';
 import { RootTabScreenProps } from '../types';
-import Compromise from './Compromise';
+import Compromise from './CompromiseScreen';
 import JoinByGroupCode from './JoinByGroupCode';
 import AddToGroup from './AddToGroup';
 
 export default function TabOneScreen() {
   return (
     <View style={styles.container}>
-      <Compromise sessionID={1}></Compromise>
+      <Compromise></Compromise>
     </View>
   );
 }

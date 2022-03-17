@@ -1,9 +1,10 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Link } from "@react-navigation/native";
 import React, { useState } from "react";
-import { FlatList, StyleSheet, Text, View } from "react-native";
+import { FlatList, StyleSheet, Text, View, Pressable } from "react-native";
+import { useNavigation } from '@react-navigation/native';
 
-export default function Compromise(sessionID) {
+export default function Compromise() {
     let [fetchError, setFetchError] = useState("");
     let [compromiseListItems, setCompromiseListItems] = useState([
             {
@@ -15,7 +16,7 @@ export default function Compromise(sessionID) {
             }]);
 
     let fetchCompromiseListItems = () => {
-        fetch(`http://131.104.49.71:80/session/<${sessionID}>/results`, { method: 'GET'})
+        fetch(`http://131.104.49.71:80/session/1/results`, { method: 'GET'})
         .then(response => {
             response.json().then(data => {
                 let items = [];
@@ -30,6 +31,7 @@ export default function Compromise(sessionID) {
         });
     }
 
+    let navigation = useNavigation();
     fetchCompromiseListItems();
 
     let compromiseListItem = item => {
@@ -60,7 +62,9 @@ export default function Compromise(sessionID) {
             <Text style={styles.subHeaderLg}>COMPROMISE</Text>
         </View>
         <FlatList data={compromiseListItems} renderItem={compromiseListItem}></FlatList>
-        <Link to={'/home'} style={styles.linkText}>Choice Made -></Link>
+        <Pressable onPress={() => { navigation.reset({index: 0})}}>
+            <Link to={'/Home'} style={styles.linkText}>Choice Made -></Link>
+        </Pressable>
     </View>
 }
 

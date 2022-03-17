@@ -3,6 +3,9 @@ import React, { useState } from "react";
 import { ListRenderItem, FlatList, SafeAreaView, StyleSheet, Pressable, StatusBar } from "react-native";
 import Colors from '../constants/Colors';
 import { Text } from './Themed';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { useNavigation } from '@react-navigation/native';
 
 export interface Group {
   id: string;
@@ -41,29 +44,19 @@ const DATA: Group[] = [
     name: "350 Bloor",
     members: [""],
   },
-  {
-    id: "58694a0f",
-    name: "Cabin Seven",
-    members: [""],
-  },
 ];
 
-const Item = ({ data }: { data: Group }) => (
-  <Pressable 
+const Item = ({ data }) => {
+  let navigation = useNavigation();
+  return(<Pressable 
     onPress={() => {
+      navigation.navigate('Session')
   }} 
     style={styles.container}>
     <Text style={styles.name}>{data.name}</Text>
     <FontAwesomeIcon style={styles.name} icon="angle-right" size={30}/>
-  </Pressable>
-); 
-
-const renderItem: ListRenderItem<Group> = ({ item }) => (
-  <Item 
-    data={item} 
-    // select={() => setSelectedId(item.id)}
-  />
-);
+  </Pressable>);
+}; 
 
 export default function GroupList() {
   const [grouplist, setGroupList] = useState([]);
@@ -86,6 +79,13 @@ export default function GroupList() {
     // })
   }
 
+  const renderItem: ListRenderItem<Group> = ({ item }) => (
+    <Item 
+      data={item} 
+      // select={() => setSelectedId(item.id)}
+    />
+  );
+  
   return (
     <SafeAreaView style={styles.background}>
       <FlatList 
