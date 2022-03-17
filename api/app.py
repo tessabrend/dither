@@ -151,7 +151,8 @@ def deactivateSession(id):
 
 @app.route("/session/<id>/results", methods=["GET"])
 def getSessionResults(id):
-    query = list(select((count(s.id), s.TypeOfFeedback, r.Name, r.id) for s in SessionSelections for r in Restaurant if s.RestaurantId == r).order_by(3))
+    session = SelectionSession[id]
+    query = list(select((count(s.id), s.TypeOfFeedback, r.Name, r.id) for s in SessionSelections for r in Restaurant if s.RestaurantId == r and session.id == int(s.SessionId)).order_by(3))
     result = {}
     for obj in query:  # obj will be a tuple of (count, typeOfFeedback, restaurant name, restaurant id) 
         if obj[3] not in result:  # if the restaurant is not already in the results add it
@@ -221,7 +222,7 @@ def getUserGroups(id):
             "isGroupLeader": query[group][0]
         })
     return jsonify(response)
-    
+
 ### End User ###
 
 if __name__ == "__main__":
