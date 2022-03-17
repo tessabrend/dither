@@ -50,7 +50,7 @@ const Item = ({ data }) => {
   let navigation = useNavigation();
   return(<Pressable 
     onPress={() => {
-      navigation.navigate('Session')
+      navigation.navigate('GroupDetails')
   }} 
     style={styles.container}>
     <Text style={styles.name}>{data.name}</Text>

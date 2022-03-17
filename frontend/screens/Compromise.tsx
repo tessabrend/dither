@@ -3,25 +3,41 @@ import { Link } from "@react-navigation/native";
 import React, { useState } from "react";
 import { FlatList, StyleSheet, Text, View, Pressable } from "react-native";
 import { useNavigation } from '@react-navigation/native';
+import { useEffect } from "react";
 
 export default function Compromise() {
     let [fetchError, setFetchError] = useState("");
     let [compromiseListItems, setCompromiseListItems] = useState([
-            {
-                id: 1,
-                name: 'Thai Tanic', 
-                numLikes: 2,
-                numDislikes: 1,
-                numCraves: 0
-            }]);
+        {
+            id: 1,
+            name: 'Thai Tanic',
+            numLikes: 2,
+            numDislikes: 1,
+            numCraves: 1
+        },
+        {
+            id: 2,
+            name: "Denny's",
+            numLikes: 1,
+            numDislikes: 2,
+            numCraves: 1
+        },
+        {
+            id: 3,
+            name: "East Side Mario's",
+            numLikes: 1,
+            numDislikes: 2,
+            numCraves: 2
+        }
+    ]);
 
     let fetchCompromiseListItems = () => {
-        fetch(`http://131.104.49.71:80/session/1/results`, { method: 'GET'})
+        fetch(`http://131.104.49.71:80/session/4/results`, { method: 'GET'})
         .then(response => {
             response.json().then(data => {
                 let items = [];
                 for(let item in data) {
-                    items.push({id: item, name: data[item]['name'], numLikes: data[item]['like'], numDislikes: data[item]['dislike'], numCraves: data[item]['crave']});
+                    items.push({id: item, name: data[item]['name'], numLikes: data[item]['like'] || 0, numDislikes: data[item]['dislike'] || 0, numCraves: data[item]['crave'] || 0});
                 }
                 setCompromiseListItems(items);
             });
@@ -32,7 +48,10 @@ export default function Compromise() {
     }
 
     let navigation = useNavigation();
-    fetchCompromiseListItems();
+
+    useEffect(() => {
+        fetchCompromiseListItems();
+    }, []);
 
     let compromiseListItem = item => {
         return (<View style={styles.listItemView}>
@@ -54,7 +73,6 @@ export default function Compromise() {
         </View>);
     }
     
-
     return <View style={styles.screen}>
         <Text style={styles.headerText}>Time's Up!</Text>
         <View style={styles.subHeaderView}>
@@ -62,8 +80,8 @@ export default function Compromise() {
             <Text style={styles.subHeaderLg}>COMPROMISE</Text>
         </View>
         <FlatList data={compromiseListItems} renderItem={compromiseListItem}></FlatList>
-        <Pressable onPress={() => { navigation.reset({index: 0})}}>
-            <Link to={'/Home'} style={styles.linkText}>Choice Made -></Link>
+        <Pressable onPress={() => { navigation.reset({index: 0, routes: [{name: 'Home' }]})}}>
+            <Text style={styles.linkText}>Choice Made <Ionicons name="arrow-forward"></Ionicons></Text>
         </Pressable>
     </View>
 }
@@ -113,6 +131,7 @@ const styles = StyleSheet.create({
     },
     linkText: {
         textAlign: 'right',
-        margin: 8
+        margin: 8,
+        color: "#2196F3"
     }
 });

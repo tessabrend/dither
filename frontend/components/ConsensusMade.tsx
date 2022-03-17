@@ -23,7 +23,8 @@ export default function ConsensusMade() {
         <Text style={styles.name}>{restaurantData[0]}</Text>
         <View style={styles.detailRow}>
           <View style={styles.hiddenCard}>
-            <FontAwesomeIcon icon="dollar-sign" size={20}/><FontAwesomeIcon icon="dollar-sign" size={20}/>
+            <FontAwesomeIcon icon="dollar-sign" size={20}/>
+            <FontAwesomeIcon icon="dollar-sign" size={20}/>
           </View>
           <View style={styles.hiddenCard}>
             <Text style={styles.detailText}>{restaurantData[2]}</Text>
