@@ -15,7 +15,7 @@ export interface GroupMembers {
 const DATA: GroupMembers[] = [
   {
     id: "bd7acbea",
-    name: "David",
+    name: "Tessa",
   },
   {
     id: "63tiy0iu",
@@ -161,7 +161,7 @@ const [highSel, setPricehigh] = useState(false);
 
   const leader: GroupMembers[] = [  {
     id: "456ghjjh",
-    name: "User",
+    name: "David",
   },]
 
   let groupCode = "wcBwxbzx"
@@ -206,7 +206,7 @@ const [highSel, setPricehigh] = useState(false);
           <Text style={styles.detailText}>PICK UP</Text>
         </Pressable>
         <Pressable 
-            onPress={() => setDineIn(!deliverySel)}
+            onPress={() => setDineIn(!dineInSel)}
             style={[{ borderWidth: dineInSel ? 2 : 1 }, styles.buttonCard] }
           >
           <Text style={styles.detailText}>DINE IN</Text>
