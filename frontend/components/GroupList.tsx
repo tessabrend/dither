@@ -1,46 +1,54 @@
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import React, { useState } from "react";
-import { ListRenderItem, FlatList, SafeAreaView, StyleSheet, TouchableOpacity, Pressable, StatusBar } from "react-native";
+import { ListRenderItem, FlatList, SafeAreaView, StyleSheet, Pressable, StatusBar } from "react-native";
 import Colors from '../constants/Colors';
-import { Text, View } from './Themed';
+import { Text } from './Themed';
 
-export interface Restaurant {
+export interface Group {
   id: string;
   name: string;
+  members: Array<any>;
 }
 
-const DATA: Restaurant[] = [
+const DATA: Group[] = [
   {
     id: "bd7acbea",
     name: "Roomies",
+    members: [""],
   },
   {
     id: "3ac68afc",
     name: "Homies",
+    members: [""],
   },
   {
     id: "58694a0f",
     name: "Dev Team",
+    members: [""],
   },
   {
     id: "ghc69a34",
     name: "Dream Team",
+    members: [""],
   },
   {
     id: "55578a0f",
     name: "Michael",
+    members: [""],
   },
   {
     id: "3asdfg45c",
     name: "350 Bloor",
+    members: [""],
   },
   {
     id: "545b7an8",
     name: "Cabin Seven",
+    members: [""],
   },
 ];
 
-const Item = ({ data }: { data: Restaurant }) => (
+const Item = ({ data }: { data: Group }) => (
   <Pressable 
     onPress={() => {
   }} 
@@ -50,7 +58,7 @@ const Item = ({ data }: { data: Restaurant }) => (
   </Pressable>
 ); 
 
-const renderItem: ListRenderItem<Restaurant> = ({ item }) => (
+const renderItem: ListRenderItem<Group> = ({ item }) => (
   <Item 
     data={item} 
     // select={() => setSelectedId(item.id)}
@@ -58,15 +66,30 @@ const renderItem: ListRenderItem<Restaurant> = ({ item }) => (
 );
 
 export default function GroupList() {
+  const [grouplist, setGroupList] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
-  const alone: Restaurant[] = [  {
-    id: "456ghjjh",
+  const alone: Group[] = [  {
+    id: "9999999",
     name: "Table for One",
+    members: [""],
   },]
+  let list: Group[]
   
+  let retrieveGroups = () => {
+    // fetch("//131.104.49.71:80/group/find", {
+    //   method:'GET'
+    // })
+    // .then(response =>response.json())
+    // .then(data => {
+    //   setGroupList(data.groups)
+    //   console.log(grouplist)
+    // })
+  }
+
   return (
     <SafeAreaView style={styles.background}>
       <FlatList 
+        {...retrieveGroups}
         data={alone.concat(DATA)}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}

@@ -1,18 +1,29 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Pressable, TextInput, StyleSheet, Alert } from "react-native";
 import { Text, View } from './Themed';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function CreateGroup() {
+export default function CreateGroup(setModalOpen) {
 
     let [groupName, setGroupName] = useState("");
     let [error, setError] = useState("");
+    const [userId, setUserId] = useState("");
+
+    useEffect(() => {
+        async function retrieveUserId() {
+            let userID = await AsyncStorage.getItem("@userId");
+            setUserId(userID);
+        }
+        retrieveUserId();
+    }, [])
+
     let createGroup = () => {
         fetch('http://131.104.49.71:80/group/create', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
-            body: `GroupName=${groupName}`
+            body: `GroupName=${groupName}&UserId=${userId}`
         })
         .then(response => {
             response.json().then(data => {
@@ -20,12 +31,14 @@ export default function CreateGroup() {
                     setError(data['message']);
                 } else {
                     setError('');
+                    setModalOpen(false);
                     alert(`Group Created Successfully: ${JSON.stringify(data)}`);
                 }
             }).catch(error => {
                 setError('Incorrect response format: likely due to internal error');
             });
         }).catch(reason => {
+            console.log(reason)
             setError(reason.toString().split(':')[1]);
         });
     }
