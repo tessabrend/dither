@@ -1,4 +1,5 @@
-import Session from '../components/ResturantOverviewCard';
+import React from 'react';
+import Session from '../components/SwipingSession';
 
 export default function SessionScreen() {
   return (

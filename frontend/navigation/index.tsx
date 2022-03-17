@@ -12,12 +12,15 @@ import { ColorSchemeName, Pressable } from 'react-native';
 
 import Colors from '../constants/Colors';
 import useColorScheme from '../hooks/useColorScheme';
-import ModalScreen from '../screens/ModalScreen';
+import JoinByGroupCode from '../screens/JoinByGroupCode';
 import NotFoundScreen from '../screens/NotFoundScreen';
-import TabOneScreen from '../screens/TabOneScreen';
+import Homepage from '../screens/HomepageScreen';
 import TabTwoScreen from '../screens/SessionScreen';
+import SearchOverScreen from '../screens/SearchOverScreen'
 import { RootStackParamList, RootTabParamList, RootTabScreenProps } from '../types';
 import LinkingConfiguration from './LinkingConfiguration';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import GroupPopup from '../components/GroupPopup';
 
 export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }) {
   return (
@@ -41,7 +44,7 @@ function RootNavigator() {
       <Stack.Screen name="Root" component={BottomTabNavigator} options={{ headerShown: false }} />
       <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ title: 'Oops!' }} />
       <Stack.Group screenOptions={{ presentation: 'modal' }}>
-        <Stack.Screen name="Modal" component={ModalScreen} />
+        <Stack.Screen name="Modal" component={JoinByGroupCode} />
       </Stack.Group>
     </Stack.Navigator>
   );
@@ -58,16 +61,19 @@ function BottomTabNavigator() {
 
   return (
     <BottomTab.Navigator
-      initialRouteName="TabOne"
+      initialRouteName="Homepage"
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme].tint,
       }}>
       <BottomTab.Screen
-        name="TabOne"
-        component={TabOneScreen}
-        options={({ navigation }: RootTabScreenProps<'TabOne'>) => ({
-          title: 'Tab One',
+        name="Homepage"
+        component={Homepage}
+        options={({ navigation }: RootTabScreenProps<'Homepage'>) => ({
+          title: '', //show username?
           tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          headerLeft: () => (
+            <GroupPopup/>
+          ),
           headerRight: () => (
             <Pressable
               onPress={() => {
@@ -75,8 +81,8 @@ function BottomTabNavigator() {
               style={({ pressed }) => ({
                 opacity: pressed ? 0.5 : 1,
               })}>
-              <FontAwesome
-                name="info-circle"
+              <FontAwesomeIcon
+                icon="circle-user"
                 size={25}
                 color={Colors[colorScheme].text}
                 style={{ marginRight: 15 }}
