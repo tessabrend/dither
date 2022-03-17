@@ -16,6 +16,32 @@ def test():
 
 ### Groups ###
 
+@app.route('/group/join', methods=["PUT"])
+def add_to_group():
+    # check find if group exists
+    group = Group.get(GroupEntryCode=request.form['groupEntryCode'])
+
+    userId = request.form.get('UserId', None)
+    if group is not None:
+        # check if user already in group
+        if not select(group_member for group_member in GroupMembers if group_member.UserId.id == userId and group_member.GroupId.id == group.id).exists():
+            # if not in, add user to group 
+            try:
+                if(userId is None):
+                    user = User(Name=request.form['UserName'], Password="NO_ACCOUNT")
+                else:
+                    user = User.get(id=userId)
+                flush()
+                group_member = GroupMembers(GroupId=group, UserId=user)
+                commit()
+            except TransactionIntegrityError as e:
+                return {'message': f"Could not add user to group in database: {str(e).split('DETAIL:')[1]}".replace('\n', '')}, 400
+        else:
+            return {'message': f"User already in group in database"}, 400
+    else:
+        return {'message': f"Group does not exist in database"}, 400
+    return {'message': f"User added in group in database", 'groupName': group.GroupName}
+
 @app.route('/group/find', methods=["GET"])
 def find_groups():
     to_return = []
@@ -49,6 +75,8 @@ def create_group():
     group = Group(GroupName=request.form['GroupName'], 
                 GroupEntryCode=''.join(random.choice(string.ascii_letters) for _ in range(8)),
                 TimeLimit=request.form.get('TimeLimit', 30))
+    flush()
+    group_member = GroupMembers(GroupId=group.id, UserId=request.form.get('UserId'), GroupLeader=True)
     try:
         commit()
     except TransactionIntegrityError as e:
@@ -56,6 +84,27 @@ def create_group():
     return render_object(group)
 
 ### End Groups ###
+
+### Restaurants ###
+
+@app.route('/resturant/query', methods=["GET"])
+def getResturantInfo():
+    to_return = []
+
+    restaurants = select(restaurant for restaurant in Restaurant if restaurant.PriceHigh >= float(request.args.get('price-high')) \
+        and restaurant.PriceLow <= float(request.args.get('price-low')) and restaurant.Rating >= float(request.args.get('rating')) \
+        and request.args.get('cuisine') in restaurant.CuisineType)[int(request.args.get('start-index')):int(request.args.get('end-index'))]
+
+    for resturant in restaurants:
+        to_return.append({"name": resturant.Name, "location": resturant.Location, "hours": resturant.HoursOfOperation,
+         "website": resturant.Website, "phone": resturant.PhoneNumber, "dining-option": resturant.DiningType, "bookingsite": resturant.BookingSite,
+         "picture": resturant.PictureLocation, "sponsored": resturant.Sponsored, "cuisine": resturant.CuisineType, "rating": resturant.Rating, 
+         "price-low": resturant.PriceLow, "price-high": resturant.PriceHigh,})
+    return {"resturants": to_return}
+
+### End Restaurants ###
+
+### Sessions ###
 
 @app.route('/session/<id>/deactivate', methods=["PUT"])
 def deactivateSession(id):
@@ -110,6 +159,22 @@ def setSessionSelection():
         if(restaurantLikes.first() >= numGroupMembers.first()):
             return jsonify({"match": True})
     return jsonify({"match": False})
+
+### End Sessions ###
+
+### User ###
+
+@app.route('/user/create', methods=["POST"])
+def createUser():
+    try:
+        user = User(Name="User", Location="", Password="NO_ACCOUNT", PhoneNumber="", Email=None)
+        commit()
+        return jsonify({"userId": str(user.id)})
+    except TransactionIntegrityError as e:
+        print(e)
+        return {"message": "Could not create a user"}, 400
+        
+### End User ###
 
 if __name__ == "__main__":
     app.run(debug=True)

@@ -20,8 +20,8 @@ export default function GroupPopup() {
                         <Text style={styles.buttonText}>Join Existing</Text>
                     </Pressable>
                 </View>,
-        create: CreateGroup(),
-        join: EnterGroupCode(),
+        create: CreateGroup(setModalOpen),
+        join: EnterGroupCode(setModalOpen),
     }
 
     return  <>
@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: 'transparent'
+        backgroundColor: '#33333398',
     },
     popupContainer: {
         width: "75%",
