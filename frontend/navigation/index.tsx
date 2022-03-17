@@ -62,6 +62,7 @@ function BottomTabNavigator() {
 
   return (
     <BottomTab.Navigator
+    //bottom nav to be removed and replaced with internal nav
       initialRouteName="Homepage"
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme].tint,
@@ -93,10 +94,10 @@ function BottomTabNavigator() {
         })}
       />
       <BottomTab.Screen
-        name="TabTwo"
+        name="TabTwo" //def in types.tsx
         component={GroupHome}
         options={{
-          title: '',
+          title: '', //replace w/ variable GroupName
           tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
           headerLeft: () => (
             <Pressable
@@ -113,6 +114,22 @@ function BottomTabNavigator() {
               />
             </Pressable>
           ),
+          headerRight: () => (
+            //replace with addmember component
+            <Pressable
+              onPress={() => {
+              }}
+              style={({ pressed }) => ({
+                opacity: pressed ? 0.5 : 1,
+              })}>
+              <FontAwesomeIcon
+                icon="ellipsis"
+                size={25}
+                color={Colors[colorScheme].text}
+                style={{ marginRight: 15 }}
+              />
+            </Pressable>
+          ),          
         }}
       />
     </BottomTab.Navigator>
