@@ -77,7 +77,8 @@ export default function AddToGroup(groupID : Number) {
 const styles = StyleSheet.create({
     screen: {
         height: '100%',
-        width: '80%'
+        width: '100%',
+        padding: 16
     },
     headerText: {
         fontSize: 36,
