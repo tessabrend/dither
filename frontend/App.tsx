@@ -7,6 +7,7 @@ import useCachedResources from './hooks/useCachedResources';
 import useColorScheme from './hooks/useColorScheme';
 import React, { useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { MenuProvider } from 'react-native-popup-menu';
 
 export default function App() {
   const isLoadingComplete = useCachedResources();
@@ -58,8 +59,10 @@ export default function App() {
   } else {
     return (
       <SafeAreaProvider>
-        <Navigation colorScheme={colorScheme} />
-        <StatusBar />
+        <MenuProvider>
+          <Navigation colorScheme={colorScheme} />
+          <StatusBar />
+        </MenuProvider>
       </SafeAreaProvider>
     );
   }

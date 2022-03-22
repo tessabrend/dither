@@ -8,7 +8,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as React from 'react';
-import { ColorSchemeName, Pressable } from 'react-native';
+import { ColorSchemeName, Pressable, Text } from 'react-native';
 
 import Colors from '../constants/Colors';
 import useColorScheme from '../hooks/useColorScheme';
@@ -28,6 +28,8 @@ import SessionScreen from '../screens/SessionScreen';
 import GroupList from '../components/GroupList';
 import GroupDetails from '../components/GroupDetails';
 import { useNavigation } from '@react-navigation/native';
+import { Menu, MenuOptions, MenuOption, MenuTrigger } from 'react-native-popup-menu';
+import AddToGroup from '../screens/AddToGroup';
 
 export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }) {
   return (
@@ -47,6 +49,8 @@ export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeNa
 const Stack = createNativeStackNavigator();
 
 function RootNavigator() {
+  let navigation = useNavigation();
+
   return (
     <Stack.Navigator>
       <Stack.Screen name="Home" component={Homepage} options={{
@@ -70,13 +74,18 @@ function RootNavigator() {
           )
       }}>
       </Stack.Screen>
+      <Stack.Screen name='AddUserToGroup' component={AddToGroup} options={{title: ''}}></Stack.Screen>
       <Stack.Screen name='GroupDetails' component={GroupDetails} options={{title: '', headerRight: () => (
-        <Pressable onPress={() => {
-          let navigation = useNavigation()
-          navigation.navigate('Session');
-        }}>
-          <FontAwesomeIcon size={25} style={{marginRight: 15}} icon="ellipsis"/>
-        </Pressable>
+        <Menu>
+          <MenuTrigger>
+            <FontAwesomeIcon size={25} style={{marginRight: 15}} icon="ellipsis"/>
+          </MenuTrigger>
+          <MenuOptions>
+            <MenuOption onSelect={() => navigation.navigate('AddUserToGroup')}>
+              <Text style={{padding: 10, fontSize: 14}}>Add User</Text>
+            </MenuOption>
+          </MenuOptions>
+        </Menu>
       )}}></Stack.Screen>
       <Stack.Screen name='Compromise' component={Compromise}></Stack.Screen>
       <Stack.Screen name='Session' component={SessionScreen}></Stack.Screen>
