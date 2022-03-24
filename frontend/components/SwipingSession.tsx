@@ -5,7 +5,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import CountDown from 'react-native-countdown-component';
 import ProgressBar from "react-native-animated-progress";
 import Modal from "react-native-modal";
-import  { Rating } from 'react-native-elements';
+import Star from 'react-native-star-view';
+import { useNavigation } from '@react-navigation/native';
 
 const window = Dimensions.get("window");
 const screen = Dimensions.get("screen");
@@ -17,6 +18,12 @@ class Session extends Component {
         data: [] as any[],
         hours: [] as any[],
         index: 0,
+        navigator: null
+    }
+
+    constructor(props) {
+        super(props);
+        this.navigation = props.navigator;
     }
 
     increment = () => {
@@ -46,10 +53,10 @@ class Session extends Component {
     getRestaurants = async () => {
         try {
             const response = await fetch('http://131.104.49.71:80/restaurant/query?' + new URLSearchParams({
-            "cuisine": "Pub",
-            "rating": "3.0",
-            "price-high": "80",
-            "price-low": "20",
+            "cuisine": "pub",
+            "rating": "0",
+            "price-high": "200",
+            "price-low": "19",
             "start-index": "0",
             "end-index": "50",
             }))
@@ -126,22 +133,18 @@ class Session extends Component {
                                 source={{uri: card?.picture}}
                                 />
                                 <Text style={styles.cardName}>{card?.name}</Text>
-                                <Rating
-                                    type='custom'
-                                    fractions={1}
-                                    startingValue={card?.rating}
-                                    readonly
-                                    imageSize={30}
-                                    tintColor="#E8E8E8"
-                                    style={{alignSelf: "left"}}
-                                />
+                                <Star score={card?.rating ? card?.rating : 0} style={styles.starStyle} />
                                 <Text>{card?.location}</Text>
                                 {this.getPriceBucket(card?.price_low, card?.price_high)}
                             </View>
                         )
                     }}
                     onSwiped={() =>  {this.increment()}}
-                    onSwipedAll={() => {this.toggleSwiping(this.swiper.horizontalSwipe); this.toggleSwiping(this.swiper.verticalSwipe);}} //this needs to change to disable swiping
+                    onSwipedAll={() => {
+                        this.toggleSwiping(this.swiper.horizontalSwipe); 
+                        this.toggleSwiping(this.swiper.verticalSwipe);
+                        this.navigation.navigate('Compromise');
+                    }} //this needs to change to disable swiping
                     onSwipedLeft={(cardIndex) => {console.log('card at index ' + cardIndex +' swiped no')}}
                     onSwipedRight={(cardIndex) => {console.log('card at index ' + cardIndex +' swiped like')}}
                     onSwipedTop={(cardIndex) => {console.log('card at index ' + cardIndex +' swiped crave')}}
@@ -156,8 +159,8 @@ class Session extends Component {
                 <View style={styles.timer}>
                     <CountDown
                     size={15}
-                    until={30} //time in seconds
-                    onFinish={() => {this.swiper.horizontalSwipe = false; this.toggleSwiping(this.swiper.verticalSwipe);}} //neither currently working
+                    until={300} //time in seconds
+                    onFinish={() => {alert("Session Over")}} //neither currently working
                     digitStyle={{backgroundColor: '#FFF', borderWidth: 2, borderColor: '#000000'}}
                     digitTxtStyle={{color: '#000000'}}
                     timeLabelStyle={{color: 'red', fontWeight: 'bold'}}
@@ -213,7 +216,7 @@ const styles = StyleSheet.create({
     buttonRow: {
         justifyContent: "space-between",
         flexDirection: "row",
-        marginTop: Platform.OS === 'ios' ? screen.width + 160 : screen.width + 80,
+        marginTop: Platform.OS === 'ios' ? screen.width + 160 : screen.width,
         paddingRight: 30,
         paddingLeft: 30,
     },
@@ -280,12 +283,16 @@ const styles = StyleSheet.create({
           borderColor: '#000000',
           borderWidth: 2,
           width: 320,
-          height: 300,
+          height: Platform.OS === 'ios' ? screen.height - 650 : screen.height - 600,
           alignSelf: "center",
-          marginBottom: 20,
+          marginBottom: Platform.OS === 'ios' ? 20 : 10,
       },
       bucketRow: {
         flexDirection: "row",
         padding: 5,
-      }
+      },
+      starStyle: {
+        width: 100,
+        height: 20,
+      },
   });
