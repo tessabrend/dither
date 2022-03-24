@@ -1,0 +1,17 @@
+[
+    {
+        "GroupName": "Test Group",
+        "GroupEntryCode": "ABCDEFGH",
+        "TimeLimit": 5  
+    },
+    {
+        "GroupName": "Test Group 2",
+        "GroupEntryCode": "ABCDEFGH",
+        "TimeLimit": 30
+    },
+    {
+        "GroupName": "Test Group 3",
+        "GroupEntryCode": "pmrgksof",
+        "TimeLimit": 10  
+    }
+]
