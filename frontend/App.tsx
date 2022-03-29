@@ -2,17 +2,18 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import Navigation from './navigation';
 import { StatusBar } from 'expo-status-bar';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faHeart, faCircleXmark, faFaceGrinStars, faFaceFrown, faDollarSign, faCircleUser, faAngleRight, faCrown } from '@fortawesome/free-solid-svg-icons';
+import { faHeart, faCircleXmark, faFaceGrinStars, faFaceFrown, faDollarSign, faCircleUser, faAngleRight, faCrown, faLongArrowLeft, faStar, faEllipsisH} from '@fortawesome/free-solid-svg-icons';
 import useCachedResources from './hooks/useCachedResources';
 import useColorScheme from './hooks/useColorScheme';
 import React, { useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { MenuProvider } from 'react-native-popup-menu';
 
 export default function App() {
   const isLoadingComplete = useCachedResources();
   const colorScheme = useColorScheme();
 
-  library.add(faHeart, faCircleXmark, faFaceGrinStars, faFaceFrown, faDollarSign, faCircleUser, faAngleRight, faCrown );
+  library.add(faHeart, faCircleXmark, faFaceGrinStars, faFaceFrown, faDollarSign, faCircleUser, faAngleRight, faCrown, faLongArrowLeft, faStar, faEllipsisH);
 
   const checkUserExists = async () => {
   }
@@ -58,8 +59,10 @@ export default function App() {
   } else {
     return (
       <SafeAreaProvider>
-        <Navigation colorScheme={colorScheme} />
-        <StatusBar />
+        <MenuProvider>
+          <Navigation colorScheme={colorScheme} />
+          <StatusBar />
+        </MenuProvider>
       </SafeAreaProvider>
     );
   }

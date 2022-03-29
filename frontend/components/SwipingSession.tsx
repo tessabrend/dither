@@ -6,6 +6,7 @@ import CountDown from 'react-native-countdown-component';
 import ProgressBar from "react-native-animated-progress";
 import Modal from "react-native-modal";
 import Star from 'react-native-star-view';
+import { useNavigation } from '@react-navigation/native';
 
 const window = Dimensions.get("window");
 const screen = Dimensions.get("screen");
@@ -17,6 +18,12 @@ class Session extends Component {
         data: [] as any[],
         hours: [] as any[],
         index: 0,
+        navigator: null
+    }
+
+    constructor(props) {
+        super(props);
+        this.navigation = props.navigator;
     }
 
     increment = () => {
@@ -89,7 +96,6 @@ class Session extends Component {
     }
 
     render () {
-        console.log(screen.width / 10)
         return (
             <View style={styles.container}>
                 <View style={styles.centeredView}>
@@ -134,7 +140,11 @@ class Session extends Component {
                         )
                     }}
                     onSwiped={() =>  {this.increment()}}
-                    onSwipedAll={() => {this.toggleSwiping(this.swiper.horizontalSwipe); this.toggleSwiping(this.swiper.verticalSwipe);}} //this needs to change to disable swiping
+                    onSwipedAll={() => {
+                        this.toggleSwiping(this.swiper.horizontalSwipe); 
+                        this.toggleSwiping(this.swiper.verticalSwipe);
+                        this.navigation.navigate('Compromise');
+                    }} //this needs to change to disable swiping
                     onSwipedLeft={(cardIndex) => {console.log('card at index ' + cardIndex +' swiped no')}}
                     onSwipedRight={(cardIndex) => {console.log('card at index ' + cardIndex +' swiped like')}}
                     onSwipedTop={(cardIndex) => {console.log('card at index ' + cardIndex +' swiped crave')}}

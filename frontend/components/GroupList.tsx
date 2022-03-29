@@ -4,6 +4,9 @@ import { ListRenderItem, FlatList, SafeAreaView, StyleSheet, Pressable, StatusBa
 import Colors from '../constants/Colors';
 import { Text } from './Themed';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { useNavigation } from '@react-navigation/native';
 
 export interface Group {
   groupId: string;
@@ -51,6 +54,7 @@ const Item = (props: {
   return (
     <Pressable 
       onPress={() => {
+        navigation.navigate('GroupDetails')
     }} 
       style={styles.container}>
       <Text style={styles.name}>{data.groupName}{leader}</Text>
@@ -58,13 +62,6 @@ const Item = (props: {
     </Pressable>
   )
 }; 
-
-const renderItem: ListRenderItem<Group> = ({ item }) => (
-  <Item 
-    data={item} 
-    // select={() => setSelectedId(item.id)}
-  />
-);
 
 export default function GroupList() {
   const [grouplist, setGroupList] = useState([]);
@@ -98,6 +95,13 @@ export default function GroupList() {
     })
   }
 
+  const renderItem: ListRenderItem<Group> = ({ item }) => (
+    <Item 
+      data={item} 
+      // select={() => setSelectedId(item.id)}
+    />
+  );
+  
   return (
     <SafeAreaView style={styles.background}>
       <FlatList 
