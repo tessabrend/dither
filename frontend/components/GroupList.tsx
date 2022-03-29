@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import React, { useEffect, useState } from "react";
-import { ListRenderItem, FlatList, SafeAreaView, StyleSheet, Pressable, StatusBar } from "react-native";
+import { ListRenderItem, FlatList, SafeAreaView, StyleSheet, Pressable, StatusBar, View } from "react-native";
 import Colors from '../constants/Colors';
 import { Text } from './Themed';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -20,13 +20,13 @@ const DATA: Group[] = [
     groupId: "1",
     groupCode: "bd7acbea",
     groupName: "Roomies",
-    isGroupLeader: false,
+    isGroupLeader: true,
   },
   {
     groupId: "2",
     groupCode: "3ac68afc",
     groupName: "Homies",
-    isGroupLeader: false,
+    isGroupLeader: true,
   },
   {
     groupId: "3",
@@ -46,23 +46,38 @@ const Item = (props: {
   data : any
   }) => {
   const { data } = props;
-  // let leader
-  // leader = <FontAwesomeIcon style={styles.name} icon="crown" size={26}/>
-  // if (data.isGroupLeader == false) {
-  //   leader = null
-  // };
+  let isLeader = data.isGroupLeader;
   let navigation = useNavigation();
-  return(
-    <Pressable 
-      onPress={() => {
-        navigation.navigate('GroupDetails')
-      }} 
-      style={styles.container}>
-      <Text style={styles.name}>{data.groupName}</Text>
-      <FontAwesomeIcon style={styles.name} icon="angle-right" size={30}/>
-    </Pressable>
-  )
-}; 
+
+  if (isLeader && data.groupId != "9999999") {
+    return(
+      <Pressable 
+        onPress={() => {
+          navigation.navigate('GroupDetails')
+        }} 
+        style={styles.container}>
+        <View style={styles.spacer}>
+          <View style={styles.nameContainer}>
+            <FontAwesomeIcon style={styles.leaderIcon} icon="crown" size={26}/>
+            <Text style={styles.leaderName}>{data.groupName} </Text>
+          </View>
+          <FontAwesomeIcon style={styles.arrowIcon} icon="angle-right" size={30}/>
+        </View>
+      </Pressable>
+    )
+  } else {
+    return(
+      <Pressable 
+        onPress={() => {
+          navigation.navigate('GroupDetails')
+        }} 
+        style={styles.container}>
+        <Text style={styles.name}>{data.groupName}</Text>
+        <FontAwesomeIcon style={styles.arrowIcon} icon="angle-right" size={30}/>
+      </Pressable>
+    )
+  };
+}
 
 export default function GroupList() {
   const [grouplist, setGroupList] = useState([]);
@@ -132,6 +147,36 @@ const styles = StyleSheet.create({
     marginLeft: "10%",
     marginRight: "10%",
   },
+  leaderName: {
+    fontSize: 25,
+    fontWeight: 'bold',
+    justifyContent: 'space-between',
+    alignSelf: "center",
+    color: Colors.light.text,
+    marginLeft: "4%",
+    marginRight: "10%",
+  },
+  leaderIcon: {
+    color: "#FFC107",
+    alignSelf: "center",
+  },
+  arrowIcon: {
+    justifyContent: 'flex-end',
+    alignSelf: "center",
+    marginRight: "10%",
+  },
+  nameContainer: {
+    flex: 1,
+    flexDirection: "row",
+    marginLeft: "8%",
+  },
+  spacer: {
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignSelf: "center",
+    width: "100%",
+  },
   container: {
     flex: 1,
     flexDirection: 'row',
@@ -143,9 +188,9 @@ const styles = StyleSheet.create({
     borderStyle: "solid",
     justifyContent: "space-between",
     alignContent: "center",
-    width: "86%",
+    width: "80%",
     height: 73,
     marginHorizontal: "5%",
-  }, 
+  },  
 });
 
