@@ -46,11 +46,11 @@ const Item = (props: {
   data : any
   }) => {
   const { data } = props;
-  let leader
-  leader = <FontAwesomeIcon style={styles.name} icon="crown" size={26}/>
-  if (data.isGroupLeader == false) {
-    leader = null
-  };
+  // let leader
+  // leader = <FontAwesomeIcon style={styles.name} icon="crown" size={26}/>
+  // if (data.isGroupLeader == false) {
+  //   leader = null
+  // };
   let navigation = useNavigation();
   return(
     <Pressable 
@@ -58,7 +58,7 @@ const Item = (props: {
         navigation.navigate('GroupDetails')
       }} 
       style={styles.container}>
-      <Text style={styles.name}>{data.groupName}{leader}</Text>
+      <Text style={styles.name}>{data.groupName}</Text>
       <FontAwesomeIcon style={styles.name} icon="angle-right" size={30}/>
     </Pressable>
   )
