@@ -96,7 +96,6 @@ class Session extends Component {
     }
 
     render () {
-        console.log(screen.width / 10)
         return (
             <View style={styles.container}>
                 <View style={styles.centeredView}>
