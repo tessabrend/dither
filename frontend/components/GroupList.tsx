@@ -15,32 +15,32 @@ export interface Group {
   isGroupLeader: boolean;
 }
 
-// const DATA: Group[] = [
-//   {
-//     groupId: "1",
-//     groupCode: "bd7acbea",
-//     groupName: "Roomies",
-//     isGroupLeader: false,
-//   },
-//   {
-//     groupId: "2",
-//     groupCode: "3ac68afc",
-//     groupName: "Homies",
-//     isGroupLeader: false,
-//   },
-//   {
-//     groupId: "3",
-//     groupCode: "58694a0f",
-//     groupName: "Dev Team",
-//     isGroupLeader: false,
-//   },
-//   {
-//     groupId: "4",
-//     groupCode: "ghc69a34",
-//     groupName: "Dream Team",
-//     isGroupLeader: false,
-//   },
-// ];
+const DATA: Group[] = [
+  {
+    groupId: "1",
+    groupCode: "bd7acbea",
+    groupName: "Roomies",
+    isGroupLeader: false,
+  },
+  {
+    groupId: "2",
+    groupCode: "3ac68afc",
+    groupName: "Homies",
+    isGroupLeader: false,
+  },
+  {
+    groupId: "3",
+    groupCode: "58694a0f",
+    groupName: "Dev Team",
+    isGroupLeader: false,
+  },
+  {
+    groupId: "4",
+    groupCode: "ghc69a34",
+    groupName: "Dream Team",
+    isGroupLeader: false,
+  },
+];
 
 const Item = (props: { 
   data : any
@@ -51,11 +51,12 @@ const Item = (props: {
   if (data.isGroupLeader == false) {
     leader = null
   };
-  return (
+  let navigation = useNavigation();
+  return(
     <Pressable 
       onPress={() => {
         navigation.navigate('GroupDetails')
-    }} 
+      }} 
       style={styles.container}>
       <Text style={styles.name}>{data.groupName}{leader}</Text>
       <FontAwesomeIcon style={styles.name} icon="angle-right" size={30}/>
@@ -75,25 +76,25 @@ export default function GroupList() {
     isGroupLeader: true
   },]
 
-  useEffect(() => {
-    async function retrieveUserId() {
-        let userID = await AsyncStorage.getItem("@userId");
-        setUserId(userID);
-    }
-    retrieveUserId();
-  }, [])
+  // useEffect(() => {
+  //   async function retrieveUserId() {
+  //       let userID = await AsyncStorage.getItem("@userId");
+  //       setUserId(userID);
+  //   }
+  //   retrieveUserId();
+  // }, [])
 
-  let url = "//131.104.49.71:80/user/" + userId + "/groups"
+  // let url = "//131.104.49.71:80/user/" + userId + "/groups"
   
-  let retrieveGroups = () => {
-    fetch(url, {
-      method:'GET'
-    })
-    .then(response => response.json())
-    .then(data => {
-      setGroupList(data.groups)
-    })
-  }
+  // let retrieveGroups = () => {
+  //   fetch(url, {
+  //     method:'GET'
+  //   })
+  //   .then(response => response.json())
+  //   .then(data => {
+  //     setGroupList(data.groups)
+  //   })
+  // }
 
   const renderItem: ListRenderItem<Group> = ({ item }) => (
     <Item 
@@ -105,8 +106,8 @@ export default function GroupList() {
   return (
     <SafeAreaView style={styles.background}>
       <FlatList 
-        {...retrieveGroups}
-        data={alone.concat(grouplist)}
+        // {...retrieveGroups}
+        data={alone.concat(DATA)}
         renderItem={renderItem}
         keyExtractor={(item) => item.groupCode}
         extraData={selectedId}
