@@ -38,6 +38,7 @@
     "react-dom": "17.0.1",
     "react-native": "0.64.3",
     "react-native-animated-progress": "^1.0.2",
+    "react-native-card-flip": "^1.0.7",
     "react-native-countdown-component": "^2.7.1",
     "react-native-deck-swiper": "^2.0.5",
     "react-native-element-dropdown": "^1.8.0",

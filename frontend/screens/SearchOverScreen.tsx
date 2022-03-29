@@ -1,5 +1,5 @@
 import React from 'react';
-import ConsensusMade from '../components/ConsensusMade';
+import ConsensusMade from '../components/AllDetails';
 
 import { RootTabScreenProps } from '../types';
 

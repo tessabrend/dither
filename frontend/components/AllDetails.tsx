@@ -1,8 +1,9 @@
 import React from "react";
-import { StyleSheet, Image } from "react-native";
+import { StyleSheet, Image, TouchableOpacity } from "react-native";
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import Colors from '../constants/Colors';
 import { Text, View } from './Themed';
+import CardFlip from 'react-native-card-flip';
 
 const enum Price {
   Low = '$',
@@ -13,36 +14,43 @@ const enum Price {
 export default function ConsensusMade() {
   const restaurantData = ['Restaurant Name' , Price.Medium, '0.5km', 'Pub' ];//temp data
 
+  // <View style={styles.background}>
+  //     <View style={styles.headerWrapper}>
+  //       <Text style={styles.title}>Consensus Made!</Text>
+  //     </View>
+
+  //     <View style={styles.container}>
+  //       <Text style={styles.name}>{restaurantData[0]}</Text>
+  //       <View style={styles.detailRow}>
+  //         <View style={styles.hiddenCard}>
+  //           <FontAwesomeIcon icon="dollar-sign" size={20}/>
+  //           <FontAwesomeIcon icon="dollar-sign" size={20}/>
+  //         </View>
+  //         <View style={styles.hiddenCard}>
+  //           <Text style={styles.detailText}>{restaurantData[2]}</Text>
+  //         </View>
+  //         <View style={styles.cuisineCard}>
+  //           <Text style={styles.detailText}>{restaurantData[3]}</Text>
+  //         </View>
+  //       </View>
+
+  //       {/* replace with mapview when provider added */}
+  //       <Image style={styles.mapbox}
+  //             source={{uri: 'https://i.stack.imgur.com/SlwjS.png'}}
+  //           />
+  //     </View>
+
+  //     <View style={styles.footer}></View>
+  //   </View>
+
+
   return (
-    <View style={styles.background}>
-      <View style={styles.headerWrapper}>
-        <Text style={styles.title}>Consensus Made!</Text>
-      </View>
-
-      <View style={styles.container}>
-        <Text style={styles.name}>{restaurantData[0]}</Text>
-        <View style={styles.detailRow}>
-          <View style={styles.hiddenCard}>
-            <FontAwesomeIcon icon="dollar-sign" size={20}/>
-            <FontAwesomeIcon icon="dollar-sign" size={20}/>
-          </View>
-          <View style={styles.hiddenCard}>
-            <Text style={styles.detailText}>{restaurantData[2]}</Text>
-          </View>
-          <View style={styles.cuisineCard}>
-            <Text style={styles.detailText}>{restaurantData[3]}</Text>
-          </View>
-        </View>
-
-        {/* replace with mapview when provider added */}
-        <Image style={styles.mapbox}
-              source={{uri: 'https://i.stack.imgur.com/SlwjS.png'}}
-            />
-      </View>
-
-      <View style={styles.footer}></View>
+    <View>
+        <CardFlip style={styles.container} ref={(card) => this.card = card} >
+    <TouchableOpacity style={styles.background} onPress={() => this.card.flip()} ><Text>AB</Text></TouchableOpacity>
+    <TouchableOpacity style={styles.background} onPress={() => this.card.flip()} ><Text>CD</Text></TouchableOpacity>
+  </CardFlip>
     </View>
-
   );
 }
 
