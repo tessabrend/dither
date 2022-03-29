@@ -1,23 +1,27 @@
 import os
 import json
+from pathlib import Path
 
 from models import *
 from crontab import CronTab
+
+app_folder = Path(__file__).parent
+print(app_folder)
 
 with CronTab(user = 'student') as cron:
     job_exists = False
     for job in cron.find_comment('Fetch Restaurant Data'):
         job_exists = True
     if not job_exists:
-        print('Creating a new crontab to fetch data from places API')
-        job = cron.new(command = 'python3 /app/checkmein/api/fetch_restaurant_data.py && python3 /app/checkmein/api/refresh_database.py', comment='Fetch Restaurant Data')
-        job.minute.every(1)
+        print('Creating a new cron job to fetch data from places API')
+        job = cron.new(command = f"python3 {app_folder}/fetch_restaurant_data.py && python3 {app_folder}/refresh_database.py", comment='Fetch Restaurant Data')
+        job.minute.every(1) # This should be set to a longer timeframe (1 week) when we actually start using it
 
 table_names = [User, Group, GroupMembers, SelectionSession, Restaurant, SessionSelections]
 
 def load_into_table(folder, table):
-    sample_path = os.path.join('/', 'app', 'checkmein', 'api', 'data', folder, f"{table.__name__}.json")
-    if(os.path.isfile(sample_path)):
+    sample_path = Path(app_folder).joinpath('data', folder, f"{table.__name__}.json")
+    if(sample_path.is_file()):
         try:
             with open(sample_path) as input_file:
                 data = json.load(input_file)

@@ -1,0 +1,3 @@
+# Sample Data
+
+For testing purposes, it often makes sense to load in some initial data every time the database is recreated - it allows for quick testing and development without needing to track the state of the database and manually insert data into it. The files in this folder will correspond to the tables in the database: each table can have a file associated with it (it should have the same name as the table) and each file should contain a list of objects, which will be loaded in to the database, one for each row.
