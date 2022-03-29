@@ -15,7 +15,7 @@ with CronTab(user = 'student') as cron:
     if not job_exists:
         print('Creating a new cron job to fetch data from places API')
         job = cron.new(command = f"python3 {app_folder}/fetch_restaurant_data.py && python3 {app_folder}/refresh_database.py", comment='Fetch Restaurant Data')
-        job.minute.every(1) # This should be set to a longer timeframe (1 week) when we actually start using it
+        job.day.every(7) # This should be set to a longer timeframe (1 week) when we use it in production
 
 table_names = [User, Group, GroupMembers, SelectionSession, Restaurant, SessionSelections]
 
