@@ -150,14 +150,14 @@ export default function GroupDetails() {
   const [selected, setSelected] = useState(false);
   let dineStyle = "All"
 
-//bad but temp button option
+//temp button option
 const [deliverySel, setDelivery] = useState(false);
 const [pickUpSel, setPickUp] = useState(false);
 const [dineInSel, setDineIn] = useState(false);
-const [lowSel, setPriceLow] = useState(false);
-const [midSel, setPriceMid] = useState(false);
-const [highSel, setPricehigh] = useState(false);
-
+const [lvl1Sel, setPriceLvl1] = useState(false);
+const [lvl2Sel, setPriceLvl2] = useState(false);
+const [lvl3Sel, setPriceLvl3] = useState(false);
+const [lvl4Sel, setPriceLvl4] = useState(false);
 
   const leader: GroupMembers[] = [  {
     id: "456ghjjh",
@@ -242,23 +242,32 @@ const [highSel, setPricehigh] = useState(false);
       </View>
       <View style={styles.buttonRow}>
       <Pressable 
-            onPress={() => setPriceLow(!lowSel)}
+            onPress={() => setPriceLvl1(!lvl1Sel)}
             // onLongPress={() => setSelected(!selected)}
-            style={[{ borderWidth: lowSel ? 2 : 1 }, styles.buttonCard] }
+            style={[{ borderWidth: lvl1Sel ? 2 : 1 }, styles.buttonCard] }
           >
            <FontAwesomeIcon icon="dollar-sign" size={26}/>
         </Pressable>
         <Pressable 
-            onPress={() => setPriceMid(!midSel)}
-            style={[{ borderWidth: midSel ? 2 : 1 }, styles.buttonCard] }
+            onPress={() => setPriceLvl2(!lvl2Sel)}
+            style={[{ borderWidth: lvl2Sel ? 2 : 1 }, styles.buttonCard] }
           >
            <FontAwesomeIcon icon="dollar-sign" size={26}/>
            <FontAwesomeIcon icon="dollar-sign" size={26}/>
         </Pressable>
         <Pressable 
-            onPress={() => setPricehigh(!highSel)}
-            style={[{ borderWidth: highSel ? 2 : 1 }, styles.buttonCard] }
+            onPress={() => setPriceLvl3(!lvl3Sel)}
+            style={[{ borderWidth: lvl3Sel ? 2 : 1 }, styles.buttonCard] }
           >
+           <FontAwesomeIcon icon="dollar-sign" size={26}/>
+           <FontAwesomeIcon icon="dollar-sign" size={26}/>
+           <FontAwesomeIcon icon="dollar-sign" size={26}/>
+        </Pressable>
+        <Pressable 
+            onPress={() => setPriceLvl4(!lvl4Sel)}
+            style={[{ borderWidth: lvl4Sel ? 2 : 1 }, styles.buttonCard] }
+          >
+           <FontAwesomeIcon icon="dollar-sign" size={26}/>
            <FontAwesomeIcon icon="dollar-sign" size={26}/>
            <FontAwesomeIcon icon="dollar-sign" size={26}/>
            <FontAwesomeIcon icon="dollar-sign" size={26}/>
