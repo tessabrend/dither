@@ -60,12 +60,12 @@ def insertIntoRestaurants(places):
         for place in places:
             if place["place_id"] not in placeIds:
                 Restaurant(Name=place["name"], Location=place["formatted_address"],
-                HoursOfOperation=place["opening_hours"]["weekday_text"], Website=place["website"],
-                Rating=place["rating"], NumberOfRatings=place["user_ratings_total"],
-                PriceBucket=str(place["price_level"]), PlaceId=place["place_id"],
-                BusinessStatus=place["business_status"], PhotoReference=place["photo_reference"],
-                PhoneNumber=place["formatted_phone_number"], CuisineType=place["cuisine_type"],
-                DiningType=place["dining_type"], PictureLocation="N/A")
+                HoursOfOperation=place["opening_hours"]["weekday_text"] if "opening_hours" in place.keys() else "N/A", 
+                Website=place.get("website", "N/A"), Rating=place.get("rating", "N/A"), 
+                NumberOfRatings=place.get("user_ratings_total", "N/A"), PriceBucket=str(place.get("price_level", "N/A")), 
+                PlaceId=place["place_id"], BusinessStatus=place.get("business_status", "N/A"), 
+                PhotoReference=place.get("photo_reference", "N/A"), PhoneNumber=place.get("formatted_phone_number", "N/A"),
+                CuisineType=place["cuisine_type"], DiningType=place["dining_type"], PictureLocation="N/A")
             else:
                 Restaurant.get(PlaceId=place["place_id"]).CuisineType.append(place["cuisine_type"])
             flush()
@@ -78,6 +78,6 @@ chineseRestaurants = findPlacesByText("Chinese restaurants in Guelph, CA")
 chineseRestaurants = findPlaceDetails(chineseRestaurants, "Chinese")
 insertIntoRestaurants(chineseRestaurants)
 
-indianRestaurants = findPlacesByText("Indian restaurants in Guelph, CA")
+"""indianRestaurants = findPlacesByText("Indian restaurants in Guelph, CA")
 indianRestaurants = findPlaceDetails(indianRestaurants, "Indian")
-insertIntoRestaurants(indianRestaurants)
+insertIntoRestaurants(indianRestaurants)"""
