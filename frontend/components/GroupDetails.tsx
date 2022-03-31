@@ -159,6 +159,8 @@ const [lvl2Sel, setPriceLvl2] = useState(false);
 const [lvl3Sel, setPriceLvl3] = useState(false);
 const [lvl4Sel, setPriceLvl4] = useState(false);
 
+let priceLvl = [lvl1Sel,lvl2Sel,lvl3Sel,lvl4Sel];
+
   const leader: GroupMembers[] = [  {
     id: "456ghjjh",
     name: "David",
