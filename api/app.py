@@ -257,4 +257,4 @@ def getUserGroups(id):
 ### End User ###
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=80, host="131.104.49.71")
