@@ -70,14 +70,9 @@ def insertIntoRestaurants(places):
                 Restaurant.get(PlaceId=place["place_id"]).CuisineType.append(place["cuisine_type"])
             flush()
 
-#raysChinese = findPlacesByText("Ray's Chinese in Guelph, CA")
-#raysChinese = findPlaceDetails(raysChinese, "Chinese")
-#insertIntoRestaurants(raysChinese)
-
-chineseRestaurants = findPlacesByText("Chinese restaurants in Guelph, CA")
-chineseRestaurants = findPlaceDetails(chineseRestaurants, "Chinese")
-insertIntoRestaurants(chineseRestaurants)
-
-"""indianRestaurants = findPlacesByText("Indian restaurants in Guelph, CA")
-indianRestaurants = findPlaceDetails(indianRestaurants, "Indian")
-insertIntoRestaurants(indianRestaurants)"""
+cuisineTypes = ['African', 'South American', 'Chinese', 'Indian', 'Middle Eastern', 'Fast Food', 'Italian', 'Mexican', 'Pub', 'Japanese']
+restaurants = None
+for cuisine in cuisineTypes:
+    restaurants = findPlacesByText(f'{cuisine} Restaurants in Guelph, CA')
+    restaurants = findPlaceDetails(restaurants, cuisine)
+    insertIntoRestaurants(restaurants)
