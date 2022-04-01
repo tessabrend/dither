@@ -67,7 +67,10 @@ def insertIntoRestaurants(places):
                 PhotoReference=place.get("photo_reference", "N/A"), PhoneNumber=place.get("formatted_phone_number", "N/A"),
                 CuisineType=place["cuisine_type"], DiningType=place["dining_type"], PictureLocation="N/A")
             else:
-                Restaurant.get(PlaceId=place["place_id"]).CuisineType.append(place["cuisine_type"])
+                restaurant = Restaurant.get(PlaceId=place["place_id"])
+                cuisineTypes = restaurant.CuisineType
+                cuisineTypes.append(place["cuisine_type"])
+                restaurant.cuisineType = cuisineTypes
             flush()
 
 cuisineTypes = ['African', 'South American', 'Chinese', 'Indian', 'Middle Eastern', 'Fast Food', 'Italian', 'Mexican', 'Pub', 'Japanese']
