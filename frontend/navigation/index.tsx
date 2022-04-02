@@ -23,6 +23,7 @@ import LinkingConfiguration from './LinkingConfiguration';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import GroupPopup from '../components/GroupPopup';
 import Compromise from '../screens/Compromise';
+import ConsensusReveal from '../screens/SearchOverScreen';
 import Session from '../components/SwipingSession';
 import SessionScreen from '../screens/SessionScreen';
 import GroupList from '../components/GroupList';
@@ -87,7 +88,7 @@ function RootNavigator() {
           </MenuOptions>
         </Menu>
       )}}></Stack.Screen>
-      <Stack.Screen name='Compromise' component={Compromise}></Stack.Screen>
+      <Stack.Screen name='Compromise' component={ConsensusReveal}></Stack.Screen>
       <Stack.Screen name='Session' component={SessionScreen}></Stack.Screen>
       <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ title: 'Oops!' }} />
       <Stack.Group screenOptions={{ presentation: 'modal' }}>
