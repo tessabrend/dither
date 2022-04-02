@@ -56,7 +56,7 @@ def findPlaceDetails(places, cuisineType, fields=['website', 'formatted_phone_nu
 def insertIntoRestaurants(places):
     with db_session():
         set_sql_debug(True)
-        placeIds = list(select((r.id for r in Restaurant)))
+        placeIds = list(select((r.PlaceId for r in Restaurant)))
         for place in places:
             if place["place_id"] not in placeIds:
                 Restaurant(Name=place["name"], Location=place["formatted_address"],
@@ -66,11 +66,10 @@ def insertIntoRestaurants(places):
                 PlaceId=place["place_id"], BusinessStatus=place.get("business_status", "N/A"), 
                 PhotoReference=place.get("photo_reference", "N/A"), PhoneNumber=place.get("formatted_phone_number", "N/A"),
                 CuisineType=place["cuisine_type"], DiningType=place["dining_type"], PictureLocation="N/A")
+                placeIds.append(place["place_id"])
             else:
                 restaurant = Restaurant.get(PlaceId=place["place_id"])
-                cuisineTypes = restaurant.CuisineType
-                cuisineTypes.append(place["cuisine_type"])
-                restaurant.cuisineType = cuisineTypes
+                restaurant.CuisineType.append(place["cuisine_type"])
             flush()
 
 cuisineTypes = ['African', 'South American', 'Chinese', 'Indian', 'Middle Eastern', 'Fast Food', 'Italian', 'Mexican', 'Pub', 'Japanese']

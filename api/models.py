@@ -50,7 +50,7 @@ class Restaurant(db.Entity):
     HoursOfOperation = Optional(StrArray)
     NumberOfRatings = Optional(int)
     PriceBucket = Optional(str)
-    PlaceId = Required(str)
+    PlaceId = Required(str, unique=True)
     BusinessStatus = Required(str)
     PhotoReference = Optional(str)
     PhoneNumber = Optional(str)
