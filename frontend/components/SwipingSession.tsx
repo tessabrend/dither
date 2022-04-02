@@ -55,8 +55,7 @@ class Session extends Component {
             const response = await fetch('http://131.104.49.71:80/restaurant/query?' + new URLSearchParams({
             "cuisine": "pub",
             "rating": "0",
-            "price-high": "200",
-            "price-low": "19",
+            "price-bucket": "2",
             "start-index": "0",
             "end-index": "50",
             }))
@@ -67,27 +66,43 @@ class Session extends Component {
         }  
     }
 
-    getPriceBucket = (low, high) => {
-        if( high > 150 )
-           return (
-            <View style={styles.bucketRow}>
-            <FontAwesomeIcon icon="dollar-sign" size={15}/>
-            <FontAwesomeIcon icon="dollar-sign" size={15}/>
-            <FontAwesomeIcon icon="dollar-sign" size={15}/>
-            </View>
-           ); else if ( low > 75 && high < 150 ) 
-            return (
-                <View style={styles.bucketRow}>
-                <FontAwesomeIcon icon="dollar-sign" size={15}/>
-                <FontAwesomeIcon icon="dollar-sign" size={15}/>
-                </View>
-               );
-            else 
-            return (
-                <View style={styles.bucketRow}>
-                <FontAwesomeIcon icon="dollar-sign" size={15}/>
-                </View>
-               );
+    getPriceBucket = (price_bucket) => {
+        switch (price_bucket) {
+            case "1":
+                return (
+                    <View style={styles.bucketRow}>
+                    <FontAwesomeIcon icon="dollar-sign" size={15}/>
+                    <FontAwesomeIcon icon="dollar-sign" size={15}/>
+                    <FontAwesomeIcon icon="dollar-sign" size={15}/>
+                    </View>
+                );
+            case "2":
+                return (
+                    <View style={styles.bucketRow}>
+                    <FontAwesomeIcon icon="dollar-sign" size={15}/>
+                    <FontAwesomeIcon icon="dollar-sign" size={15}/>
+                    </View>
+                );
+            case "3":
+                return (
+                    <View style={styles.bucketRow}>
+                    <FontAwesomeIcon icon="dollar-sign" size={15}/>
+                    <FontAwesomeIcon icon="dollar-sign" size={15}/>
+                    <FontAwesomeIcon icon="dollar-sign" size={15}/>
+                    </View>
+                );
+            case "4":
+                return (
+                    <View style={styles.bucketRow}>
+                    <FontAwesomeIcon icon="dollar-sign" size={15}/>
+                    <FontAwesomeIcon icon="dollar-sign" size={15}/>
+                    <FontAwesomeIcon icon="dollar-sign" size={15}/>
+                    <FontAwesomeIcon icon="dollar-sign" size={15}/>
+                    </View>
+                );
+            default:
+                break;
+        }
         return null;
      }
 
@@ -135,7 +150,7 @@ class Session extends Component {
                                 <Text style={styles.cardName}>{card?.name}</Text>
                                 <Star score={card?.rating ? card?.rating : 0} style={styles.starStyle} />
                                 <Text>{card?.location}</Text>
-                                {this.getPriceBucket(card?.price_low, card?.price_high)}
+                                {this.getPriceBucket(card?.price_bucket)}
                             </View>
                         )
                     }}
@@ -219,6 +234,7 @@ const styles = StyleSheet.create({
         marginTop: Platform.OS === 'ios' ? screen.width + 160 : screen.width,
         paddingRight: 30,
         paddingLeft: 30,
+        marginVertical: "3%"
     },
     progressBar: {
         justifyContent: "center",
