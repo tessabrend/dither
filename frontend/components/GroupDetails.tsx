@@ -1,11 +1,12 @@
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ListRenderItem, FlatList, SafeAreaView, StyleSheet, Pressable, ScrollView, } from "react-native";
 import { Slider } from '@miblanchard/react-native-slider';
 import { MultiSelect } from 'react-native-element-dropdown';
 import Colors from '../constants/Colors';
 import { Text, View } from './Themed';
 import { useNavigation } from '@react-navigation/native';
+import getLocation from '../utils/utils';
 
 export interface GroupMembers {
   id: string;
@@ -157,7 +158,7 @@ const [dineInSel, setDineIn] = useState(false);
 const [lowSel, setPriceLow] = useState(false);
 const [midSel, setPriceMid] = useState(false);
 const [highSel, setPricehigh] = useState(false);
-
+const [location, setLocation] = useState({});
 
   const leader: GroupMembers[] = [  {
     id: "456ghjjh",
@@ -177,7 +178,10 @@ const [highSel, setPricehigh] = useState(false);
     })
   }
   const navigation = useNavigation();
-
+  useEffect(() => {
+    getLocation().then((userLocation) => setLocation(userLocation));
+  }, [])
+  
   return (
     <SafeAreaView style={styles.background}>
       {retrieveGroups}
