@@ -45,16 +45,17 @@ class SelectionSession(db.Entity):
 class Restaurant(db.Entity):
     Name = Required(str)
     Location = Required(LongStr)
-    HoursOfOperation = Optional(str)
     Website = Optional(str)
     Rating = Optional(float)
-    PriceHigh = Optional(float)
-    PriceLow = Optional(float)
+    HoursOfOperation = Optional(StrArray)
+    NumberOfRatings = Optional(int)
+    PriceBucket = Optional(str)
+    PlaceId = Required(str, unique=True)
+    BusinessStatus = Required(str)
+    PhotoReference = Optional(str)
     PhoneNumber = Optional(str)
     CuisineType = Optional(StrArray) # an array of cuisine types
-    DiningType = Optional(str) # should be 'dine in', 'check out', or 'both', but is dependant on what the places api (or other data source) provides
-    Sponsored = Optional(bool, default=False)
-    BookingSite = Optional(str)
+    DiningType = Optional(StrArray) # Places API provides 'meal_delivery', 'meal_takeaway', and 'restaurant'. I believe these can be read as delivery, take out, dine in 
     PictureLocation = Required(LongStr) # Do we need to store date taken and type?
     Selection = Set('SessionSelections') # this is needed to make a foreign key in the sessionselections table
 
