@@ -15,9 +15,6 @@ export default function App() {
 
   library.add(faHeart, faCircleXmark, faFaceGrinStars, faFaceFrown, faDollarSign, faCircleUser, faAngleRight, faCrown, faLongArrowLeft, faStar, faEllipsisH, faUpRightFromSquare);
 
-  const checkUserExists = async () => {
-  }
-
   useEffect(() => {
     async function checkUserExists() {
       /* To Remove the items in async storage run this code
