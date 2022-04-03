@@ -1,11 +1,12 @@
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ListRenderItem, FlatList, SafeAreaView, StyleSheet, Pressable, ScrollView, } from "react-native";
 import { Slider } from '@miblanchard/react-native-slider';
 import { MultiSelect } from 'react-native-element-dropdown';
 import Colors from '../constants/Colors';
 import { Text, View } from './Themed';
 import { useNavigation } from '@react-navigation/native';
+import getLocation from '../utils/utils';
 
 export interface GroupMembers {
   id: string;
@@ -154,6 +155,7 @@ export default function GroupDetails() {
 const [deliverySel, setDelivery] = useState(false);
 const [pickUpSel, setPickUp] = useState(false);
 const [dineInSel, setDineIn] = useState(false);
+const [location, setLocation] = useState({});
 const [lvl1Sel, setPriceLvl1] = useState(false);
 const [lvl2Sel, setPriceLvl2] = useState(false);
 const [lvl3Sel, setPriceLvl3] = useState(false);
@@ -179,7 +181,10 @@ let priceLvl = [lvl1Sel,lvl2Sel,lvl3Sel,lvl4Sel];
     })
   }
   const navigation = useNavigation();
-
+  useEffect(() => {
+    getLocation().then((userLocation) => setLocation(userLocation));
+  }, [])
+  
   return (
     <SafeAreaView style={styles.background}>
       {retrieveGroups}

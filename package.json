@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "@mui/icons-material": "^5.4.2"
+    "@mui/icons-material": "^5.4.2",
+    "expo-location": "^14.0.2"
   }
 }
