@@ -126,25 +126,25 @@ def create_group():
 
 @app.route('/restaurant/query', methods=["GET"])
 def getRestaurantInfo():
+    # optional params priceBucket, rating, cuisineType, diningType, coords, maxDistance
     cuisineTypes = request.args.get("cuisineType", ['African', 'South American', 
     'Chinese', 'Indian', 'Middle Eastern', 'Fast Food', 'Italian', 'Mexican', 'Pub', 'Japanese']).split(",")
     diningTypes = request.args.get("diningType", ['dine in', 'take out', 'delivery']).split(',')
     priceLevels = request.args.get("priceBucket", [0, 1, 2, 3, 4]).split(',')
-    # optional params priceBucket, rating, cuisineType, diningType, latitude, longitude, maxDistance
+    coords = eval(request.args.get("coords", (0,0)))
     to_return = []
     query = f'''SELECT id, Name, Location, Website, Rating, HoursOfOperation, 
-    NumberOfRatings, PriceBucket, PhoneNumber, CuisineType, DiningType 
+    NumberOfRatings, PriceBucket, PhoneNumber, CuisineType, DiningType, Coordinates 
     from Restaurant WHERE Rating >= {request.args.get("rating", 0, float)} 
     and PriceBucket in ({str(priceLevels)[1:-1]}) 
     and CuisineType && '{{{str(cuisineTypes)[1:-1].replace("'", '"')}}}' 
     and DiningType && '{{{str(diningTypes)[1:-1].replace("'", '"')}}}';'''
-    print(query)
     restaurants = db.execute(query).fetchall()
-    print(len(restaurants))
     for r in restaurants:
-        to_return.append({"id": r[0], "name": r[1], "location": r[2], "website": r[3], "rating": r[4],
-        "hoursOfOperation": r[5], "numberOfRatings": r[6], "priceBucket": r[7], "phoneNumber": r[8],
-        "cuisineType": r[9], "dining_type": r[10]})
+        if distance(eval(r[11]), coords).km < request.args.get("maxDistance", 5, float):
+            to_return.append({"id": r[0], "name": r[1], "location": r[2], "website": r[3], "rating": r[4],
+            "hoursOfOperation": r[5], "numberOfRatings": r[6], "priceBucket": r[7], "phoneNumber": r[8],
+            "cuisineType": r[9], "dining_type": r[10]})
     return jsonify(to_return)
 
 ### End Restaurants ###

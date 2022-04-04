@@ -41,15 +41,21 @@ def findPlacesByText(query, lat='43.5327', lng='-80.2262', radius=500, placeType
         placeDetails.append(place)
     return placeDetails
 
-def findPlaceDetails(places, cuisineType, fields=['website', 'formatted_phone_number', 'opening_hours/weekday_text']):
+def findPlaceDetails(places, cuisineType, fields=['website', 'formatted_phone_number', 'opening_hours/weekday_text', 'geometry/location']):
     placeDetails = places
+    # 1164
     for i in range(len(places)):
         url = 'https://maps.googleapis.com/maps/api/place/details/json?place_id={place_id}&fields={fields}&key={api_key}'.format(place_id=places[i]["place_id"], fields=','.join(fields), api_key=API_KEY)
         response = requests.get(url)
         res = json.loads(response.text)
+        print(res)
         if "result" in res:
             for key in res["result"]:
-                placeDetails[i][key] = res["result"][key]
+                print(key)
+                if key == "geometry":
+                    placeDetails[i]["coordinates"] = str(res["result"][key]["location"]["lat"]) + "," + str(res["result"][key]["location"]["lng"])
+                else:
+                    placeDetails[i][key] = res["result"][key]
             placeDetails[i]["cuisine_type"] = cuisineType # Not sure how to deal with conflicts
     return placeDetails
 
@@ -65,7 +71,7 @@ def insertIntoRestaurants(places):
                 NumberOfRatings=place.get("user_ratings_total", "N/A"), PriceBucket=str(place.get("price_level", "N/A")), 
                 PlaceId=place["place_id"], BusinessStatus=place.get("business_status", "N/A"), 
                 PhotoReference=place.get("photo_reference", "N/A"), PhoneNumber=place.get("formatted_phone_number", "N/A"),
-                CuisineType=place["cuisine_type"], DiningType=place["dining_type"], PictureLocation="N/A")
+                CuisineType=place["cuisine_type"], DiningType=place["dining_type"], PictureLocation="N/A", Coordinates=place["coordinates"])
                 placeIds.append(place["place_id"])
             else:
                 restaurant = Restaurant.get(PlaceId=place["place_id"])

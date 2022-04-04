@@ -56,6 +56,7 @@ class Restaurant(db.Entity):
     PhoneNumber = Optional(str)
     CuisineType = Optional(StrArray) # an array of cuisine types
     DiningType = Optional(StrArray) # Places API provides 'meal_delivery', 'meal_takeaway', and 'restaurant'. I believe these can be read as delivery, take out, dine in 
+    Coordinates = Optional(str)
     PictureLocation = Required(LongStr) # Do we need to store date taken and type?
     Selection = Set('SessionSelections') # this is needed to make a foreign key in the sessionselections table
 
