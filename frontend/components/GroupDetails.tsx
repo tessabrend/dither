@@ -29,19 +29,17 @@ const DATA: GroupMembers[] = [
 ];
 
 const dropdownContent = [
-  { label: 'Thai', value: '1' },
+  { label: 'African', value: '1' },
   { label: 'Chinese', value: '2' },
-  { label: 'Pub', value: '3' },
-  { label: 'French', value: '4' },
+  { label: 'Fast Food', value: '3' },
+  { label: 'Indian', value: '4' },
   { label: 'Italian', value: '5' },
-  { label: 'Asian Fusion', value: '6' },
+  { label: 'Japanese', value: '6' },
+  { label: 'Mexican', value: '7' },
+  { label: 'Middle Eastern', value: '8' },
+  { label: 'South American', value: '9' },
+  { label: 'Pub', value: '10' },
 ];
-
-enum dineType {
-  Delivery,
-  PickUp,
-  DineIn,
-}
 
 const Item = ({ data }: { data: GroupMembers }) => (
   <Pressable 
@@ -57,10 +55,6 @@ const renderItem: ListRenderItem<GroupMembers> = ({ item }) => (
     data={item} 
   />
 );
-
-const dineTypeChoice = (_dineType: string | dineType) => {
-  console.log(_dineType);
-};
 
 const SliderContainer = (props: {
   caption: string,
@@ -183,7 +177,9 @@ let priceLvl = [lvl1Sel,lvl2Sel,lvl3Sel,lvl4Sel];
   const navigation = useNavigation();
   useEffect(() => {
     getLocation().then((userLocation) => setLocation(userLocation));
-  }, [])
+  }, []);
+
+  console.log(location);
   
   return (
     <SafeAreaView style={styles.background}>
@@ -290,7 +286,7 @@ let priceLvl = [lvl1Sel,lvl2Sel,lvl3Sel,lvl4Sel];
       </ScrollView>
 
       <View style={styles.submitWrapper}>
-        <Pressable style={styles.buttonCard} onPress={() => {navigation.navigate('Session')}}>
+        <Pressable style={styles.buttonCard} onPress={() => {navigation.navigate('Session', {})}}>
           <Text style={styles.submitText}>Go Eat!</Text>
         </Pressable>
       </View>
