@@ -127,17 +127,16 @@ def create_group():
 @app.route('/restaurant/query', methods=["GET"])
 def getRestaurantInfo():
     # optional params priceBucket, rating, cuisineType, diningType, coords, maxDistance
-    cuisineTypes = request.args.get("cuisineType", ['African', 'South American', 
-    'Chinese', 'Indian', 'Middle Eastern', 'Fast Food', 'Italian', 'Mexican', 'Pub', 'Japanese']).split(",")
-    diningTypes = request.args.get("diningType", ['dine in', 'take out', 'delivery']).split(',')
-    priceLevels = request.args.get("priceBucket", [0, 1, 2, 3, 4]).split(',')
+    cuisineTypes = request.args.get("cuisineType", '''African,South American,Chinese,Indian,Middle Eastern,Fast Food,Italian,Mexican,Pub,Japanese''').split(",")
+    diningTypes = request.args.get("diningType", 'dine in,take out,delivery').split(',')
+    priceLevels = request.args.get("priceBucket", '0,1,2,3,4').split(',')
     coords = eval(request.args.get("coords", (0,0)))
     to_return = []
     query = f'''SELECT id, Name, Location, Website, Rating, HoursOfOperation, 
     NumberOfRatings, PriceBucket, PhoneNumber, CuisineType, DiningType, Coordinates 
     from Restaurant WHERE Rating >= {request.args.get("rating", 0, float)} 
-    and PriceBucket in ({str(priceLevels)[1:-1]}) 
-    and CuisineType && '{{{str(cuisineTypes)[1:-1].replace("'", '"')}}}' 
+    and (PriceBucket in ({str(priceLevels)[1:-1]}) OR PriceBucket = 'N/A')
+    and CuisineType && '{{{str(cuisineTypes)[1:-1].replace("'", '"')}}}'
     and DiningType && '{{{str(diningTypes)[1:-1].replace("'", '"')}}}';'''
     restaurants = db.execute(query).fetchall()
     for r in restaurants:
