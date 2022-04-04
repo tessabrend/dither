@@ -6,11 +6,14 @@ from itsdangerous import json
 from models import *
 from util import *
 from pony.flask import Pony
+from geopy.distance import distance
+from geopy.geocoders import Nominatim
 import sendgrid
 from sendgrid.helpers.mail import *
 
 app = Flask(__name__, static_url_path='')
 Pony(app)
+geolocator = Nominatim(user_agent="Dither")
 sg = sendgrid.SendGridAPIClient(api_key=os.environ.get('SENDGRID_API_KEY'))
 
 SERVER_URL = "http://131.104.49.71"
@@ -123,19 +126,25 @@ def create_group():
 
 @app.route('/restaurant/query', methods=["GET"])
 def getRestaurantInfo():
+    # optional params priceBucket, rating, cuisineType, diningType, coords, maxDistance
+    cuisineTypes = request.args.get("cuisineType", '''African,South American,Chinese,Indian,Middle Eastern,Fast Food,Italian,Mexican,Pub,Japanese''').split(",")
+    diningTypes = request.args.get("diningType", 'dine in,take out,delivery').split(',')
+    priceLevels = request.args.get("priceBucket", '0,1,2,3,4').split(',')
+    coords = eval(request.args.get("coords", (0,0)))
     to_return = []
-    restaurants = select(restaurant for restaurant in Restaurant if restaurant.PriceHigh <= float(request.args.get('price-high')) \
-        and restaurant.PriceLow >= float(request.args.get('price-low')) and restaurant.Rating >= float(request.args.get('rating')) \
-        and request.args.get('cuisine') in restaurant.CuisineType)[int(request.args.get('start-index')):int(request.args.get('end-index'))]
-
-    for restaurant in restaurants:
-        i = 0
-        to_return.append({"id": i, "name": restaurant.Name, "location": restaurant.Location, "hours": restaurant.HoursOfOperation,
-         "website": restaurant.Website, "phone": restaurant.PhoneNumber, "dining_option": restaurant.DiningType, "bookingsite": restaurant.BookingSite,
-         "picture": restaurant.PictureLocation, "sponsored": restaurant.Sponsored, "cuisine": restaurant.CuisineType, "rating": restaurant.Rating, 
-         "price_low": restaurant.PriceLow, "price_high": restaurant.PriceHigh,})
-        i = i + 1
-    return {"restaurants": to_return}
+    query = f'''SELECT id, Name, Location, Website, Rating, HoursOfOperation, 
+    NumberOfRatings, PriceBucket, PhoneNumber, CuisineType, DiningType, Coordinates 
+    from Restaurant WHERE Rating >= {request.args.get("rating", 0, float)} 
+    and (PriceBucket in ({str(priceLevels)[1:-1]}) OR PriceBucket = 'N/A')
+    and CuisineType && '{{{str(cuisineTypes)[1:-1].replace("'", '"')}}}'
+    and DiningType && '{{{str(diningTypes)[1:-1].replace("'", '"')}}}';'''
+    restaurants = db.execute(query).fetchall()
+    for r in restaurants:
+        if distance(eval(r[11]), coords).km < request.args.get("maxDistance", 5, float):
+            to_return.append({"id": r[0], "name": r[1], "location": r[2], "website": r[3], "rating": r[4],
+            "hoursOfOperation": r[5], "numberOfRatings": r[6], "priceBucket": r[7], "phoneNumber": r[8],
+            "cuisineType": r[9], "dining_type": r[10]})
+    return jsonify(to_return)
 
 ### End Restaurants ###
 
