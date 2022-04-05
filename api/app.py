@@ -234,6 +234,29 @@ def pollForMatch(id):
         })
     return jsonify({"match": False})
 
+@app.route("/session/start", methods=["POST"])
+def startSession():
+    groupId = request.form.get("groupId", 0, int)
+    if groupId == 0:
+        return { "message": "Invalid Group ID" }, 400
+    activeSession = SelectionSession.get(GroupId=groupId, Active=True)
+    if(activeSession):
+        activeSession.Active = False
+        flush()
+    cuisineTypes = request.form.get("cuisineType", ['African', 'South American', 'Chinese', 'Indian', 'Middle Eastern', 'Fast Food', 'Italian', 'Mexican', 'Pub', 'Japanese'])
+    cuisineTypes = cuisineTypes.split(",") if type(cuisineTypes) == str else cuisineTypes
+    diningTypes = request.form.get("diningType", ['dine in', 'take out', 'delivery'])
+    diningTypes = diningTypes.split(",") if type(diningTypes) == str else diningTypes
+    priceBucket = request.form.get("priceBucket", [0,1,2,3,4], str)
+    priceBucket = priceBucket.split(",") if type(priceBucket) == str else priceBucket
+    SelectionSession(Rating=request.form.get("rating", 0.0, float), 
+    Radius=request.form.get("radius", 5, int), 
+    PriceBucket=priceBucket, CuisineType=cuisineTypes, DiningType=diningTypes, GroupId=groupId, Active=True)
+    try:
+        commit()
+    except TransactionIntegrityError as e:
+        return {'message': f"Could not add user choice to database: {str(e).split('DETAIL:')[1]}".replace('\n', '')}, 400
+    return { "success": True }
 
 ### End Sessions ###
 
