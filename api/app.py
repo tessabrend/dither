@@ -8,6 +8,7 @@ from util import *
 from pony.flask import Pony
 import sendgrid
 from sendgrid.helpers.mail import *
+from argon2 import PasswordHasher
 
 app = Flask(__name__, static_url_path='')
 Pony(app)
@@ -253,6 +254,41 @@ def getUserGroups(id):
             "isGroupLeader": query[group][0]
         })
     return jsonify(response)
+
+@app.route('/user/<uid>/register', methods=['POST'])
+def user_register(uid):
+    # In order to complete the registration process, we will need to have the user ID
+    # Here, we will associate a specific email and hashed password with our ID, allowing it to be retreived later
+    if not uid or not request.form.get('Email') or not request.form.get('Password'):
+        return { "message" : "cannot register because required form fields are missing" }, 400
+    user = User[uid]
+    if not user:
+        return { "message" : "cannot register because the user does not exist" }, 400
+    if user.Password != "NO_ACCOUNT":
+        return { "message" : "cannot register because the user is already registered" }, 400
+
+    ph = PasswordHasher()
+    user.Email = request.form.get('Email')
+    user.Password = ph.hash(request.form.get('Password'))
+    commit()
+    return { "message" : "OK" }
+
+@app.route('/user/login', methods=['POST'])
+def user_login():
+    # This depends on the user already being registered - they will need to have an email address and hashed password associated
+    # With their account in order to log in
+    if not request.form.get('Email') or not request.form.get('Password'):
+        return { "message" : "cannot login because form fields are missing" }, 400 
+    user = list(select(user for user in User if user.Email == request.form.get('Email')))[0]
+    if not user:
+        return { "message" : "cannot login because the user does not exist" }, 400
+
+    ph = PasswordHasher()
+    try:
+        if ph.verify(user.Password, request.form.get('Password')):
+            return { "message" : "OK" }
+    except:
+        return { "message" : "connot login because the password is incorrect" }, 400
 
 ### End User ###
 

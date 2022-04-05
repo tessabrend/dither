@@ -28,6 +28,7 @@ def load_into_table(folder, table):
                 with db_session():
                     for element in data:
                         table(**element)
+                        commit()
             print(f"Loading sample data for table {table.__name__}")
         except:
             print(f"Sample data already loaded for table {table.__name__}")
