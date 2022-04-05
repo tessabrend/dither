@@ -33,11 +33,9 @@ class GroupMembers(db.Entity):
 class SelectionSession(db.Entity):
     Rating = Optional(float)
     Radius = Required(int)
-    PriceHigh = Optional(float)
-    PriceLow = Optional(float)
-    DietaryRestrictions = Optional(StrArray) # an array of all dietary restrictions
+    PriceBucket = Optional(StrArray)
     CuisineType = Optional(StrArray) # an array of all cuisine preferences
-    DiningType = Optional(str) # should be 'dine in', 'check out', or 'both', but is dependant on what the places api provides
+    DiningType = Optional(StrArray) # should be 'dine in', 'check out', or 'both', but is dependant on what the places api provides
     GroupId = Required(Group)
     Active = Required(bool, default=True) # needed to ensure that session is not already in progress and to close a session
     Selection = Set('SessionSelections') # this is needed to make a foreign key in the sessionselections table
