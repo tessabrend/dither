@@ -131,6 +131,9 @@ def getRestaurantInfo():
     diningTypes = request.args.get("diningType", 'dine in,take out,delivery').split(',')
     priceLevels = request.args.get("priceBucket", '0,1,2,3,4').split(',')
     coords = eval(request.args.get("coords", (0,0)))
+    priceLevels = ['1', '2', '3', '4'] if priceLevels == '' or priceLevels == [''] else priceLevels
+    diningTypes = ['dine in', 'take out', 'delivery'] if diningTypes == '' or diningTypes == [''] else diningTypes
+    cuisineTypes = ['African', 'South American', 'Chinese', 'Indian', 'Middle Eastern', 'Fast Food', 'Italian', 'Mexican', 'Pub', 'Japanese'] if cuisineTypes == '' or cuisineTypes == [''] else cuisineTypes
     to_return = []
     query = f'''SELECT id, Name, Location, Website, Rating, HoursOfOperation, 
     NumberOfRatings, PriceBucket, PhoneNumber, CuisineType, DiningType, Coordinates 
