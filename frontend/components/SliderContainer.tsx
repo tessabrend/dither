@@ -5,14 +5,11 @@ import { Slider } from '@miblanchard/react-native-slider';
 
 //caption: string, unit: string, children: React.ReactChildren sliderValue?: Array<number>
 export default function SliderContainer(props: any) {
-    const { caption, unit, children, sliderValue } = props;
-    const [value, setValue] = React.useState(sliderValue ? sliderValue : 5);
+    const { value, caption, unit, children } = props;
     const renderSlide = () => {
       return React.Children.map(children, (child: React.ReactElement) => {
         if (!!child && child.type === Slider) {
           return React.cloneElement(child, {
-            onValueChange: setValue,
-            value,
           });
         }
         return child;

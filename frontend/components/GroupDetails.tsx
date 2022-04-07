@@ -10,12 +10,7 @@ import getLocation from '../utils/utils';
 import Dropdown from "./Dropdown";
 import Rating from "./Rating";
 import SliderContainer from "./SliderContainer";
-import { RatingProps } from "../constants/Interfaces";
-
-export interface GroupMembers {
-  id: string;
-  name: string;
-}
+import { GroupMembers, RatingProps, SliderProps, DropdownProps, RestaurantQueryParams } from "../constants/Interfaces";
 
 const DATA: GroupMembers[] = [
   {
@@ -58,8 +53,9 @@ const [diningType, setDiningType] = useState<string[]>([]);
 const [cuisineType, setCuisineType] = useState<string[]>([]);
 const [priceBuckets, setPriceBuckets] = useState<string[]>([]);
 const [rating, setRating] = useState(0.0);
-const ratingProps: RatingProps = { rating: rating, setRating: setRating}
-const [location, setLocation] = useState({});
+const [distance, setDistance] = useState(5.0);
+const [timeLimit, setTimeLimit] = useState(5);
+const [location, setLocation] = useState("");
 
 let updateDiningType = (type: string) => {
   let types = diningType.slice();
@@ -93,6 +89,16 @@ let updatePriceBucket = (bucket: string) => {
     setPriceBuckets(buckets)
   }
 }
+
+let startSession = () => {
+  fetch("http://131.104.49.71:80/session/start", {
+    method: 'POST',
+    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+    body: `groupId=${2}&diningType=${diningType}&radius=${distance}&cuisineType=${cuisineType}&priceBucket=${priceBuckets}&rating=${rating}`
+  }).then().catch((err) => {
+    alert("The session could not be started due to an internal error")
+  });
+}
   const leader: GroupMembers[] = [  {
     id: "456ghjjh",
     name: "David",
@@ -115,6 +121,11 @@ let updatePriceBucket = (bucket: string) => {
     getLocation().then((userLocation) => setLocation(userLocation));
   }, []);
 
+  const ratingProps: RatingProps = {rating: rating, setRating: setRating}
+  const distanceProps: SliderProps = {value: distance, caption: "Distance: ", unit: " km"}
+  const timeLimitProps: SliderProps = {value: timeLimit, caption: "Time Limit: ", unit: " min"}
+  const dropdownProps: DropdownProps = {selection: cuisineType, updateSelection: updateCuisineType}
+  const restaurantParams: RestaurantQueryParams = {cuisineType: cuisineType, diningType: diningType, priceBucket: priceBuckets, rating: rating, maxDistance: distance, coords: "43.5327,-80.2262"}
   return (
     <SafeAreaView style={styles.background}>
       <View style={styles.membersWrapper}>
@@ -155,19 +166,23 @@ let updatePriceBucket = (bucket: string) => {
         </Pressable>
       </View>
 
-      <SliderContainer caption="Distance: " unit=" km">
+      <SliderContainer {...distanceProps}>
         <Slider 
           minimumValue={0}
           maximumValue={100}
           step={0.5}
+          value={distance}
+          onValueChange={value => setDistance(value[0])}
         />
       </SliderContainer>
 
-      <SliderContainer caption="Time Limit: " unit=" min">
+      <SliderContainer {...timeLimitProps}>
         <Slider 
           minimumValue={0}
           maximumValue={120}
           step={1}
+          value={timeLimit}
+          onValueChange={value => setTimeLimit(value[0])}
           />
       </SliderContainer>
 
@@ -175,7 +190,7 @@ let updatePriceBucket = (bucket: string) => {
         <Text style={styles.label}>Cuisine</Text>
       </View>
       <View style={styles.elementWrapper}>
-        <Dropdown/>
+        <Dropdown {...dropdownProps}/>
       </View>
 
       <View style={styles.labelWrapper}>
@@ -224,8 +239,8 @@ let updatePriceBucket = (bucket: string) => {
 
       <View style={styles.submitWrapper}>
         <Pressable style={styles.buttonCard} onPress={() => {
-          
-          navigation.navigate('Session')
+          startSession()
+          navigation.navigate('Session', restaurantParams);
         }}>
           <Text style={styles.submitText}>Go Eat!</Text>
         </Pressable>

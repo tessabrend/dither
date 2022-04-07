@@ -2,20 +2,20 @@ import React, { useState } from "react";
 import { StyleSheet } from "react-native";
 import { MultiSelect } from 'react-native-element-dropdown';
 
-export default function Dropdown() {
+export default function Dropdown(props: any) {
     const dropdownContent = [
-        { label: 'African', value: '1' },
-        { label: 'Chinese', value: '2' },
-        { label: 'Fast Food', value: '3' },
-        { label: 'Indian', value: '4' },
-        { label: 'Italian', value: '5' },
-        { label: 'Japanese', value: '6' },
-        { label: 'Mexican', value: '7' },
-        { label: 'Middle Eastern', value: '8' },
-        { label: 'Pub', value: '9' },
-        { label: 'South American', value: '10' }
+        { label: 'African', value: 'African' },
+        { label: 'Chinese', value: 'Chinese' },
+        { label: 'Fast Food', value: 'Fast Food' },
+        { label: 'Indian', value: 'Indian' },
+        { label: 'Italian', value: 'Italian' },
+        { label: 'Japanese', value: 'Japanese' },
+        { label: 'Mexican', value: 'Mexican' },
+        { label: 'Middle Eastern', value: 'Middle Eastern' },
+        { label: 'Pub', value: 'Pub' },
+        { label: 'South American', value: 'South American' }
     ];
-      
+    const {selection, updateSelection} = props;  
     const [selected, setSelected] = useState([]);
     
     return (
@@ -33,6 +33,7 @@ export default function Dropdown() {
         value={selected}
         onChange={item => {
           setSelected(item);
+          updateSelection(item.slice(-1)[0])
         }}
         selectedStyle={styles.selectedStyle}
         />
