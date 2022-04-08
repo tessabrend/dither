@@ -120,6 +120,20 @@ def create_group():
         return {'message': f"Could not create group in database: {str(e).split('DETAIL:')[1]}".replace('\n', '')}, 400
     return render_object(group)
 
+@app.route('/group/<id>/leave/<userId>', methods=["PUT"])
+def leaveGroup(id, userId):
+    membership = GroupMembers.get(GroupId=id, UserId=userId)
+    if not membership:
+        return { "message": "The user is not in the group. Invalid request" }, 400
+    if membership.GroupLeader:
+        GroupMembers.select(GroupId=id).delete(bulk=True)
+        Group.get(id=id).delete() 
+        return { "status": "delete all" }
+    else:
+        membership.delete()
+        return { "status": "delete" }
+
+
 ### End Groups ###
 
 ### Restaurants ###
