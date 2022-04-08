@@ -18,12 +18,14 @@ class Session extends Component {
         data: [] as any[],
         hours: [] as any[],
         index: 0,
-        navigator: null
+        navigator: null,
+        restaurantParams: {}
     }
 
     constructor(props) {
         super(props);
         this.navigation = props.navigator;
+        this.state.restaurantParams = this.navigation.getState()["routes"][2]["params"];
     }
 
     increment = () => {
@@ -52,15 +54,9 @@ class Session extends Component {
 
     getRestaurants = async () => {
         try {
-            const response = await fetch('http://131.104.49.71:80/restaurant/query?' + new URLSearchParams({
-            "cuisine": "pub",
-            "rating": "0",
-            "price-bucket": "2",
-            "start-index": "0",
-            "end-index": "50",
-            }))
+            const response = await fetch('http://131.104.49.71:80/restaurant/query?' + new URLSearchParams(this.state.restaurantParams))
             const json = await response.json()
-            this.setState({ data: json.restaurants })
+            this.setState({ data: json })
         } catch(error) {
             console.error(error)
         }  
@@ -143,14 +139,13 @@ class Session extends Component {
                     renderCard={(card) => {
                         return (
                             <View style={styles.card}>
-                                <Image
+                                {/*<Image
                                 style={styles.restaurantImage}
                                 source={{uri: card?.picture}}
-                                />
+                                />*/}
                                 <Text style={styles.cardName}>{card?.name}</Text>
                                 <Star score={card?.rating ? card?.rating : 0} style={styles.starStyle} />
                                 <Text>{card?.location}</Text>
-                                {this.getPriceBucket(card?.price_bucket)}
                             </View>
                         )
                     }}
@@ -239,6 +234,7 @@ const styles = StyleSheet.create({
     progressBar: {
         justifyContent: "center",
         //alignItems: "center",
+        bottom: screen.height/8,
         marginTop: 20,
         marginRight: 20,
         marginLeft: 20,
@@ -247,7 +243,8 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "flex-end",
         marginTop: 10,
-        marginRight: 20
+        marginRight: 20,
+        bottom: screen.height/8
     },
     centeredView: {
         flex: 1,

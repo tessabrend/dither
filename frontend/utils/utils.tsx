@@ -7,5 +7,5 @@ export default async function getPosition() {
       return {};
     }
     let location = await Location.getCurrentPositionAsync({});
-    return location;
+    return String(location["coords"]["latitude"]) + ',' + String(location["coords"]["longitude"]);
 } 
