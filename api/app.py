@@ -133,6 +133,17 @@ def leaveGroup(id, userId):
         membership.delete()
         return { "status": "delete" }
 
+@app.route('/group/<id>/members', methods=["GET"])
+def getGroupMembers(id):
+    group = Group.get(id=id)
+    if group is None:
+        return { "message": "invalid group" }, 400
+    else:
+        groupMembers = GroupMembers.select(GroupId=id)
+        response = []
+        for gm in groupMembers:
+            response.append({"user_id": gm.UserId.id, "name": gm.UserId.Name, "leader": gm.GroupLeader})
+        return jsonify(response)
 
 ### End Groups ###
 
