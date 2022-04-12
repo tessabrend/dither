@@ -11,6 +11,7 @@ from geopy.geocoders import Nominatim
 import sendgrid
 from sendgrid.helpers.mail import *
 
+
 app = Flask(__name__, static_url_path='')
 Pony(app)
 geolocator = Nominatim(user_agent="Dither")
@@ -106,18 +107,24 @@ def join_group_link():
 def create_group():
     provided_fields = ['id', 'TimeLimit', 'GroupEntryCode']
     if not confirm_fields(request.form, Group, exceptions=provided_fields):
+        print("a")
+        print({'message': f"Required form item(s) not present: {', '.join(field_difference(request.form, Group, exceptions=provided_fields))}"})
         return {'message': f"Required form item(s) not present: {', '.join(field_difference(request.form, Group, exceptions=provided_fields))}"}, 400
-
     # If a time limit is not provided, use the default value of 30 minutes
     group = Group(GroupName=request.form['GroupName'], 
                 GroupEntryCode=''.join(random.choice(string.ascii_letters) for _ in range(8)),
                 TimeLimit=request.form.get('TimeLimit', 30))
     flush()
+    print(request.form.get("UserId"))
     group_member = GroupMembers(GroupId=group.id, UserId=request.form.get('UserId'), GroupLeader=True)
     try:
         commit()
     except TransactionIntegrityError as e:
+        print("b")
+        print({'message': f"Could not create group in database: {str(e).split('DETAIL:')[1]}".replace('\n', '')})
         return {'message': f"Could not create group in database: {str(e).split('DETAIL:')[1]}".replace('\n', '')}, 400
+    print("c")
+    print(render_object(group))
     return render_object(group)
 
 @app.route('/group/<id>/leave/<userId>', methods=["PUT"])
@@ -133,6 +140,19 @@ def leaveGroup(id, userId):
         membership.delete()
         return { "status": "delete" }
 
+@app.route('/group/<id>/members', methods=["GET"])
+def getGroupMembers(id):
+    group = Group.get(id=id)
+    if group is None:
+        print('invalid, id = ' + str(id))
+        return { "message": "invalid group" }, 400
+    else:
+        groupMembers = GroupMembers.select(GroupId=id)
+        response = []
+        for gm in groupMembers:
+            response.append({"user_id": gm.UserId.id, "name": gm.UserId.Name, "leader": gm.GroupLeader})
+        print(response)
+        return jsonify(response)
 
 ### End Groups ###
 
@@ -281,6 +301,10 @@ def startSession():
 
 @app.route('/user/create', methods=["POST"])
 def createUser():
+    # userId = request.form.get("userId", None)
+    # print(userId)
+    # user = User.get(id=userId)
+    #if userId is None or user is None:
     try:
         user = User(Name="User", Location="", Password="NO_ACCOUNT", PhoneNumber="", Email=None)
         commit()
@@ -288,7 +312,11 @@ def createUser():
     except TransactionIntegrityError as e:
         print(e)
         return {"message": "Could not create a user"}, 400
-        
+    #elif user:
+        #print({"userId": userId})
+        #return jsonify({"userId": userId})
+
+
 @app.route('/user/<id>/groups', methods=["GET"])
 def getUserGroups(id):
     user = User[id]
@@ -301,9 +329,11 @@ def getUserGroups(id):
             "groupCode": query[group][2],
             "isGroupLeader": query[group][0]
         })
+    print(response)
+    print(request.headers)
     return jsonify(response)
 
 ### End User ###
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=80, host="131.104.49.71")
