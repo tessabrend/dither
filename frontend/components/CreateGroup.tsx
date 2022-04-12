@@ -3,6 +3,7 @@ import { Pressable, TextInput, StyleSheet, Alert } from "react-native";
 import { Text, View } from './Themed';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
+import { apiRequestRetry } from "../utils/utils";
 
 export default function CreateGroup(setModalOpen) {
     let navigation = useNavigation();
@@ -19,32 +20,17 @@ export default function CreateGroup(setModalOpen) {
     }, [])
 
     let createGroup = () => {
-        fetch('http://131.104.49.71:80/group/create', {
+        const url = 'http://131.104.49.71:80/group/create';
+        const options = {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
                 'Accept': 'application/json'
             },
             body: `GroupName=${groupName}&UserId=${userId}`
-        })
-        .then(response => {
-            response.json().then(data => {
-                if(data['message']) {
-                    setError(data['message']);
-                } else {
-                    setError('');
-                    setModalOpen(false);
-                    alert(`Group Created Successfully`);
-                    navigation.navigate("GroupList")
-                }
-            }).catch(error => {
-                console.log("in creategroup.tsx, 1st catch");
-                console.log(error)
-                setError('Incorrect response format: likely due to internal error');
-            });
-        }).catch(reason => {
-            console.log(Object.getOwnPropertyNames(reason));
-        });
+        }
+        apiRequestRetry(url, options, 10);
+        navigation.navigate("GroupList");
     }
 
     return <>
@@ -55,7 +41,7 @@ export default function CreateGroup(setModalOpen) {
                 <Text style={styles.errorText}>{error}</Text>
             }
         </View>
-        <Pressable style={styles.createGroupButton} onPress={createGroup}>
+        <Pressable style={styles.createGroupButton} onPress={() => createGroup()}>
             <Text style={styles.buttonText}>Create</Text>
         </Pressable>
     </>
