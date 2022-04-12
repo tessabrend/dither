@@ -18,12 +18,14 @@ class Session extends Component {
         data: [] as any[],
         hours: [] as any[],
         index: 0,
-        navigator: null
+        navigator: null,
+        restaurantParams: {}
     }
 
     constructor(props) {
         super(props);
         this.navigation = props.navigator;
+        this.state.restaurantParams = this.navigation.getState()["routes"][2]["params"];
     }
 
     increment = () => {
@@ -40,11 +42,6 @@ class Session extends Component {
         this.setState({ index: index })
     }
 
-    splitHours = (string) => {
-        let days = string?.split(';')
-        this.setState({ hours: days })
-    }
-
     toggleSwiping = (swiping) => {
         //this.setState({ canSwipe: !swiping })
         swiping = false
@@ -52,42 +49,51 @@ class Session extends Component {
 
     getRestaurants = async () => {
         try {
-            const response = await fetch('http://131.104.49.71:80/restaurant/query?' + new URLSearchParams({
-            "cuisine": "pub",
-            "rating": "0",
-            "price-high": "200",
-            "price-low": "19",
-            "start-index": "0",
-            "end-index": "50",
-            }))
+            const response = await fetch('http://131.104.49.71:80/restaurant/query?' + new URLSearchParams(this.state.restaurantParams))
             const json = await response.json()
-            this.setState({ data: json.restaurants })
+            this.setState({ data: json })
         } catch(error) {
             console.error(error)
         }  
     }
 
-    getPriceBucket = (low, high) => {
-        if( high > 150 )
-           return (
-            <View style={styles.bucketRow}>
-            <FontAwesomeIcon icon="dollar-sign" size={15}/>
-            <FontAwesomeIcon icon="dollar-sign" size={15}/>
-            <FontAwesomeIcon icon="dollar-sign" size={15}/>
-            </View>
-           ); else if ( low > 75 && high < 150 ) 
-            return (
-                <View style={styles.bucketRow}>
-                <FontAwesomeIcon icon="dollar-sign" size={15}/>
-                <FontAwesomeIcon icon="dollar-sign" size={15}/>
-                </View>
-               );
-            else 
-            return (
-                <View style={styles.bucketRow}>
-                <FontAwesomeIcon icon="dollar-sign" size={15}/>
-                </View>
-               );
+    getPriceBucket = (price_bucket) => {
+        switch (price_bucket) {
+            case "1":
+                return (
+                    <View style={styles.bucketRow}>
+                    <FontAwesomeIcon icon="dollar-sign" size={15}/>
+                    <FontAwesomeIcon icon="dollar-sign" size={15}/>
+                    <FontAwesomeIcon icon="dollar-sign" size={15}/>
+                    </View>
+                );
+            case "2":
+                return (
+                    <View style={styles.bucketRow}>
+                    <FontAwesomeIcon icon="dollar-sign" size={15}/>
+                    <FontAwesomeIcon icon="dollar-sign" size={15}/>
+                    </View>
+                );
+            case "3":
+                return (
+                    <View style={styles.bucketRow}>
+                    <FontAwesomeIcon icon="dollar-sign" size={15}/>
+                    <FontAwesomeIcon icon="dollar-sign" size={15}/>
+                    <FontAwesomeIcon icon="dollar-sign" size={15}/>
+                    </View>
+                );
+            case "4":
+                return (
+                    <View style={styles.bucketRow}>
+                    <FontAwesomeIcon icon="dollar-sign" size={15}/>
+                    <FontAwesomeIcon icon="dollar-sign" size={15}/>
+                    <FontAwesomeIcon icon="dollar-sign" size={15}/>
+                    <FontAwesomeIcon icon="dollar-sign" size={15}/>
+                    </View>
+                );
+            default:
+                break;
+        }
         return null;
      }
 
@@ -96,6 +102,7 @@ class Session extends Component {
     }
 
     render () {
+        
         return (
             <View style={styles.container}>
                 <View style={styles.centeredView}>
@@ -109,11 +116,15 @@ class Session extends Component {
                      <View style={styles.centeredView}>
                          <View style={styles.modalView}>
                              <Text style={styles.modalText}>Hours of Operation:</Text>
-                            { this.state.hours?.map((item, key)=>(
-                            <Text key={key}> { item } </Text>)
+                            { this.state.data[this.state.index]?.hoursOfOperation.map((item)=>(
+                            <Text> { item } </Text>)
                             )}
-                            <Text style={styles.moreDetailsTagItem}>{this.state.data[this.state.index]?.cuisine}</Text>
-                            <Text style={styles.moreDetailsTagItem}>{this.state.data[this.state.index]?.dining_option}</Text>
+                            { this.state.data[this.state.index]?.cuisineType.map((item)=>(
+                            <Text style={styles.moreDetailsTagItem}> { item } </Text>)
+                            )}
+                            { this.state.data[this.state.index]?.dining_type.map((item)=>(
+                            <Text style={styles.moreDetailsTagItem}> { item } </Text>)
+                            )}
                          </View>
                      </View>
                     </Modal>
@@ -128,14 +139,9 @@ class Session extends Component {
                     renderCard={(card) => {
                         return (
                             <View style={styles.card}>
-                                <Image
-                                style={styles.restaurantImage}
-                                source={{uri: card?.picture}}
-                                />
                                 <Text style={styles.cardName}>{card?.name}</Text>
                                 <Star score={card?.rating ? card?.rating : 0} style={styles.starStyle} />
                                 <Text>{card?.location}</Text>
-                                {this.getPriceBucket(card?.price_low, card?.price_high)}
                             </View>
                         )
                     }}
@@ -144,12 +150,12 @@ class Session extends Component {
                         this.toggleSwiping(this.swiper.horizontalSwipe); 
                         this.toggleSwiping(this.swiper.verticalSwipe);
                         this.navigation.navigate('Compromise');
-                    }} //this needs to change to disable swiping
+                    }} 
                     onSwipedLeft={(cardIndex) => {console.log('card at index ' + cardIndex +' swiped no')}}
                     onSwipedRight={(cardIndex) => {console.log('card at index ' + cardIndex +' swiped like')}}
                     onSwipedTop={(cardIndex) => {console.log('card at index ' + cardIndex +' swiped crave')}}
                     onSwipedBottom={(cardIndex) => {console.log('card at index ' + cardIndex +' swiped hard no')}}
-                    onTapCard={(cardIndex) => {this.toggleModal(!this.state.modalVisible); this.showMoreDetails(cardIndex); this.splitHours(this.state.data[this.state.index]?.hours)}}
+                    onTapCard={(cardIndex) => {this.toggleModal(!this.state.modalVisible); this.showMoreDetails(cardIndex);}}
                     cardIndex={0}
                     backgroundColor={'#ffffff'}
                     stackSize= {3}
@@ -219,10 +225,12 @@ const styles = StyleSheet.create({
         marginTop: Platform.OS === 'ios' ? screen.width + 160 : screen.width,
         paddingRight: 30,
         paddingLeft: 30,
+        marginVertical: "3%"
     },
     progressBar: {
         justifyContent: "center",
         //alignItems: "center",
+        bottom: screen.height/8,
         marginTop: 20,
         marginRight: 20,
         marginLeft: 20,
@@ -231,7 +239,8 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "flex-end",
         marginTop: 10,
-        marginRight: 20
+        marginRight: 20,
+        bottom: screen.height/8
     },
     centeredView: {
         flex: 1,
