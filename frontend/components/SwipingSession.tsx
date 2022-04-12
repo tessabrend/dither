@@ -7,6 +7,7 @@ import ProgressBar from "react-native-animated-progress";
 import Modal from "react-native-modal";
 import Star from 'react-native-star-view';
 import { useNavigation } from '@react-navigation/native';
+import { apiRequestRetry } from '../utils/utils';
 
 const window = Dimensions.get("window");
 const screen = Dimensions.get("screen");
@@ -53,19 +54,14 @@ class Session extends Component {
     }
 
     getRestaurants = async () => {
-        //const url = 'http://131.104.49.71:80/restaurant/query?' + new URLSearchParams(this.state.restaurantParams);
-        //const 
-        try {
-            const response = await fetch('http://131.104.49.71:80/restaurant/query?' + new URLSearchParams(this.state.restaurantParams), {
-                headers: {
-                    'Accept': 'application/json'
-                }
-            })
-            const json = await response.json()
-            this.setState({ data: json })
-        } catch(error) {
-            console.error(error)
-        }  
+        const url = 'http://131.104.49.71:80/restaurant/query?' + new URLSearchParams(this.state.restaurantParams);
+        const options = {
+            headers: {
+                'Accept': 'application/json'
+            }
+        } 
+        let json = await apiRequestRetry(url, options, 10);
+        this.setState({data: json})
     }
 
     getPriceBucket = (price_bucket) => {
