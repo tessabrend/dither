@@ -1,8 +1,7 @@
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import React, { useState, useEffect } from "react";
-import { ListRenderItem, FlatList, SafeAreaView, StyleSheet, Pressable, ScrollView, Alert, Button, } from "react-native";
+import { ListRenderItem, FlatList, SafeAreaView, StyleSheet, Pressable, ScrollView, } from "react-native";
 import { Slider } from '@miblanchard/react-native-slider';
-import { MultiSelect } from 'react-native-element-dropdown';
 import Colors from '../constants/Colors';
 import { Text, View } from './Themed';
 import { useNavigation } from '@react-navigation/native';
