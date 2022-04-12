@@ -42,11 +42,6 @@ class Session extends Component {
         this.setState({ index: index })
     }
 
-    splitHours = (string) => {
-        let days = string?.split(';')
-        this.setState({ hours: days })
-    }
-
     toggleSwiping = (swiping) => {
         //this.setState({ canSwipe: !swiping })
         swiping = false
@@ -107,6 +102,7 @@ class Session extends Component {
     }
 
     render () {
+        
         return (
             <View style={styles.container}>
                 <View style={styles.centeredView}>
@@ -120,11 +116,15 @@ class Session extends Component {
                      <View style={styles.centeredView}>
                          <View style={styles.modalView}>
                              <Text style={styles.modalText}>Hours of Operation:</Text>
-                            { this.state.hours?.map((item, key)=>(
-                            <Text key={key}> { item } </Text>)
+                            { this.state.data[this.state.index]?.hoursOfOperation.map((item)=>(
+                            <Text> { item } </Text>)
                             )}
-                            <Text style={styles.moreDetailsTagItem}>{this.state.data[this.state.index]?.cuisine}</Text>
-                            <Text style={styles.moreDetailsTagItem}>{this.state.data[this.state.index]?.dining_option}</Text>
+                            { this.state.data[this.state.index]?.cuisineType.map((item)=>(
+                            <Text style={styles.moreDetailsTagItem}> { item } </Text>)
+                            )}
+                            { this.state.data[this.state.index]?.dining_type.map((item)=>(
+                            <Text style={styles.moreDetailsTagItem}> { item } </Text>)
+                            )}
                          </View>
                      </View>
                     </Modal>
@@ -139,10 +139,6 @@ class Session extends Component {
                     renderCard={(card) => {
                         return (
                             <View style={styles.card}>
-                                {/*<Image
-                                style={styles.restaurantImage}
-                                source={{uri: card?.picture}}
-                                />*/}
                                 <Text style={styles.cardName}>{card?.name}</Text>
                                 <Star score={card?.rating ? card?.rating : 0} style={styles.starStyle} />
                                 <Text>{card?.location}</Text>
@@ -154,12 +150,12 @@ class Session extends Component {
                         this.toggleSwiping(this.swiper.horizontalSwipe); 
                         this.toggleSwiping(this.swiper.verticalSwipe);
                         this.navigation.navigate('Compromise');
-                    }} //this needs to change to disable swiping
+                    }} 
                     onSwipedLeft={(cardIndex) => {console.log('card at index ' + cardIndex +' swiped no')}}
                     onSwipedRight={(cardIndex) => {console.log('card at index ' + cardIndex +' swiped like')}}
                     onSwipedTop={(cardIndex) => {console.log('card at index ' + cardIndex +' swiped crave')}}
                     onSwipedBottom={(cardIndex) => {console.log('card at index ' + cardIndex +' swiped hard no')}}
-                    onTapCard={(cardIndex) => {this.toggleModal(!this.state.modalVisible); this.showMoreDetails(cardIndex); this.splitHours(this.state.data[this.state.index]?.hours)}}
+                    onTapCard={(cardIndex) => {this.toggleModal(!this.state.modalVisible); this.showMoreDetails(cardIndex);}}
                     cardIndex={0}
                     backgroundColor={'#ffffff'}
                     stackSize= {3}
