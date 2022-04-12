@@ -2,71 +2,91 @@ import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import React, { useState } from "react";
 import { ListRenderItem, FlatList, SafeAreaView, StyleSheet, Pressable, StatusBar } from "react-native";
 import Colors from '../constants/Colors';
-import { Text } from './Themed';
+import { Text, View } from './Themed';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
 
 export interface Group {
-  id: string;
-  name: string;
-  members: Array<any>;
+  groupId: string;
+  groupCode: string;  
+  groupName: string;
+  isGroupLeader: boolean;
 }
 
 const DATA: Group[] = [
   {
-    id: "bd7acbea",
-    name: "Roomies",
-    members: [""],
+    groupId: "1",
+    groupCode: "bd7acbea",
+    groupName: "Roomies",
+    isGroupLeader: true,
   },
   {
-    id: "3ac68afc",
-    name: "Homies",
-    members: [""],
+    groupId: "2",
+    groupCode: "3ac68afc",
+    groupName: "Homies",
+    isGroupLeader: true,
   },
   {
-    id: "58694a0d",
-    name: "Dev Team",
-    members: [""],
+    groupId: "3",
+    groupCode: "58694a0f",
+    groupName: "Dev Team",
+    isGroupLeader: false,
   },
   {
-    id: "ghc69a34",
-    name: "Dream Team",
-    members: [""],
-  },
-  {
-    id: "55578a0f",
-    name: "Michael",
-    members: [""],
-  },
-  {
-    id: "3asdfg45c",
-    name: "350 Bloor",
-    members: [""],
+    groupId: "4",
+    groupCode: "ghc69a34",
+    groupName: "Dream Team",
+    isGroupLeader: false,
   },
 ];
 
-const Item = ({ data }) => {
+const Item = (props: { 
+  data : any
+  }) => {
+  const { data } = props;
+  let isLeader = data.isGroupLeader;
   let navigation = useNavigation();
-  return(<Pressable 
-    onPress={() => {
-      navigation.navigate('GroupDetails')
-  }} 
-    style={styles.container}>
-    <Text style={styles.name}>{data.name}</Text>
-    <FontAwesomeIcon style={styles.name} icon="angle-right" size={30}/>
-  </Pressable>);
-}; 
+
+  if (isLeader && data.groupId != "9999999") {
+    return(
+      <Pressable 
+        onPress={() => {
+          navigation.navigate('GroupDetails')
+        }} 
+        style={styles.container}>
+        <View style={styles.spacer}>
+          <View style={styles.nameContainer}>
+            <FontAwesomeIcon style={styles.leaderIcon} icon="crown" size={26}/>
+            <Text style={styles.leaderName}>{data.groupName} </Text>
+          </View>
+          <FontAwesomeIcon style={styles.arrowIcon} icon="angle-right" size={30}/>
+        </View>
+      </Pressable>
+    )
+  } else {
+    return(
+      <Pressable 
+        onPress={() => {
+          navigation.navigate('GroupDetails')
+        }} 
+        style={styles.container}>
+        <Text style={styles.name}>{data.groupName}</Text>
+        <FontAwesomeIcon style={styles.arrowIcon} icon="angle-right" size={30}/>
+      </Pressable>
+    )
+  };
+}
 
 export default function GroupList() {
   const [grouplist, setGroupList] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
   const alone: Group[] = [  {
-    id: "9999999",
-    name: "Table for One",
-    members: [""],
+    groupId: "9999999",
+    groupCode: "9999999",
+    groupName: "Table for One",
+    isGroupLeader: true
   },]
-  let list: Group[]
   
   let retrieveGroups = () => {
     // fetch("//131.104.49.71:80/group/find", {
@@ -92,7 +112,7 @@ export default function GroupList() {
         {...retrieveGroups}
         data={alone.concat(DATA)}
         renderItem={renderItem}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.groupCode}
         extraData={selectedId}
       />
     </SafeAreaView>
@@ -115,6 +135,36 @@ const styles = StyleSheet.create({
     marginLeft: "10%",
     marginRight: "10%",
   },
+  leaderName: {
+    fontSize: 25,
+    fontWeight: 'bold',
+    justifyContent: 'space-between',
+    alignSelf: "center",
+    color: Colors.light.text,
+    marginLeft: "4%",
+    marginRight: "10%",
+  },
+  leaderIcon: {
+    color: "#FFC107",
+    alignSelf: "center",
+  },
+  arrowIcon: {
+    justifyContent: 'flex-end',
+    alignSelf: "center",
+    marginRight: "10%",
+  },
+  nameContainer: {
+    flex: 1,
+    flexDirection: "row",
+    marginLeft: "8%",
+  },
+  spacer: {
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignSelf: "center",
+    width: "100%",
+  },
   container: {
     flex: 1,
     flexDirection: 'row',
@@ -129,6 +179,6 @@ const styles = StyleSheet.create({
     width: "80%",
     height: 73,
     marginHorizontal: "5%",
-  }, 
+  },  
 });
 
