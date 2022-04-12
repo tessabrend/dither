@@ -25,6 +25,13 @@ export default function App() {
       console.log(keys);
       */
       // Checks if the user exists, and if not creates a temporary one for them
+
+      // let keys = await AsyncStorage.getAllKeys();
+      // console.log(keys);
+      // await AsyncStorage.multiRemove(keys);
+      // keys = await AsyncStorage.getAllKeys();
+      // console.log(keys);
+
       try {
         const userId = await AsyncStorage.getItem("@userId");
         if(userId === null) {
@@ -49,6 +56,18 @@ export default function App() {
       }
     }
     checkUserExists();
+
+    (async () => {
+      try {
+        let val = await AsyncStorage.getItem('@userLoggedIn');
+        if(val == null) {
+          console.log("nulling");
+          await AsyncStorage.setItem('@userLoggedIn', 'false');
+        }
+      } catch(error) {
+        console.log(error);
+      }
+    })();
   }, []);
 
   if (!isLoadingComplete) {
