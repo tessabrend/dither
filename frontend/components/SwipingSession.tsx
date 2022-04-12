@@ -58,7 +58,7 @@ class Session extends Component {
         }  
     }
 
-    getPriceBucket = (price_bucket) => {
+    getPriceBucket = (price_bucket: any) => {
         switch (price_bucket) {
             case "1":
                 return (
@@ -147,6 +147,7 @@ class Session extends Component {
                                 <Text style={styles.cardName}>{card?.name}</Text>
                                 <Star score={card?.rating ? card?.rating : 0} style={styles.starStyle} />
                                 <Text>{card?.location}</Text>
+                                <Text>{card?.price}</Text>
                             </View>
                         )
                     }}
@@ -288,7 +289,7 @@ const styles = StyleSheet.create({
       fontSize: 15,
       backgroundColor: '#B3B3B3',
       minWidth: 70,
-      minHeight: 40,
+      minHeight: 35,
       borderColor: '#000000',
       borderWidth: 1.4,
       borderRadius: 10,
