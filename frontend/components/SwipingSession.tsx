@@ -53,6 +53,8 @@ class Session extends Component {
     }
 
     getRestaurants = async () => {
+        //const url = 'http://131.104.49.71:80/restaurant/query?' + new URLSearchParams(this.state.restaurantParams);
+        //const 
         try {
             const response = await fetch('http://131.104.49.71:80/restaurant/query?' + new URLSearchParams(this.state.restaurantParams), {
                 headers: {

@@ -6,7 +6,7 @@ import { MultiSelect } from 'react-native-element-dropdown';
 import Colors from '../constants/Colors';
 import { Text, View } from './Themed';
 import { useNavigation } from '@react-navigation/native';
-import getLocation from '../utils/utils';
+import getLocation, { apiRequestRetry } from '../utils/utils';
 import Dropdown from "./Dropdown";
 import Rating from "./Rating";
 import SliderContainer from "./SliderContainer";
@@ -76,34 +76,32 @@ let updatePriceBucket = (bucket: string) => {
 }
 
 let startSession = () => {
-  fetch("http://131.104.49.71:80/session/start", {
+  const url = "http://131.104.49.71:80/session/start";
+  const options = {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
       'Accept': 'application/json'
     },
     body: `groupId=${2}&diningType=${diningType}&radius=${distance}&cuisineType=${cuisineType}&priceBucket=${priceBuckets}&rating=${rating}`
-  }).then().catch((err) => {
-    alert("The session could not be started due to an internal error")
-  });
+  }
+  apiRequestRetry(url, options, 10);
 }
 
   const navigation = useNavigation();
   useEffect(() => {
     getLocation().then((userLocation) => setLocation(userLocation));
-    fetch(`http://131.104.49.71:80/group/${group.groupId}/members`, {
-      headers: {
-        'Accept': 'application/json'
+    async function getGroupMembers() {
+      const url = `http://131.104.49.71:80/group/${group.groupId}/members`;
+      const options = {
+        headers: {
+          'Accept': 'application/json'
+        }
       }
+      let groupMembers = await apiRequestRetry(url, options, 10)
+      setGroupMembers(groupMembers);
     }
-    )
-    .then(response => response.json())
-    .then(data => {
-      //console.log(data)
-      setGroupMembers(data)
-    }).catch(err => {
-      //console.log(err);
-    });
+    getGroupMembers();
   }, []);
 
   const ratingProps: RatingProps = {rating: rating, setRating: setRating}
