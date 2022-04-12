@@ -8,7 +8,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as React from 'react';
-import { ColorSchemeName, Pressable, Text } from 'react-native';
+import { ColorSchemeName, Pressable, Text, Alert } from 'react-native';
 
 import Colors from '../constants/Colors';
 import useColorScheme from '../hooks/useColorScheme';
@@ -31,6 +31,9 @@ import GroupDetails from '../components/GroupDetails';
 import { useNavigation } from '@react-navigation/native';
 import { Menu, MenuOptions, MenuOption, MenuTrigger } from 'react-native-popup-menu';
 import AddToGroup from '../screens/AddToGroup';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+import { faRoute } from '@fortawesome/free-solid-svg-icons';
 
 export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }) {
   return (
@@ -76,14 +79,58 @@ function RootNavigator() {
       }}>
       </Stack.Screen>
       <Stack.Screen name='AddUserToGroup' component={AddToGroup} options={{title: ''}}></Stack.Screen>
+      <Stack.Screen name='GroupList' component={GroupList} options={{title: ''}}></Stack.Screen>
       <Stack.Screen name='GroupDetails' component={GroupDetails} options={{title: '', headerRight: () => (
-        <Menu>
+      <Menu>
           <MenuTrigger>
             <FontAwesomeIcon size={25} style={{marginRight: 15}} icon="ellipsis"/>
           </MenuTrigger>
           <MenuOptions>
             <MenuOption onSelect={() => navigation.navigate('AddUserToGroup')}>
               <Text style={{padding: 10, fontSize: 14}}>Add User</Text>
+            </MenuOption>
+            <MenuOption onSelect={() => {
+              Alert.alert(
+              "Confirm",
+              navigation.getCurrentRoute().params.isGroupLeader ? 
+              "Are you sure you want to delete the Group " + navigation.getCurrentRoute().params.groupName + "?" :
+              "Are you sure you  want to leave the Group " + navigation.getCurrentRoute().params.groupName + "?",
+              [
+                {
+                  text: "Yes",
+                  onPress: async () => {
+                    const userId = await AsyncStorage.getItem("@userId");
+                    fetch(`http://131.104.49.71:80/group/${navigation.getCurrentRoute().params.groupId}/leave/${userId}`, {
+                      method: "PUT",
+                      headers: {
+                        'Content-Type': "multipart/form-data",
+                        'Accept': 'application/json'
+                      }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                      if(data.status === 'delete') {
+                        alert("You have successfully left the group");
+                      } else if(data.status === 'delete all') {
+                        alert("You have successfully deleted the group");
+                      } else {
+                        alert("An error occured. Please try again later");
+                      }
+                      navigation.navigate("GroupList")
+                    }).catch(err => console.log(err));
+                  }
+                },
+                {
+                  text: "No"
+                }
+              ]
+            )}}>
+              <Text style={{padding: 10, fontSize: 14}}>
+                {navigation.getCurrentRoute().params.isGroupLeader ? 
+                  "Delete Group" :
+                  "Leave Group"
+                }
+              </Text>
             </MenuOption>
           </MenuOptions>
         </Menu>

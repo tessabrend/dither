@@ -8,4 +8,18 @@ export default async function getPosition() {
     }
     let location = await Location.getCurrentPositionAsync({});
     return String(location["coords"]["latitude"]) + ',' + String(location["coords"]["longitude"]);
-} 
+}
+
+export async function apiRequestRetry(url: string, options: object, numTries: number) {
+  const errs = [];
+  for(var i = 0; i < numTries; i++) {
+    try {
+      console.log(`trying GET ${url} (${i+1}/ ${numTries})`);
+      let fetched = await (await fetch(url, options)).json();
+      return fetched;
+    } catch(err) {
+      errs.push(err.message);
+    }
+  }
+  alert("A network error occured. Try again later");
+}

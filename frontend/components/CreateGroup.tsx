@@ -2,9 +2,10 @@ import React, { useState, useEffect } from "react";
 import { Pressable, TextInput, StyleSheet, Alert } from "react-native";
 import { Text, View } from './Themed';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
 
 export default function CreateGroup(setModalOpen) {
-
+    let navigation = useNavigation();
     let [groupName, setGroupName] = useState("");
     let [error, setError] = useState("");
     const [userId, setUserId] = useState("");
@@ -21,7 +22,8 @@ export default function CreateGroup(setModalOpen) {
         fetch('http://131.104.49.71:80/group/create', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Accept': 'application/json'
             },
             body: `GroupName=${groupName}&UserId=${userId}`
         })
@@ -33,13 +35,15 @@ export default function CreateGroup(setModalOpen) {
                     setError('');
                     setModalOpen(false);
                     alert(`Group Created Successfully`);
+                    navigation.navigate("GroupList")
                 }
             }).catch(error => {
+                console.log("in creategroup.tsx, 1st catch");
+                console.log(error)
                 setError('Incorrect response format: likely due to internal error');
             });
         }).catch(reason => {
-            console.log(reason)
-            setError(reason.toString().split(':')[1]);
+            console.log(Object.getOwnPropertyNames(reason));
         });
     }
 

@@ -26,7 +26,8 @@ export default function EnterGroupCode(setModalOpen) {
         fetch('http://131.104.49.71:80/group/join', {
             method: 'PUT',
             headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Accept': 'application/json'
             },
             body: `groupEntryCode=${groupCode}&UserName=${userName}&UserId=${userId}`
         })
@@ -39,6 +40,7 @@ export default function EnterGroupCode(setModalOpen) {
                 } else {
                     setError(data['message']);
                 }
+                
             }).catch(error => {
                 console.log(error)
                 setError('Incorrect response format: likely due to internal error');
