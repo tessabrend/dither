@@ -1,3 +1,6 @@
+argon2-cffi==21.3.0
+argon2-cffi-bindings==21.2.0
+cffi==1.15.0
 aiofiles==0.8.0
 aioflask==0.4.0
 asgiref==3.5.0
@@ -20,10 +23,13 @@ importlib-metadata==4.11.0
 itsdangerous==2.0.1
 Jinja2==3.0.3
 MarkupSafe==2.0.1
-pkg-resources==0.0.0
 pony==0.7.16
 priority==2.0.0
 psycopg2==2.9.3
+psycopg2-binary==2.9.3
+pycparser==2.21
+python-crontab==2.6.0
+python-dateutil==2.8.2
 python-dotenv==0.19.2
 python-http-client==3.3.7
 requests==2.27.1

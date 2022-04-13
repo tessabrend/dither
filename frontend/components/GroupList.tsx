@@ -2,7 +2,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import React, { useState, useEffect } from "react";
 import { ListRenderItem, FlatList, SafeAreaView, StyleSheet, Pressable, StatusBar } from "react-native";
 import Colors from '../constants/Colors';
-import { Text } from './Themed';
+import { Text, View } from './Themed';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useNavigation, useIsFocused } from '@react-navigation/native';
@@ -11,14 +11,18 @@ import { Group } from '../constants/Interfaces';
 import { faCropSimple } from "@fortawesome/free-solid-svg-icons";
 import { apiRequestRetry } from "../utils/utils";
 
-const Item = ({ data }) => {
+const Item = (props: { 
+  data : any
+  }) => {
+  const { data } = props;
+  let isLeader = data.isGroupLeader;
   let navigation = useNavigation();
   return(<Pressable 
     onPress={() => {
       navigation.navigate('GroupDetails', data)
   }} 
     style={styles.container}>
-    {data.isGroupLeader && data.groupId !== "9999999" ? <FontAwesomeIcon style={styles.groupLeader} icon="star" size={30}/> : null}
+    {data.isGroupLeader && data.groupId !== "9999999" ? <FontAwesomeIcon style={styles.groupLeader} icon="crown" size={30}/> : null}
     <Text style={styles.name}>{data.groupName}</Text>
     <FontAwesomeIcon style={styles.name} icon="angle-right" size={30}/>
   </Pressable>);
@@ -34,7 +38,6 @@ export default function GroupList() {
     groupCode: "",
     isGroupLeader: true
   },]
-  let list: Group[]
   
   useEffect(() => {
     async function getUserGroups() {
@@ -106,6 +109,6 @@ const styles = StyleSheet.create({
     width: "80%",
     height: 73,
     marginHorizontal: "5%",
-  }, 
+  },  
 });
 
