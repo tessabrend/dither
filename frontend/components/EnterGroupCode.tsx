@@ -36,7 +36,18 @@ export default function EnterGroupCode(setModalOpen, setCurrentAction) {
             body: `groupEntryCode=${groupCode}&UserName=${userName}&UserId=${userId}`
         }
         apiRequestRetry(url, options, 10).then(res => {
-            console.log(res);
+            setModalOpen(false);
+            setCurrentAction('start');
+            if(res.message) {
+                navigation.navigate("GroupList");
+            } else {
+                navigation.navigate("GroupDetails", {
+                    "groupCode": res.GroupEntryCode,
+                    "groupId": res.id,
+                    "groupName": res.GroupName,
+                    "isGroupLeader": true
+                });    
+            }
         });
     }
     

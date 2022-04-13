@@ -43,6 +43,7 @@ def add_to_group():
                 flush()
                 group_member = GroupMembers(GroupId=group, UserId=user)
                 commit()
+                return render_object(group)
             except TransactionIntegrityError as e:
                 return {'message': f"Could not add user to group in database: {str(e).split('DETAIL:')[1]}".replace('\n', '')}, 400
         else:
