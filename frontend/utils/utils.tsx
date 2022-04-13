@@ -15,8 +15,8 @@ export async function apiRequestRetry(url: string, options: object, numTries: nu
   for(var i = 0; i < numTries; i++) {
     try {
       console.log(`trying ${options.method ? options.method : 'GET'} ${url} (${i+1}/ ${numTries})`);
+      console.log(`with options: ${JSON.stringify(options,2)}`)
       let fetched = await (await fetch(url, options)).json();
-      console.log(fetched);
       return fetched;
     } catch(err) {
       console.log(err.message);

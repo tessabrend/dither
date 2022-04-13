@@ -53,6 +53,20 @@ export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeNa
 
 const Stack = createNativeStackNavigator();
 
+const getCurrentRouteParamItems = (nav: object, value: string) => {
+  try {
+    const currentRouteParams = nav.getCurrentRoute().params;
+    console.log("typeof currentRouteParams = " + typeof currentRouteParams)
+    if(typeof currentRouteParams === 'undefined' ) {
+      return false;
+    } else {
+      return currentRouteParams[value]
+    }
+  } catch(err) {
+    return false;
+  }
+}
+
 function RootNavigator() {
   let navigation = useNavigation();
   const popAction = StackActions.pop();
@@ -90,20 +104,24 @@ function RootNavigator() {
           </MenuTrigger>
           <MenuOptions>
             <MenuOption onSelect={() => navigation.navigate('AddUserToGroup')}>
+              {console.log("\n\n\n*************************************\n\n")}
+              {console.log(navigation.getCurrentRoute())}
+              {console.log("\n\n*************************************\n\n\n")}
+  
               <Text style={{padding: 10, fontSize: 14}}>Add User</Text>
             </MenuOption>
             <MenuOption onSelect={() => {
               Alert.alert(
               "Confirm",
-              navigation.getCurrentRoute().params.isGroupLeader ? 
-              "Are you sure you want to delete the Group " + navigation.getCurrentRoute().params.groupName + "?" :
-              "Are you sure you  want to leave the Group " + navigation.getCurrentRoute().params.groupName + "?",
+              getCurrentRouteParamItems(navigation, 'isGroupLeader') ? 
+              "Are you sure you want to delete the Group " + getCurrentRouteParamItems(navigation, "groupName") + "?" :
+              "Are you sure you  want to leave the Group " + getCurrentRouteParamItems(navigation, "groupName") + "?",
               [
                 {
                   text: "Yes",
                   onPress: async () => {
                     const userId = await AsyncStorage.getItem("@userId");
-                    const url = `http://131.104.49.71:80/group/${navigation.getCurrentRoute().params.groupId}/leave/${userId}`
+                    const url = `http://131.104.49.71:80/group/${getCurrentRouteParamItems(navigation, "groupId")}/leave/${userId}`
                     const options = {
                       method: "PUT",
                       headers: {
@@ -112,9 +130,9 @@ function RootNavigator() {
                       }
                     }
                     let data = await apiRequestRetry(url, options, 10);
-                    if(data.status === 'delete all' || (data.message && navigation.getCurrentRoute().params.isGroupLeader === true)) {
+                    if(data.status === 'delete all' || (data.message && getCurrentRouteParamItems(navigation, "isGroupLeader") === true)) {
                       alert("You have successfully deleted the group");
-                    } else if(data.status === 'delete' || (data.message && navigation.getCurrentRoute().params.isGroupLeader === false)) {
+                    } else if(data.status === 'delete' || (data.message && getCurrentRouteParamItems(navigation, "isGroupLeader") === false)) {
                       alert("You have successfully left the group");
                     } else {
                       alert("An error occured. Please reload the app.");
@@ -147,7 +165,7 @@ function RootNavigator() {
               ]
             )}}>
               <Text style={{padding: 10, fontSize: 14}}>
-                {navigation.getCurrentRoute().params.isGroupLeader ? 
+                {getCurrentRouteParamItems(navigation, "isGroupLeader") ? 
                   "Delete Group" :
                   "Leave Group"
                 }

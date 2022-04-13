@@ -34,12 +34,16 @@ export default function CreateGroup(setModalOpen: any, setCurrentAction: any) {
         apiRequestRetry(url, options, 10).then(res => {
             setModalOpen(false);
             setCurrentAction('start');
-            navigation.navigate("GroupDetails", {
-                "groupCode": res.GroupEntryCode,
-                "groupId": res.id,
-                "groupName": res.GroupName,
-                "isGroupLeader": true
-            })
+            if(res.groupExists) {
+                navigation.navigate("GroupList")               
+            } else {
+                navigation.navigate("GroupDetails", {
+                    "groupCode": res.GroupEntryCode,
+                    "groupId": res.id,
+                    "groupName": res.GroupName,
+                    "isGroupLeader": true
+                });    
+            }
         });
 
     }
