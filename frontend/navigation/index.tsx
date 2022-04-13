@@ -31,6 +31,12 @@ import GroupDetails from '../components/GroupDetails';
 import { useNavigation } from '@react-navigation/native';
 import { Menu, MenuOptions, MenuOption, MenuTrigger } from 'react-native-popup-menu';
 import AddToGroup from '../screens/AddToGroup';
+import { LoginRegisterScreen } from '../screens/LoginRegisterScreen';
+import { useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
+import { DeviceEventEmitter } from 'react-native';
+import { useEffect } from 'react';
 
 export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }) {
   return (
@@ -52,27 +58,74 @@ const Stack = createNativeStackNavigator();
 function RootNavigator() {
   let navigation = useNavigation();
 
+  let [userLoggedIn, setUserLoggedIn] = useState("false");
+
+  let getUserLoggedIn = () => {
+    AsyncStorage.getItem('@userLoggedIn').then((val) => {
+      setUserLoggedIn(val || "false");
+    }); 
+  };
+
+  useEffect(() => {
+    getUserLoggedIn();
+    DeviceEventEmitter.addListener('event.userUpdate', (data) => getUserLoggedIn());
+  }, []);
+
+  let userSignout = async () => {
+    await AsyncStorage.setItem('@userLoggedIn', 'false');
+    await AsyncStorage.removeItem('@userId');
+    setUserLoggedIn('false');
+    getUserLoggedIn();
+    fetch('http://131.104.49.71:80/user/create', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/x-www-form-urlencoded'
+          },
+    }).then(response => {
+        response.json().then(async (data) => {
+            await AsyncStorage.setItem('@userId', data.userId)
+        }).catch(error => {
+            console.log(error)
+        });
+    }).catch(reason => {
+        console.log(reason)
+    });
+  }
+
   return (
     <Stack.Navigator>
       <Stack.Screen name="Home" component={Homepage} options={{
-        title: '',
+          title: '',
           headerLeft: () => (
             <GroupPopup/>
           ),
-          headerRight: () => (
-            <Pressable
-              onPress={() => {
-              }}
-              style={({ pressed }) => ({
-                opacity: pressed ? 0.5 : 1,
-              })}>
-              <FontAwesomeIcon
-                icon="circle-user"
-                size={25}
-                style={{ marginRight: 15 }}
-              />
-            </Pressable>
-          )
+          headerRight: () => {
+            if(userLoggedIn === "false") {
+              return (
+                <Pressable onPress={() => navigation.navigate('Login')}>
+                  <Text style={{fontSize: 16}}>Sign In</Text>
+                </Pressable>
+              );
+            } else {
+              return (
+                <Menu>
+                  <MenuTrigger><FontAwesomeIcon
+                    icon="circle-user"
+                    size={25}
+                    style={{ marginRight: 15 }}
+                  /></MenuTrigger>
+                  <MenuOptions>
+                    <MenuOption onSelect={() => navigation.navigate('Login')}>
+                      <Text style={{padding: 10, fontSize: 14}}>Switch User</Text>
+                    </MenuOption>
+                    <MenuOption onSelect={() => userSignout()}>
+                      <Text style={{padding: 10, fontSize: 14}}>Sign Out</Text>
+                    </MenuOption>
+                  </MenuOptions>
+                </Menu>
+              )
+            }
+          }
       }}>
       </Stack.Screen>
       <Stack.Screen name='AddUserToGroup' component={AddToGroup} options={{title: ''}}></Stack.Screen>
@@ -88,6 +141,7 @@ function RootNavigator() {
           </MenuOptions>
         </Menu>
       )}}></Stack.Screen>
+      <Stack.Screen name='Login' component={LoginRegisterScreen} options={{ title: ''}}></Stack.Screen>
       <Stack.Screen name='Compromise' component={ConsensusReveal}></Stack.Screen>
       <Stack.Screen name='Session' component={SessionScreen}></Stack.Screen>
       <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ title: 'Oops!' }} />

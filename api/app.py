@@ -10,6 +10,7 @@ from geopy.distance import distance
 from geopy.geocoders import Nominatim
 import sendgrid
 from sendgrid.helpers.mail import *
+from argon2 import PasswordHasher
 
 app = Flask(__name__, static_url_path='')
 Pony(app)
@@ -314,7 +315,47 @@ def getUserGroups(id):
         })
     return jsonify(response)
 
+@app.route('/user/<uid>/register', methods=['POST'])
+def user_register(uid):
+    # In order to complete the registration process, we will need to have the user ID
+    # Here, we will associate a specific email and hashed password with our ID, allowing it to be retreived later
+    if not uid or not request.form.get('Email') or not request.form.get('Password'):
+        return { "message": "Cannot register because required form fields are missing" }, 400
+    user = User[uid]
+    if not user:
+        return { "message": "Cannot register because the user does not exist" }, 400
+    if user.Password != "NO_ACCOUNT":
+        return { "message": "Cannot register because the user is already registered" }, 400
+
+    try:
+        ph = PasswordHasher()
+        user.Email = request.form.get('Email')
+        user.Password = ph.hash(request.form.get('Password'))
+        commit()
+    except Exception as e:
+        return { "message": "Cannot register because a user with this email already exists" }, 400
+    
+    return { "message": "OK" }
+
+@app.route('/user/login', methods=['POST'])
+def user_login():
+    # This depends on the user already being registered - they will need to have an email address and hashed password associated
+    # With their account in order to log in
+    if not request.form.get('Email') or not request.form.get('Password'):
+        return { "message": "Cannot login because form fields are missing" }, 400 
+    users = list(select(user for user in User if user.Email == request.form.get('Email')))
+    if len(users) == 0:
+        return { "message": "Cannot login because the user does not exist (incorrect email)" }, 400
+    user = users[0]
+
+    ph = PasswordHasher()
+    try:
+        if ph.verify(user.Password, request.form.get('Password')):
+            return { "message": "OK" , "userID": user.id }
+    except:
+        return { "message": "Cannot login because the password is incorrect" }, 400
+
 ### End User ###
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(port = "80", host = "0.0.0.0", debug=True)
