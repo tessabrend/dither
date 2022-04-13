@@ -61,9 +61,10 @@ function RootNavigator() {
     <Stack.Navigator>
       <Stack.Screen name="Home" component={Homepage} options={{
         title: '',
-          headerLeft: () => (
-            <GroupPopup/>
-          ),
+          headerLeft: () => {
+            return <GroupPopup/>
+          }
+          ,
           headerRight: () => (
             <Pressable
               onPress={() => {

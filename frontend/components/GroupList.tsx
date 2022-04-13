@@ -41,8 +41,10 @@ export default function GroupList() {
       const userId = await AsyncStorage.getItem("@userId");
       const url = `http://131.104.49.71:80/user/${userId}/groups`;
       const options = {headers: {'Accept': 'application/json'}}
+
       let userGroups = await apiRequestRetry(url, options, 10);
       setGroupList(userGroups);
+      console.log(groupList);
     }
     getUserGroups()
   }, [isFocused]);

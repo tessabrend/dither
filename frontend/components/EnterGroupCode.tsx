@@ -10,7 +10,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { apiRequestRetry } from '../utils/utils';
 import { useNavigation } from '@react-navigation/native';
 
-export default function EnterGroupCode(setModalOpen) {
+export default function EnterGroupCode(setModalOpen, setCurrentAction) {
     const [groupCode, setGroupCode] = useState("");
     const [userName, setUserName] = useState("");
     const [error, setError] = useState("");
@@ -35,8 +35,9 @@ export default function EnterGroupCode(setModalOpen) {
             },
             body: `groupEntryCode=${groupCode}&UserName=${userName}&UserId=${userId}`
         }
-        apiRequestRetry(url, options, 10);
-        navigation.navigate("GroupList");
+        apiRequestRetry(url, options, 10).then(res => {
+            console.log(res);
+        });
     }
     
     return (<KeyboardAvoidingScrollView 

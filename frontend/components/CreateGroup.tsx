@@ -6,7 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 import { apiRequestRetry } from "../utils/utils";
 import { StackActions } from '@react-navigation/native';
 
-export default function CreateGroup(setModalOpen) {
+export default function CreateGroup(setModalOpen: any, setCurrentAction: any) {
     let navigation = useNavigation();
     let [groupName, setGroupName] = useState("");
     let [error, setError] = useState("");
@@ -32,7 +32,8 @@ export default function CreateGroup(setModalOpen) {
             body: `GroupName=${groupName}&UserId=${userId}`
         }
         apiRequestRetry(url, options, 10).then(res => {
-            console.log(res);
+            setModalOpen(false);
+            setCurrentAction('start');
             navigation.navigate("GroupDetails", {
                 "groupCode": res.GroupEntryCode,
                 "groupId": res.id,

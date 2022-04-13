@@ -4,13 +4,13 @@ import { Modal, StyleSheet, Pressable, KeyboardAvoidingView } from 'react-native
 import CreateGroup from './CreateGroup';
 import EnterGroupCode from './EnterGroupCode';
 import { Text, View } from './Themed';
+import { useNavigation } from '@react-navigation/native';
 
 
 export default function GroupPopup() {
-
+    let navigation = useNavigation();
     let [modalOpen, setModalOpen] = useState(false);
     let [currentAction, setCurrentAction] = useState('start');
-
     let actions = {
         start: <View style={styles.actionButtonContainer}>
                     <Pressable style={styles.actionButton} onPress={() => setCurrentAction('create')}>
@@ -20,8 +20,8 @@ export default function GroupPopup() {
                         <Text style={styles.buttonText}>Join Existing</Text>
                     </Pressable>
                 </View>,
-        create: CreateGroup(setModalOpen),
-        join: EnterGroupCode(setModalOpen),
+        create: CreateGroup(setModalOpen, setCurrentAction),
+        join: EnterGroupCode(setModalOpen, setCurrentAction),
     }
 
     return  <>

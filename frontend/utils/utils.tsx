@@ -16,8 +16,10 @@ export async function apiRequestRetry(url: string, options: object, numTries: nu
     try {
       console.log(`trying GET ${url} (${i+1}/ ${numTries})`);
       let fetched = await (await fetch(url, options)).json();
+      console.log(fetched);
       return fetched;
     } catch(err) {
+      console.log(err.message);
       errs.push(err.message);
     }
   }
