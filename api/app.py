@@ -80,7 +80,7 @@ def send_group_invitation():
     if not 'GroupID' in request.form.keys() or not 'InviteEmail' in request.form.keys():
         return {'message': f"Required form item(s) not present: {', '.join(set(request.form.keys()) - set(['GroupID', 'InviteEmail']))}"}, 400
     
-    user_to_invite = get(user for user in User if user.email and user.email == request.form.get('InviteEmail'))
+    user_to_invite = get(user for user in User if user.Email and user.Email == request.form.get('InviteEmail'))
     if not user_to_invite:
         return {'message': f"Sending the invitation email failed, because the user with email {request.form.get('InviteEmail')} was not found"}, 400
 
@@ -112,12 +112,15 @@ def create_group():
         print({'message': f"Required form item(s) not present: {', '.join(field_difference(request.form, Group, exceptions=provided_fields))}"})
         return {'message': f"Required form item(s) not present: {', '.join(field_difference(request.form, Group, exceptions=provided_fields))}"}, 400
     # If a time limit is not provided, use the default value of 30 minutes
-    group = Group(GroupName=request.form['GroupName'], 
-                GroupEntryCode=''.join(random.choice(string.ascii_letters) for _ in range(8)),
-                TimeLimit=request.form.get('TimeLimit', 30))
-    flush()
-    print(request.form.get("UserId"))
-    group_member = GroupMembers(GroupId=group.id, UserId=request.form.get('UserId'), GroupLeader=True)
+    try:
+        group = Group(GroupName=request.form['GroupName'], 
+                    GroupEntryCode=''.join(random.choice(string.ascii_letters) for _ in range(8)),
+                    TimeLimit=request.form.get('TimeLimit', 30))
+        flush()
+        print(request.form.get("UserId"))
+        group_member = GroupMembers(GroupId=group.id, UserId=request.form.get('UserId'), GroupLeader=True)
+    except Exception as e:
+        return {'groupExists': True}
     try:
         commit()
     except TransactionIntegrityError as e:
