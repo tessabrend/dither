@@ -4,12 +4,14 @@ import { Text, View } from './Themed';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { apiRequestRetry } from "../utils/utils";
+import { StackActions } from '@react-navigation/native';
 
 export default function CreateGroup(setModalOpen) {
     let navigation = useNavigation();
     let [groupName, setGroupName] = useState("");
     let [error, setError] = useState("");
     const [userId, setUserId] = useState("");
+    const popAction = StackActions.pop();
 
     useEffect(() => {
         async function retrieveUserId() {
@@ -29,8 +31,16 @@ export default function CreateGroup(setModalOpen) {
             },
             body: `GroupName=${groupName}&UserId=${userId}`
         }
-        apiRequestRetry(url, options, 10);
-        navigation.navigate("GroupList");
+        apiRequestRetry(url, options, 10).then(res => {
+            console.log(res);
+            navigation.navigate("GroupDetails", {
+                "groupCode": res.GroupEntryCode,
+                "groupId": res.id,
+                "groupName": res.GroupName,
+                "isGroupLeader": true
+            })
+        });
+
     }
 
     return <>

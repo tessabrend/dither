@@ -5,7 +5,7 @@
  */
 import { FontAwesome } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
+import { NavigationContainer, DefaultTheme, DarkTheme, StackActions } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as React from 'react';
 import { ColorSchemeName, Pressable, Text, Alert } from 'react-native';
@@ -34,6 +34,7 @@ import AddToGroup from '../screens/AddToGroup';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { faRoute } from '@fortawesome/free-solid-svg-icons';
+import { apiRequestRetry } from '../utils/utils';
 
 export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }) {
   return (
@@ -54,7 +55,8 @@ const Stack = createNativeStackNavigator();
 
 function RootNavigator() {
   let navigation = useNavigation();
-
+  const popAction = StackActions.pop();
+  
   return (
     <Stack.Navigator>
       <Stack.Screen name="Home" component={Homepage} options={{
@@ -100,7 +102,25 @@ function RootNavigator() {
                   text: "Yes",
                   onPress: async () => {
                     const userId = await AsyncStorage.getItem("@userId");
-                    fetch(`http://131.104.49.71:80/group/${navigation.getCurrentRoute().params.groupId}/leave/${userId}`, {
+                    const url = `http://131.104.49.71:80/group/${navigation.getCurrentRoute().params.groupId}/leave/${userId}`
+                    const options = {
+                      method: "PUT",
+                      headers: {
+                        'Content-Type': "multipart/form-data",
+                        'Accept': 'application/json'
+                      }
+                    }
+                    let data = await apiRequestRetry(url, options, 10);
+                    if(data.status === 'delete all' || (data.message && navigation.getCurrentRoute().params.isGroupLeader === true)) {
+                      alert("You have successfully deleted the group");
+                    } else if(data.status === 'delete' || (data.message && navigation.getCurrentRoute().params.isGroupLeader === false)) {
+                      alert("You have successfully left the group");
+                    } else {
+                      alert("An error occured. Please reload the app.");
+                    }
+                    navigation.dispatch(popAction);
+                  }
+                    /*fetch(`http://131.104.49.71:80/group/${navigation.getCurrentRoute().params.groupId}/leave/${userId}`, {
                       method: "PUT",
                       headers: {
                         'Content-Type': "multipart/form-data",
@@ -116,9 +136,9 @@ function RootNavigator() {
                       } else {
                         alert("An error occured. Please try again later");
                       }
-                      navigation.navigate("GroupList")
+                      navigation.dispatch(popAction);
                     }).catch(err => console.log(err));
-                  }
+                  }*/
                 },
                 {
                   text: "No"
