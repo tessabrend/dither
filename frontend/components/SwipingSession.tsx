@@ -8,6 +8,7 @@ import Modal from "react-native-modal";
 import Star from 'react-native-star-view';
 import { useNavigation } from '@react-navigation/native';
 import { apiRequestRetry } from '../utils/utils';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const window = Dimensions.get("window");
 const screen = Dimensions.get("screen");
@@ -17,18 +18,19 @@ class Session extends Component {
         progress: 0,
         modalVisible: false,
         data: [] as any[],
-        hours: [] as any[],
+        isMatch: false,
         index: 0,
         navigator: null,
         restaurantParams: {},
-        timeLimit: 300
+        timeLimit: 300,
+        userId: " "
     }
 
     constructor(props) {
         super(props);
         this.navigation = props.navigator;
         this.state.restaurantParams = this.navigation.getState()["routes"][2]["params"];
-        this.state.timeLimit = props.timeLimit;
+        this.state.timeLimit = props.route.params.timeLimit;
     }
 
     increment = () => {
@@ -59,6 +61,25 @@ class Session extends Component {
         } 
         let json = await apiRequestRetry(url, options, 10);
         this.setState({data: json})
+    }
+
+    setSelection = async (userid, restaurantid, sessionid, groupid, selection) => {
+        const url = 'http://131.104.49.71:80//session/selection';
+        const options = {
+            headers: {
+                'Content-Type': 'application/json'
+            }, 
+            body: JSON.stringify({
+                "UserId": userid,
+                "RestaurantId": restaurantid,
+                "SessionId": sessionid,
+                "GroupId": groupid,
+                "TypeOfFeedback": selection
+            })
+        }; 
+        fetch(url, options)
+        .then(response => response.json())
+        .then(data => this.setState({isMatch: data.match}))
     }
 
     getPriceBucket = (price_bucket: any) => {
@@ -98,9 +119,15 @@ class Session extends Component {
         }
         return null;
      }
+     
+     getUser = async () => {
+         let id = await AsyncStorage.getItem("@userId")
+        this.setState({userId: id})
+     }
 
-    componentDidMount = () => {
+    componentDidMount = async () => {
         this.getRestaurants()
+        this.getUser()
     }
 
     render () {

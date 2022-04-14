@@ -237,7 +237,7 @@ let startSession = () => {
       <View style={styles.submitWrapper}>
         <Pressable style={styles.buttonCard} onPress={() => {
           startSession()
-          navigation.navigate('Session', restaurantParams);
+          navigation.navigate('Session', {restaurantParams, timeLimit});
         }}>
           <Text style={styles.submitText}>Go Eat!</Text>
         </Pressable>
