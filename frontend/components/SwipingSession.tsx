@@ -61,42 +61,40 @@ class Session extends Component {
         this.setState({data: json})
     }
 
-    getPriceBucket = (price_bucket) => {
+    getPriceBucket = (price_bucket: any) => {
         switch (price_bucket) {
-            case "1":
-                return (
-                    <View style={styles.bucketRow}>
-                    <FontAwesomeIcon icon="dollar-sign" size={15}/>
-                    <FontAwesomeIcon icon="dollar-sign" size={15}/>
-                    <FontAwesomeIcon icon="dollar-sign" size={15}/>
-                    </View>
-                );
-            case "2":
-                return (
-                    <View style={styles.bucketRow}>
-                    <FontAwesomeIcon icon="dollar-sign" size={15}/>
-                    <FontAwesomeIcon icon="dollar-sign" size={15}/>
-                    </View>
-                );
-            case "3":
-                return (
-                    <View style={styles.bucketRow}>
-                    <FontAwesomeIcon icon="dollar-sign" size={15}/>
-                    <FontAwesomeIcon icon="dollar-sign" size={15}/>
-                    <FontAwesomeIcon icon="dollar-sign" size={15}/>
-                    </View>
-                );
-            case "4":
-                return (
-                    <View style={styles.bucketRow}>
-                    <FontAwesomeIcon icon="dollar-sign" size={15}/>
-                    <FontAwesomeIcon icon="dollar-sign" size={15}/>
-                    <FontAwesomeIcon icon="dollar-sign" size={15}/>
-                    <FontAwesomeIcon icon="dollar-sign" size={15}/>
-                    </View>
-                );
-            default:
-                break;
+          case "1":
+            return (
+              <View style={styles.bucketRow}>
+                <FontAwesomeIcon icon="dollar-sign" size={18}/>
+              </View>
+            );
+          case "2":
+            return (
+              <View style={styles.bucketRow}>
+                <FontAwesomeIcon icon="dollar-sign" size={18}/>
+                <FontAwesomeIcon icon="dollar-sign" size={18}/>
+              </View>
+            );
+          case "3":
+            return (
+              <View style={styles.bucketRow}>
+                <FontAwesomeIcon icon="dollar-sign" size={18}/>
+                <FontAwesomeIcon icon="dollar-sign" size={18}/>
+                <FontAwesomeIcon icon="dollar-sign" size={18}/>
+              </View>
+            );
+          case "4":
+            return (
+              <View style={styles.bucketRow}>
+                <FontAwesomeIcon icon="dollar-sign" size={18}/>
+                <FontAwesomeIcon icon="dollar-sign" size={18}/>
+                <FontAwesomeIcon icon="dollar-sign" size={18}/>
+                <FontAwesomeIcon icon="dollar-sign" size={18}/>
+              </View>
+            );
+          default:
+            break;
         }
         return null;
      }
@@ -119,16 +117,23 @@ class Session extends Component {
                      >
                      <View style={styles.centeredView}>
                          <View style={styles.modalView}>
-                             <Text style={styles.modalText}>Hours of Operation:</Text>
-                            { this.state.data[this.state.index]?.hoursOfOperation.map((item)=>(
-                            <Text> { item } </Text>)
-                            )}
-                            { this.state.data[this.state.index]?.cuisineType.map((item)=>(
-                            <Text style={styles.moreDetailsTagItem}> { item } </Text>)
-                            )}
-                            { this.state.data[this.state.index]?.dining_type.map((item)=>(
-                            <Text style={styles.moreDetailsTagItem}> { item } </Text>)
-                            )}
+                            {/* <Text style={styles.modalText}>{this.state.data[this.state.index]?.location}</Text> */}
+                            <Text style={styles.modalText}>Hours of Operation:</Text>
+                            <View style={styles.modalTextBox}>
+                              { this.state.data[this.state.index]?.hoursOfOperation.map((item)=>(
+                              <Text style={styles.infoText}> { item } </Text>)
+                              )}
+                            </View>
+                            <View style={styles.tagWrap}>
+                              { this.state.data[this.state.index]?.cuisineType.map((item)=>(
+                              <Text style={styles.moreDetailsTagItem}> { item } </Text>)
+                              )}
+                            </View>
+                            <View style={styles.tagWrap}>
+                              { this.state.data[this.state.index]?.dining_type.map((item)=>(
+                              <Text style={styles.moreDetailsTagItem}> { item } </Text>)
+                              )}
+                            </View>
                          </View>
                      </View>
                     </Modal>
@@ -145,7 +150,8 @@ class Session extends Component {
                             <View style={styles.card}>
                                 <Text style={styles.cardName}>{card?.name}</Text>
                                 <Star score={card?.rating ? card?.rating : 0} style={styles.starStyle} />
-                                <Text>{card?.location}</Text>
+                                <Text style={styles.infoText}>{card?.location}</Text>
+                                <View>{this.getPriceBucket(card?.priceBucket)}</View>
                             </View>
                         )
                     }}
@@ -224,88 +230,107 @@ const styles = StyleSheet.create({
       backgroundColor: "transparent",
     },
     buttonRow: {
-        justifyContent: "space-between",
-        flexDirection: "row",
-        marginTop: Platform.OS === 'ios' ? screen.width + 160 : screen.width,
-        paddingRight: 30,
-        paddingLeft: 30,
-        marginVertical: "3%"
+      justifyContent: "space-between",
+      flexDirection: "row",
+      marginTop: Platform.OS === 'ios' ? screen.width + 160 : screen.width,
+      paddingRight: 30,
+      paddingLeft: 30,
+      marginVertical: "3%"
     },
     progressBar: {
-        justifyContent: "center",
-        //alignItems: "center",
-        bottom: screen.height/8,
-        marginTop: 20,
-        marginRight: 20,
-        marginLeft: 20,
+      justifyContent: "center",
+      //alignItems: "center",
+      bottom: screen.height/8,
+      marginTop: 20,
+      marginRight: 20,
+       marginLeft: 20,
     },
     timer: {
-        justifyContent: "center",
-        alignItems: "flex-end",
-        marginTop: 10,
-        marginRight: 20,
-        bottom: screen.height/8
+      justifyContent: "center",
+      alignItems: "flex-end",
+      marginTop: 10,
+      marginRight: 20,
+      bottom: screen.height/8
     },
     centeredView: {
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        marginTop: 22
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      marginTop: 22
+    },
+    modalView: {
+      margin: 20,
+      backgroundColor: "white",
+      borderRadius: 5,
+      padding: "8%",
+      width: screen.width - 50,
+      minHeight: screen.height / 2,
+      alignItems: "center",
+      shadowColor: "#000",
+      shadowOffset: {
+        width: 0,
+        height: 2
       },
-      modalView: {
-        margin: 20,
-        backgroundColor: "white",
-        borderRadius: 5,
-        padding: 50,
-        width: screen.width - 50,
-        height: screen.height / 2,
-        alignItems: "center",
-        shadowColor: "#000",
-        shadowOffset: {
-          width: 0,
-          height: 2
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 4,
-        elevation: 5
-      },
-      modalText: {
-        marginBottom: 15,
-        textAlign: "center"
-      },
-      cardName: {
-          fontSize: 50,
-      },
-      moreDetailsTagItem: {
-        backgroundColor: '#B3B3B3',
-       width: 70,
-        height: 40,
-        borderColor: '#000000',
-        borderWidth: 2,
-        alignItems: "center",
-        textAlign: "center",
-        marginBottom: 30
-      },
-      moreDetailsTags: {
-        flex: 1,
-        flexDirection: "row",
-        justifyContent: "space-evenly",
-        padding: 20,
-      },
-      restaurantImage: {
-          borderColor: '#000000',
-          borderWidth: 2,
-          width: 320,
-          height: Platform.OS === 'ios' ? screen.height - 650 : screen.height - 600,
-          alignSelf: "center",
-          marginBottom: Platform.OS === 'ios' ? 20 : 10,
-      },
-      bucketRow: {
-        flexDirection: "row",
-        padding: 5,
-      },
-      starStyle: {
-        width: 100,
-        height: 20,
-      },
+      shadowOpacity: 0.25,
+      shadowRadius: 4,
+      elevation: 5
+    },
+    modalText: {
+      fontSize: 18,
+      fontWeight: "bold",
+      textAlign: "center"
+    },
+    cardName: {
+      fontSize: 50,
+    },
+    tagWrap: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      alignItems: "center",
+      justifyContent: "flex-start",
+    },
+    moreDetailsTagItem: {
+      fontSize: 15,
+      backgroundColor: '#B3B3B3',
+      minWidth: 70,
+      minHeight: 35,
+      borderColor: '#000000',
+      borderWidth: 1.4,
+      borderRadius: 10,
+      textAlign: "center",
+      justifyContent: "space-around",
+      padding: "2%",
+      margin: "2%"
+    },
+    moreDetailsTags: {
+      flex: 1,
+      flexDirection: "row",
+      justifyContent: "space-evenly",
+      padding: 20,
+    },
+    restaurantImage: {
+      borderColor: '#000000',
+      borderWidth: 2,
+      width: 320,
+      height: Platform.OS === 'ios' ? screen.height - 650 : screen.height - 600,
+      alignSelf: "center",
+      marginBottom: Platform.OS === 'ios' ? 20 : 10,
+    },
+    bucketRow: {
+      backgroundColor: "transparent",
+      flexDirection: "row",
+      padding: 5,
+    },
+    starStyle: {
+      width: 100,
+      height: 20,
+    },
+    infoText: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      fontSize: 16,
+    },
+    modalTextBox: {
+      marginVertical: "2%"
+    }
   });

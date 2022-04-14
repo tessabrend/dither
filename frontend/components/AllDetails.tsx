@@ -1,20 +1,46 @@
-import React, {Component} from "react";
+import React, {Component, useEffect, useState} from "react";
 import { StyleSheet, Image, Pressable, TouchableOpacity } from "react-native";
 import { Text, View } from './Themed';
 import FlipCard from "react-native-flip-card-plus";
 import * as WebBrowser from 'expo-web-browser';
 import * as Linking from 'expo-linking';
 import { Feather } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import { RestaurantQueryParams } from "../constants/Interfaces";
+import { apiRequestRetry } from "../utils/utils";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import { Star } from 'react-native-star-view';
 
-const enum Price {
-  Low = '$',
-  Medium = '$$',
-  High = '$$$'
-}
+
 
 export default class AllDetailsCard extends Component {
-  restaurantData = ['Restaurant Name' , Price.Medium, '0.5km', 'Pub', 
-  'https://google.com', '000-000-0000', '123 Alphabet Street', '3 stars', 'https://www.opentable.ca/r/' ];//temp data
+  restaurantData = ['Restaurant Name' , "2", '0.5 km', ['Indian', 'Thai', 'African', 'Buffet'], 
+  'https://google.com', '000-000-0000', '123 Alphabet Street', '3', 'https://www.opentable.ca/r/' ];//temp data
+
+  state = {
+    data: [] as any[],
+    index: 0,
+    navigator: null,
+    sessionId: {},
+  }
+
+  constructor(props) {
+    super(props);
+    this.navigation = props.navigator;
+    // this.state.sessionId = retrieved sessionId;
+  }
+
+  getSessionInfo = async () => {
+    const url = `http://131.104.49.71:80/session/${this.state.sessionId}/ismatch`;
+    const options = {
+        headers: {
+            'Accept': 'application/json'
+        }
+    } 
+    let json = await apiRequestRetry(url, options, 10);
+    this.setState({data: json})
+  }
+
 
   openWebsite = () => {
     WebBrowser.openBrowserAsync(this.restaurantData[4]);
@@ -25,13 +51,51 @@ export default class AllDetailsCard extends Component {
   };
 
   makeCall = () => {
-    Linking.openURL(`tel:${this.restaurantData[5]}`);
+    Linking.openURL(`tel:${this.restaurantData[5]}`); //state.data[this.state.index]?.phoneNumber
   };
 
   viewInMap = () => {
     let url = 'https://www.google.com/maps/search/?api=1&query='+this.restaurantData[6]
     Linking.openURL(url)
   };
+
+  getPriceBucket = (price_bucket: any) => {
+    switch (price_bucket) {
+      case "1":
+        return (
+          <View style={styles.bucketRow}>
+            <FontAwesomeIcon icon="dollar-sign" size={20}/>
+          </View>
+        );
+      case "2":
+        return (
+          <View style={styles.bucketRow}>
+            <FontAwesomeIcon icon="dollar-sign" size={20}/>
+            <FontAwesomeIcon icon="dollar-sign" size={20}/>
+          </View>
+        );
+      case "3":
+        return (
+          <View style={styles.bucketRow}>
+            <FontAwesomeIcon icon="dollar-sign" size={20}/>
+            <FontAwesomeIcon icon="dollar-sign" size={20}/>
+            <FontAwesomeIcon icon="dollar-sign" size={20}/>
+          </View>
+        );
+      case "4":
+        return (
+          <View style={styles.bucketRow}>
+            <FontAwesomeIcon icon="dollar-sign" size={20}/>
+            <FontAwesomeIcon icon="dollar-sign" size={20}/>
+            <FontAwesomeIcon icon="dollar-sign" size={20}/>
+            <FontAwesomeIcon icon="dollar-sign" size={20}/>
+          </View>
+        );
+      default:
+        break;
+    }
+    return null;
+  }
 
   render () {
     return (
@@ -45,9 +109,13 @@ export default class AllDetailsCard extends Component {
             onPress={() =>this.card.flipVertical()}>
             <Text style={styles.label}>{this.restaurantData[0]}</Text>
             <View style={styles.infoRow}>
-            <Text style={styles.rowMember}>{this.restaurantData[1]}</Text>
+              <Text style={styles.rowMember}>{this.getPriceBucket(this.restaurantData[1])}</Text>
               <Text style={styles.rowMember}>{this.restaurantData[2]}</Text>
-              <Text style={styles.rowMember}>{this.restaurantData[3]}</Text>
+            </View>
+            <View style={styles.infoRow}>
+              { this.restaurantData[3].map((item)=>(
+                <Text style={styles.cuisineTypeBox}> { item } </Text>)
+              )}
             </View>
             <Image style={styles.mapbox}
                source={{uri: 'https://i.stack.imgur.com/SlwjS.png'}}
@@ -60,15 +128,18 @@ export default class AllDetailsCard extends Component {
             <TouchableOpacity onPress={this.viewInMap}>
             <Text style={styles.rowMember}>LOCATION: {this.restaurantData[6]}</Text>
             </TouchableOpacity>
-            <Text style={styles.rowMember}>RATING: {this.restaurantData[7]}</Text>
+            <View style={styles.infoRow}>
+              <Text style={styles.rowMember}>RATING: {this.restaurantData[7]} Stars</Text>
+              {/* <Star score={this.restaurantData[7] ? this.restaurantData[7] : 0} style={styles.starStyle} /> */}
+            </View>
             <View style={styles.buttonCol}>
               <View style={styles.buttons}>
-                <Feather.Button name="arrow-up-right" size={24} backgroundColor="#000000" color="white"onPress={this.openWebsite}>
+                <Feather.Button name="arrow-up-right" style={styles.buttonDetail} size={24} onPress={this.openWebsite}>
                 Website
               </Feather.Button>
               </View>
               <View style={styles.buttons}>
-                <Feather.Button name="arrow-up-right" size={24} backgroundColor="#000000" color="white"onPress={this.makeReservation}>
+                <Feather.Button name="arrow-up-right" style={styles.buttonDetail} size={24} onPress={this.makeReservation}>
                 Reserve
               </Feather.Button>
               </View>
@@ -79,7 +150,7 @@ export default class AllDetailsCard extends Component {
           <Pressable
             style={styles.trigger}
             onPress={() => this.card.flipVertical()}>
-            <Text style={{ color: 'white' }}>Expand Details</Text>
+            <Text style={{ color: 'white', fontSize: 20 }}>Expand Details</Text>
           </Pressable>
         </View>
       </View>
@@ -95,12 +166,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5FCFF',
   },
   cardContainer: {
-    width: 300,
-    height: 400,
+    minWidth: 300,
+    minHeight: 400,
   },
   card: {
-    width: 300,
-    height: 400,
+    minWidth: 300,
+    minHeight: 400,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#D8CFCD',
@@ -138,19 +209,38 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.5,
   },
+  bucketRow: {
+    backgroundColor: "transparent",
+    flexDirection: "row",
+    padding: 5,
+  },
   infoRow: {
     flexDirection: 'row',
     backgroundColor: 'transparent',
+    flexWrap: "wrap",
+    justifyContent: "center",
+    marginVertical: "1%"
   },
   rowMember: {
     textAlign: 'center',
-    fontSize: 20,
+    fontSize: 22,
     fontFamily: 'System',
     color: '#000000',
     backgroundColor: 'transparent',
-    margin: 15,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
+    justifyContent: 'space-between',
+    paddingHorizontal: "4%",
+  },
+  cuisineTypeBox: {
+    textAlign: 'center',
+    fontSize: 18,
+    fontFamily: 'System',
+    color: '#000000',
+    backgroundColor: 'transparent',
+    justifyContent: 'space-between',
+    margin: "1%",
+    borderColor: '#000000',
+    borderWidth: 1.4,
+    borderRadius: 6,
   },
   mapbox:{
     width: '75%',
@@ -162,11 +252,20 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     color: '#ffffff',
     backgroundColor: 'transparent',
+    margin: '3%'
   },
   buttons: {
     marginVertical: 10,
     backgroundColor: 'transparent',
-  }
-
+  },
+  buttonDetail: {
+    backgroundColor: "#000000",
+    color: "white",
+    fontSize: 20,
+  },
+  starStyle: {
+    width: 100,
+    height: 20,
+  },
 });
 

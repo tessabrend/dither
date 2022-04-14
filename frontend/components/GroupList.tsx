@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import React, { useState, useEffect } from "react";
-import { ListRenderItem, FlatList, SafeAreaView, StyleSheet, Pressable, StatusBar } from "react-native";
+import { ListRenderItem, FlatList, SafeAreaView, StyleSheet, Pressable, StatusBar, Dimensions } from "react-native";
 import Colors from '../constants/Colors';
 import { Text, View } from './Themed';
 import { NavigationContainer } from '@react-navigation/native';
@@ -11,21 +11,47 @@ import { Group } from '../constants/Interfaces';
 import { faCropSimple } from "@fortawesome/free-solid-svg-icons";
 import { apiRequestRetry } from "../utils/utils";
 
+const screen = Dimensions.get("screen");
+
 const Item = (props: { 
   data : any
   }) => {
   const { data } = props;
   let isLeader = data.isGroupLeader;
   let navigation = useNavigation();
-  return(<Pressable 
-    onPress={() => {
-      navigation.navigate('GroupDetails', data)
-  }} 
-    style={styles.container}>
-    {data.isGroupLeader && data.groupId !== "9999999" ? <FontAwesomeIcon style={styles.groupLeader} icon="crown" size={30}/> : null}
-    <Text style={styles.name}>{data.groupName}</Text>
-    <FontAwesomeIcon style={styles.name} icon="angle-right" size={30}/>
-  </Pressable>);
+  let newName = data.groupName;
+  if (data.groupName.length > 15) {
+    newName = data.groupName.slice(0,15).concat("...");
+  }
+
+  if (isLeader && data.groupId != "9999999") {
+    return(
+      <Pressable 
+        onPress={() => {
+          navigation.navigate('GroupDetails')
+        }} 
+        style={styles.container}>
+        <View style={styles.spacer}>
+          <View style={styles.nameContainer}>
+            <FontAwesomeIcon style={styles.leaderIcon} icon="crown" size={26}/>
+            <Text style={styles.leaderName}>{newName} </Text>
+          </View>
+          <FontAwesomeIcon style={styles.arrowIcon} icon="angle-right" size={30}/>
+        </View>
+      </Pressable>
+    )
+  } else {
+    return(
+      <Pressable 
+        onPress={() => {
+          navigation.navigate('GroupDetails')
+        }} 
+        style={styles.container}>
+        <Text style={styles.name}>{data.groupName}</Text>
+        <FontAwesomeIcon style={styles.arrowIcon} icon="angle-right" size={30}/>
+      </Pressable>
+    )
+  };
 }; 
 
 export default function GroupList() {
@@ -87,13 +113,35 @@ const styles = StyleSheet.create({
     marginLeft: "10%",
     marginRight: "10%",
   },
-  groupLeader: {
+  leaderName: {
     fontSize: 25,
     fontWeight: 'bold',
+    justifyContent: 'space-between',
     alignSelf: "center",
     color: Colors.light.text,
-    marginLeft: "5%",
-    marginRight: "-5%"
+    marginLeft: "4%",
+    marginRight: "10%",
+  },
+  leaderIcon: {
+    color: "#FFC107",
+    alignSelf: "center",
+  },
+  arrowIcon: {
+    justifyContent: 'flex-end',
+    alignSelf: "center",
+    marginRight: "5%",
+  },
+  nameContainer: {
+    flex: 1,
+    flexDirection: "row",
+    marginLeft: "8%",
+  },
+  spacer: {
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignSelf: "center",
+    width: "100%",
   },
   container: {
     flex: 1,
@@ -106,7 +154,8 @@ const styles = StyleSheet.create({
     borderStyle: "solid",
     justifyContent: "space-between",
     alignContent: "center",
-    width: "80%",
+    alignSelf: "center",
+    width: screen.width - 50,
     height: 73,
     marginHorizontal: "5%",
   },  
