@@ -7,7 +7,6 @@ import ProgressBar from "react-native-animated-progress";
 import Modal from "react-native-modal";
 import Star from 'react-native-star-view';
 import { useNavigation } from '@react-navigation/native';
-import { Margin } from '@mui/icons-material';
 
 const window = Dimensions.get("window");
 const screen = Dimensions.get("screen");
@@ -60,40 +59,38 @@ class Session extends Component {
 
     getPriceBucket = (price_bucket: any) => {
         switch (price_bucket) {
-            case "1":
-                return (
-                    <View style={styles.bucketRow}>
-                    <FontAwesomeIcon icon="dollar-sign" size={15}/>
-                    <FontAwesomeIcon icon="dollar-sign" size={15}/>
-                    <FontAwesomeIcon icon="dollar-sign" size={15}/>
-                    </View>
-                );
-            case "2":
-                return (
-                    <View style={styles.bucketRow}>
-                    <FontAwesomeIcon icon="dollar-sign" size={15}/>
-                    <FontAwesomeIcon icon="dollar-sign" size={15}/>
-                    </View>
-                );
-            case "3":
-                return (
-                    <View style={styles.bucketRow}>
-                    <FontAwesomeIcon icon="dollar-sign" size={15}/>
-                    <FontAwesomeIcon icon="dollar-sign" size={15}/>
-                    <FontAwesomeIcon icon="dollar-sign" size={15}/>
-                    </View>
-                );
-            case "4":
-                return (
-                    <View style={styles.bucketRow}>
-                    <FontAwesomeIcon icon="dollar-sign" size={15}/>
-                    <FontAwesomeIcon icon="dollar-sign" size={15}/>
-                    <FontAwesomeIcon icon="dollar-sign" size={15}/>
-                    <FontAwesomeIcon icon="dollar-sign" size={15}/>
-                    </View>
-                );
-            default:
-                break;
+          case "1":
+            return (
+              <View style={styles.bucketRow}>
+                <FontAwesomeIcon icon="dollar-sign" size={18}/>
+              </View>
+            );
+          case "2":
+            return (
+              <View style={styles.bucketRow}>
+                <FontAwesomeIcon icon="dollar-sign" size={18}/>
+                <FontAwesomeIcon icon="dollar-sign" size={18}/>
+              </View>
+            );
+          case "3":
+            return (
+              <View style={styles.bucketRow}>
+                <FontAwesomeIcon icon="dollar-sign" size={18}/>
+                <FontAwesomeIcon icon="dollar-sign" size={18}/>
+                <FontAwesomeIcon icon="dollar-sign" size={18}/>
+              </View>
+            );
+          case "4":
+            return (
+              <View style={styles.bucketRow}>
+                <FontAwesomeIcon icon="dollar-sign" size={18}/>
+                <FontAwesomeIcon icon="dollar-sign" size={18}/>
+                <FontAwesomeIcon icon="dollar-sign" size={18}/>
+                <FontAwesomeIcon icon="dollar-sign" size={18}/>
+              </View>
+            );
+          default:
+            break;
         }
         return null;
      }
@@ -116,10 +113,13 @@ class Session extends Component {
                      >
                      <View style={styles.centeredView}>
                          <View style={styles.modalView}>
-                             <Text style={styles.modalText}>Hours of Operation:</Text>
-                            { this.state.data[this.state.index]?.hoursOfOperation.map((item)=>(
-                            <Text> { item } </Text>)
-                            )}
+                            {/* <Text style={styles.modalText}>{this.state.data[this.state.index]?.location}</Text> */}
+                            <Text style={styles.modalText}>Hours of Operation:</Text>
+                            <View style={styles.modalTextBox}>
+                              { this.state.data[this.state.index]?.hoursOfOperation.map((item)=>(
+                              <Text style={styles.infoText}> { item } </Text>)
+                              )}
+                            </View>
                             <View style={styles.tagWrap}>
                               { this.state.data[this.state.index]?.cuisineType.map((item)=>(
                               <Text style={styles.moreDetailsTagItem}> { item } </Text>)
@@ -146,8 +146,8 @@ class Session extends Component {
                             <View style={styles.card}>
                                 <Text style={styles.cardName}>{card?.name}</Text>
                                 <Star score={card?.rating ? card?.rating : 0} style={styles.starStyle} />
-                                <Text>{card?.location}</Text>
-                                <Text>{card?.price}</Text>
+                                <Text style={styles.infoText}>{card?.location}</Text>
+                                <View>{this.getPriceBucket(card?.priceBucket)}</View>
                             </View>
                         )
                     }}
@@ -258,9 +258,9 @@ const styles = StyleSheet.create({
       margin: 20,
       backgroundColor: "white",
       borderRadius: 5,
-      padding: 50,
+      padding: "8%",
       width: screen.width - 50,
-      height: screen.height / 2,
+      minHeight: screen.height / 2,
       alignItems: "center",
       shadowColor: "#000",
       shadowOffset: {
@@ -272,7 +272,8 @@ const styles = StyleSheet.create({
       elevation: 5
     },
     modalText: {
-      marginBottom: 15,
+      fontSize: 18,
+      fontWeight: "bold",
       textAlign: "center"
     },
     cardName: {
@@ -320,4 +321,12 @@ const styles = StyleSheet.create({
       width: 100,
       height: 20,
     },
+    infoText: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      fontSize: 16,
+    },
+    modalTextBox: {
+      marginVertical: "2%"
+    }
   });

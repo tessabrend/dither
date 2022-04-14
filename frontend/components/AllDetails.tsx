@@ -5,14 +5,39 @@ import FlipCard from "react-native-flip-card-plus";
 import * as WebBrowser from 'expo-web-browser';
 import * as Linking from 'expo-linking';
 import { Feather } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import { RestaurantQueryParams } from "../constants/Interfaces";
+
 
 const enum Price {
-  Low = '$',
+  Lvl1 = '$',
   Medium = '$$',
   High = '$$$'
 }
 
 export default class AllDetailsCard extends Component {
+  state = {
+    data: [] as any[],
+    index: 0,
+    navigator: null,
+    restaurantParams: {},
+  }
+
+  const restaurantParams: RestaurantQueryParams = {
+    cuisineType: this.state.data?[this.state.index]?.cuisineType, 
+    diningType: this.state.data?[this.state.index]?.diningType, 
+    priceBucket: this.state.data?[this.state.index]?.priceBuckets, 
+    rating: this.state.data?[this.state.index]?.rating, 
+    maxDistance: distance, 
+    coords: "43.5327,-80.2262"
+  };
+
+  constructor(props) {
+    super(props);
+    this.navigation = props.navigator;
+    this.state.restaurantParams = this.navigation.getState()["routes"][2]["params"];
+}
+
   restaurantData = ['Restaurant Name' , Price.Medium, '0.5km', 'Pub', 
   'https://google.com', '000-000-0000', '123 Alphabet Street', '3 stars', 'https://www.opentable.ca/r/' ];//temp data
 
@@ -32,6 +57,20 @@ export default class AllDetailsCard extends Component {
     let url = 'https://www.google.com/maps/search/?api=1&query='+this.restaurantData[6]
     Linking.openURL(url)
   };
+
+  getRestaurants = async () => {
+    try {
+        const response = await fetch('http://131.104.49.71:80/restaurant/query?' + new URLSearchParams(this.state.restaurantParams))
+        const json = await response.json()
+        this.setState({ data: json })
+    } catch(error) {
+        console.error(error)
+    }  
+  }
+
+  componentDidMount = () => {
+    this.getRestaurants()
+  }
 
   render () {
     return (
