@@ -48,6 +48,7 @@
     "react-native-flip-card-plus": "^2.0.0",
     "react-native-keyboard-avoiding-scroll-view": "^1.0.1",
     "react-native-keyboard-aware-scroll-view": "^0.9.5",
+    "react-native-maps": "^0.30.1",
     "react-native-modal": "^13.0.1",
     "react-native-popup-menu": "^0.15.12",
     "react-native-safe-area-context": "3.3.2",
