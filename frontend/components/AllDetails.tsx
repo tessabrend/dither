@@ -14,8 +14,8 @@ import MapView, {Marker, Region, PROVIDER_GOOGLE} from 'react-native-maps';
 
 
 export default class AllDetailsCard extends Component {
-  restaurantData = ['Restaurant Name' , "2", '0.5 km', ['Indian', 'Thai', 'African', 'Buffet'], 
-  'https://google.com', '000-000-0000', '123 Alphabet Street', '3', 'https://www.opentable.ca/r/' ];//temp data
+  restaurantData = ['Artisanale' , "3", '0.5 km', ['African'], 
+  'https://google.com', '519-382-4374', '214 Woolwich St, Guelph, ON, N1H 3V6', '3', 'https://www.opentable.ca/r/' ];//temp data
 
   state = {
     data: [] as any[],
