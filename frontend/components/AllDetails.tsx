@@ -10,7 +10,7 @@ import { RestaurantQueryParams } from "../constants/Interfaces";
 import { apiRequestRetry } from "../utils/utils";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { Star } from 'react-native-star-view';
-
+import MapView, {Marker, Region, PROVIDER_GOOGLE} from 'react-native-maps';
 
 
 export default class AllDetailsCard extends Component {
@@ -21,17 +21,19 @@ export default class AllDetailsCard extends Component {
     data: [] as any[],
     index: 0,
     navigator: null,
-    sessionId: {},
+    restaurantParams: {},
+    sessionId: 0,
   }
 
   constructor(props) {
     super(props);
     this.navigation = props.navigator;
-    // this.state.sessionId = retrieved sessionId;
+    // this.state.restaurantParams = this.navigation.state.params.restaurantParams;
+
   }
 
   getSessionInfo = async () => {
-    const url = `http://131.104.49.71:80/session/${this.state.sessionId}/ismatch`;
+    const url = `http://131.104.49.71:80/session/${this.state.sessionId/ismatch}`;
     const options = {
         headers: {
             'Accept': 'application/json'
@@ -58,6 +60,16 @@ export default class AllDetailsCard extends Component {
     let url = 'https://www.google.com/maps/search/?api=1&query='+this.restaurantData[6]
     Linking.openURL(url)
   };
+
+  getCoord = () => {
+    let location: Region = {
+      latitude: 43.5345361,
+      longitude: -80.3102086,
+      latitudeDelta: 0.009,
+      longitudeDelta: 0.009,
+    }
+    return location
+  }
 
   getPriceBucket = (price_bucket: any) => {
     switch (price_bucket) {
@@ -117,9 +129,16 @@ export default class AllDetailsCard extends Component {
                 <Text key={i} style={styles.cuisineTypeBox}> { item } </Text>)
               )}
             </View>
-            <Image style={styles.mapbox}
+            {/* <Image style={styles.mapbox}
                source={{uri: 'https://i.stack.imgur.com/SlwjS.png'}}
-             />
+             /> */}
+            <MapView 
+              style={styles.mapbox} 
+              provider={PROVIDER_GOOGLE}
+              mapType='standard'
+              region={this.getCoord()}>
+              <Marker coordinate={{latitude: 43.5345361, longitude: -80.3102086}} />
+            </MapView>
           </Pressable>
           <Pressable style={styles.card} onPress={() => this.card.flipVertical()}>
             <TouchableOpacity onPress={this.makeCall}>
