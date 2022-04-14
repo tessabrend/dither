@@ -29,6 +29,7 @@ const renderItem: ListRenderItem<GroupMembers> = ({ item }) => (
 
 export default function GroupDetails({ route }) {
   const group = route.params;
+  console.log(group);
   const [groupMembers, setGroupMembers] = useState<GroupMembers[]>([]);
   const [selectedId, setSelectedId] = useState(null);
   const [showMembers, setShowMembers] = useState(false);
@@ -89,6 +90,12 @@ let startSession = () => {
 }
 
   const navigation = useNavigation();
+  const ratingProps: RatingProps = {rating: rating, setRating: setRating}
+  const distanceProps: SliderProps = {value: distance, caption: "Distance: ", unit: " km"}
+  const timeLimitProps: SliderProps = {value: timeLimit, caption: "Time Limit: ", unit: " min"}
+  const dropdownProps: DropdownProps = {selection: cuisineType, updateSelection: updateCuisineType}
+  const restaurantParams: RestaurantQueryParams = {cuisineType: cuisineType, diningType: diningType, priceBucket: priceBuckets, rating: rating, maxDistance: distance, coords: "43.5327,-80.2262"}
+
   useEffect(() => {
     getLocation().then((userLocation) => setLocation(userLocation));
     async function getGroupMembers() {
@@ -102,13 +109,30 @@ let startSession = () => {
       setGroupMembers(groupMembers);
     }
     getGroupMembers();
+
+    function pollForActiveSession() {
+      let interval = setInterval(() => {
+        let exit = fetch(`http://131.104.49.71:80/group/${group.groupId}/hasLiveSession`)
+        .then(res => res.json())
+        .then(data => {
+          console.log(data);
+          if(data.hasLiveSession) {
+            clearInterval(interval);
+            console.log("$$$$$$$$$$$$$$$$$$$$$$$")
+            console.log(location)
+            console.log("$$$$$$$$$$$$$$$$$$$$$$$")
+            let sessionParams: RestaurantQueryParams = {cuisineType: data.cuisineType, diningType: data.diningType, priceBucket: data.priceBucket, rating: data.rating, maxDistance: data.radius, coords: "43.5327,-80.2262"}
+            alert("A session has started for the group " + group.groupName);
+            navigation.navigate("Session", sessionParams);
+          }
+        }).catch(err => console.log(err));
+      }, 5000);
+    }
+    if(! (group.isGroupLeader)) {
+      pollForActiveSession();
+    }
   }, []);
 
-  const ratingProps: RatingProps = {rating: rating, setRating: setRating}
-  const distanceProps: SliderProps = {value: distance, caption: "Distance: ", unit: " km"}
-  const timeLimitProps: SliderProps = {value: timeLimit, caption: "Time Limit: ", unit: " min"}
-  const dropdownProps: DropdownProps = {selection: cuisineType, updateSelection: updateCuisineType}
-  const restaurantParams: RestaurantQueryParams = {cuisineType: cuisineType, diningType: diningType, priceBucket: priceBuckets, rating: rating, maxDistance: distance, coords: "43.5327,-80.2262"}
   return (
     <SafeAreaView style={styles.background}>
       <View style={styles.membersWrapper}>
@@ -235,9 +259,14 @@ let startSession = () => {
       </ScrollView>
 
       <View style={styles.submitWrapper}>
-        <Pressable style={styles.buttonCard} onPress={() => {
-          startSession()
-          navigation.navigate('Session', {restaurantParams, timeLimit});
+        <Pressable 
+          style={styles.buttonCard} onPress={() => {
+          if(group.isGroupLeader) {
+            startSession()
+            navigation.navigate('Session', restaurantParams);
+          } else {
+            alert("Only the leader of a group may start the session");
+          }
         }}>
           <Text style={styles.submitText}>Go Eat!</Text>
         </Pressable>
