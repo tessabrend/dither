@@ -43,7 +43,7 @@ export default function AddToGroup({route, navigation}) {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
-            body: `GroupID=${groupID}&InviteEmail=${inviteEmail}`
+            body: `GroupID=${route.params.groupID}&InviteEmail=${inviteEmail}`
         })
         .then(response => {
             response.json().then(data => {

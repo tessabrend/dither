@@ -10,6 +10,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Group } from '../constants/Interfaces';
 import { faCropSimple } from "@fortawesome/free-solid-svg-icons";
 import { apiRequestRetry } from "../utils/utils";
+import { DeviceEventEmitter } from 'react-native';
 
 const screen = Dimensions.get("screen");
 
@@ -65,17 +66,19 @@ export default function GroupList() {
     isGroupLeader: true
   },]
   
-  useEffect(() => {
-    async function getUserGroups() {
-      const userId = await AsyncStorage.getItem("@userId");
-      const url = `http://131.104.49.71:80/user/${userId}/groups`;
-      const options = {headers: {'Accept': 'application/json'}}
+  async function getUserGroups() {
+    const userId = await AsyncStorage.getItem("@userId");
+    const url = `http://131.104.49.71:80/user/${userId}/groups`;
+    const options = {headers: {'Accept': 'application/json'}}
 
-      let userGroups = await apiRequestRetry(url, options, 10);
-      setGroupList(userGroups);
-      console.log(groupList);
-    }
-    getUserGroups()
+    let userGroups = await apiRequestRetry(url, options, 10);
+    setGroupList(userGroups);
+    console.log(groupList);
+  }
+
+  useEffect(() => {
+    getUserGroups();
+    DeviceEventEmitter.addListener('event.userUpdate', (data) => getUserGroups());
   }, [isFocused]);
 
   const renderItem: ListRenderItem<Group> = ({ item }) => (

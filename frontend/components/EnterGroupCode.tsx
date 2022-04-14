@@ -38,8 +38,10 @@ export default function EnterGroupCode(setModalOpen, setCurrentAction) {
         apiRequestRetry(url, options, 10).then(res => {
             setModalOpen(false);
             setCurrentAction('start');
+            console.log(res);
             if(res.message) {
-                navigation.navigate("GroupList");
+                alert(res.message);
+                navigation.reset({index: 0, routes: [{name: "GroupList" }]});
             } else {
                 navigation.navigate("GroupDetails", {
                     "groupCode": res.GroupEntryCode,
