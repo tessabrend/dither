@@ -100,7 +100,8 @@ function RootNavigator() {
           },
     }).then(response => {
         response.json().then(async (data) => {
-            await AsyncStorage.setItem('@userId', data.userId)
+            await AsyncStorage.setItem('@userId', data.userId);
+            DeviceEventEmitter.emit('event.userUpdate');
         }).catch(error => {
             console.log(error)
         });
