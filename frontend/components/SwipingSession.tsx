@@ -8,6 +8,8 @@ import Modal from "react-native-modal";
 import Star from 'react-native-star-view';
 import { useNavigation } from '@react-navigation/native';
 import { apiRequestRetry } from '../utils/utils';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Rating from './Rating';
 
 const window = Dimensions.get("window");
 const screen = Dimensions.get("screen");
@@ -17,19 +19,24 @@ class Session extends Component {
         progress: 0,
         modalVisible: false,
         data: [] as any[],
-        hours: [] as any[],
+        isMatch: false,
         index: 0,
         navigator: null,
         restaurantParams: {},
-        timeLimit: 300
+        timeLimit: 300,
+        userId: " ",
+        groupId: " ",
+        sessionId: " "
     }
 
     constructor(props) {
         super(props);
         this.navigation = props.navigator;
         this.state.restaurantParams = this.navigation.getState()["routes"][2]["params"];
-        this.state.timeLimit = props.timeLimit ? props.timeLimit : 300;
-    }
+        this.state.timeLimit = this.navigation.getState()["routes"][2]["params"].timeLimit;
+        this.state.groupId = this.navigation.getState()["routes"][2]["params"].groupId;
+        this.state.sessionId = this.navigation.getState()["routes"][2]["params"].sessionId;
+      }
 
     increment = () => {
         this.setState((state) => {
@@ -56,9 +63,27 @@ class Session extends Component {
             headers: {
                 'Accept': 'application/json'
             }
-        } 
+        }
         let json = await apiRequestRetry(url, options, 10);
         this.setState({data: json})
+    }
+
+    setSelection = async (restaurantDetails, response) => {
+      console.log(restaurantDetails)
+      console.log(response)
+      console.log(this.state.groupId)
+      console.log(this.state.sessionId)
+      const url = 'http://131.104.49.71:80/session/selection';
+      const options = {
+          method: "POST",
+          headers: {
+                'Content-Type': 'application/json',
+            }, 
+            body: `groupId=${this.state.groupId}&sessionId=${this.state.sessionId}&restaurantId=${restaurantDetails.id}&userId=${this.state.userId}`
+        }; 
+        fetch(url, options)
+        .then(response => response.json())
+        .then(data => this.setState({isMatch: data.match})).catch(err => console.log(err));
     }
 
     getPriceBucket = (price_bucket: any) => {
@@ -98,9 +123,15 @@ class Session extends Component {
         }
         return null;
      }
+     
+     getUser = async () => {
+         let id = await AsyncStorage.getItem("@userId")
+        this.setState({userId: id})
+     }
 
     componentDidMount = () => {
         this.getRestaurants()
+        this.getUser()
     }
 
     render () {
@@ -161,10 +192,10 @@ class Session extends Component {
                         this.toggleSwiping(this.swiper.verticalSwipe);
                         this.navigation.navigate('Compromise');
                     }} 
-                    onSwipedLeft={(cardIndex) => {console.log('card at index ' + cardIndex +' swiped no')}}
-                    onSwipedRight={(cardIndex) => {console.log('card at index ' + cardIndex +' swiped like')}}
-                    onSwipedTop={(cardIndex) => {console.log('card at index ' + cardIndex +' swiped crave')}}
-                    onSwipedBottom={(cardIndex) => {console.log('card at index ' + cardIndex +' swiped hard no')}}
+                    onSwipedLeft={(cardIndex) => {this.setSelection(this.state.data[cardIndex], "no");}}
+                    onSwipedRight={(cardIndex) => {this.setSelection(this.state.data[cardIndex], "like"); console.log('card at index ' + cardIndex +' swiped like')}}
+                    onSwipedTop={(cardIndex) => {this.setSelection(this.state.data[cardIndex], "crave"); console.log('card at index ' + cardIndex +' swiped crave')}}
+                    onSwipedBottom={(cardIndex) => {this.setSelection(this.state.data[cardIndex], "hard no"); console.log('card at index ' + cardIndex +' swiped hard no')}}
                     onTapCard={(cardIndex) => {this.toggleModal(!this.state.modalVisible); this.showMoreDetails(cardIndex);}}
                     cardIndex={0}
                     backgroundColor={'#ffffff'}
@@ -175,7 +206,7 @@ class Session extends Component {
                 <View style={styles.timer}>
                     <CountDown
                     size={15}
-                    until={this.state.timeLimit} //time in seconds
+                    until={this.state.timeLimit * 60} //time in seconds
                     onFinish={() => {alert("Session Over")}} //neither currently working
                     digitStyle={{backgroundColor: '#FFF', borderWidth: 2, borderColor: '#000000'}}
                     digitTxtStyle={{color: '#000000'}}

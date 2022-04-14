@@ -11,6 +11,8 @@ import Rating from "./Rating";
 import SliderContainer from "./SliderContainer";
 import { GroupMembers, RatingProps, SliderProps, DropdownProps, RestaurantQueryParams } from '../constants/Interfaces';
 import Modal from "react-native-modal";
+import { QrCodeScannerOutlined } from "@mui/icons-material";
+import { createIconSetFromFontello } from "react-native-vector-icons";
 
 const Item = ({ data }: { data: GroupMembers }) => (
   <View
@@ -42,6 +44,7 @@ const [rating, setRating] = useState(0.0);
 const [distance, setDistance] = useState(5.0);
 const [timeLimit, setTimeLimit] = useState(5);
 const [location, setLocation] = useState("");
+const [sessionId, setSessionId] = useState(0);
 
 let updateDiningType = (type: string) => {
   let types = diningType.slice();
@@ -86,7 +89,11 @@ let startSession = () => {
     },
     body: `groupId=${2}&diningType=${diningType}&radius=${distance}&cuisineType=${cuisineType}&priceBucket=${priceBuckets}&rating=${rating}`
   }
-  apiRequestRetry(url, options, 10);
+  apiRequestRetry(url, options, 10).then(data => {
+    console.log(data);
+    setSessionId(data.sessionId);
+    console.log("data.sessionId = " + data.sessionId);
+  }).catch(err => console.log(err));
 }
 
   const navigation = useNavigation();
@@ -94,7 +101,7 @@ let startSession = () => {
   const distanceProps: SliderProps = {value: distance, caption: "Distance: ", unit: " km"}
   const timeLimitProps: SliderProps = {value: timeLimit, caption: "Time Limit: ", unit: " min"}
   const dropdownProps: DropdownProps = {selection: cuisineType, updateSelection: updateCuisineType}
-  const restaurantParams: RestaurantQueryParams = {cuisineType: cuisineType, diningType: diningType, priceBucket: priceBuckets, rating: rating, maxDistance: distance, coords: "43.5327,-80.2262"}
+  const restaurantParams: RestaurantQueryParams = {cuisineType: cuisineType, diningType: diningType, priceBucket: priceBuckets, rating: rating, maxDistance: distance, coords: "43.5327,-80.2262", sessionId: sessionId, groupId: group.groupId, timeLimit: timeLimit}
 
   useEffect(() => {
     getLocation().then((userLocation) => setLocation(userLocation));
@@ -117,11 +124,10 @@ let startSession = () => {
         .then(data => {
           console.log(data);
           if(data.hasLiveSession) {
+            setSessionId(data.sessionId);
+            console.log("data.sessionId = " + data.sessionid)
             clearInterval(interval);
-            console.log("$$$$$$$$$$$$$$$$$$$$$$$")
-            console.log(location)
-            console.log("$$$$$$$$$$$$$$$$$$$$$$$")
-            let sessionParams: RestaurantQueryParams = {cuisineType: data.cuisineType, diningType: data.diningType, priceBucket: data.priceBucket, rating: data.rating, maxDistance: data.radius, coords: "43.5327,-80.2262"}
+            let sessionParams: RestaurantQueryParams = {cuisineType: data.cuisineType, diningType: data.diningType, priceBucket: data.priceBucket, rating: data.rating, maxDistance: data.radius, coords: "43.5327,-80.2262", sessionId: sessionId, groupId: group.groupId}
             alert("A session has started for the group " + group.groupName);
             navigation.navigate("Session", sessionParams);
           }
