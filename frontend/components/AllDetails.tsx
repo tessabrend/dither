@@ -23,20 +23,20 @@ export default class AllDetailsCard extends Component {
     restaurantParams: {},
   }
 
-  const restaurantParams: RestaurantQueryParams = {
-    cuisineType: this.state.data?[this.state.index]?.cuisineType, 
-    diningType: this.state.data?[this.state.index]?.diningType, 
-    priceBucket: this.state.data?[this.state.index]?.priceBuckets, 
-    rating: this.state.data?[this.state.index]?.rating, 
-    maxDistance: distance, 
-    coords: "43.5327,-80.2262"
-  };
+  // const restaurantParams: RestaurantQueryParams = {
+  //   cuisineType: this.state.data?[this.state.index]?.cuisineType, 
+  //   diningType: this.state.data?[this.state.index]?.diningType, 
+  //   priceBucket: this.state.data?[this.state.index]?.priceBuckets, 
+  //   rating: this.state.data?[this.state.index]?.rating, 
+  //   maxDistance: distance, 
+  //   coords: "43.5327,-80.2262"
+  // };
 
-  constructor(props) {
-    super(props);
-    this.navigation = props.navigator;
-    this.state.restaurantParams = this.navigation.getState()["routes"][2]["params"];
-}
+//   constructor(props) {
+//     super(props);
+//     this.navigation = props.navigator;
+//     this.state.restaurantParams = this.navigation.getState()["routes"][2]["params"];
+// }
 
   restaurantData = ['Restaurant Name' , Price.Medium, '0.5km', 'Pub', 
   'https://google.com', '000-000-0000', '123 Alphabet Street', '3 stars', 'https://www.opentable.ca/r/' ];//temp data
