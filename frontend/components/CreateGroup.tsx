@@ -2,12 +2,16 @@ import React, { useState, useEffect } from "react";
 import { Pressable, TextInput, StyleSheet, Alert } from "react-native";
 import { Text, View } from './Themed';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
+import { apiRequestRetry } from "../utils/utils";
+import { StackActions } from '@react-navigation/native';
 
-export default function CreateGroup(setModalOpen) {
-
+export default function CreateGroup(setModalOpen: any, setCurrentAction: any) {
+    let navigation = useNavigation();
     let [groupName, setGroupName] = useState("");
     let [error, setError] = useState("");
     const [userId, setUserId] = useState("");
+    const popAction = StackActions.pop();
 
     useEffect(() => {
         async function retrieveUserId() {
@@ -18,29 +22,30 @@ export default function CreateGroup(setModalOpen) {
     }, [])
 
     let createGroup = () => {
-        fetch('http://131.104.49.71:80/group/create', {
+        const url = 'http://131.104.49.71:80/group/create';
+        const options = {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Accept': 'application/json'
             },
             body: `GroupName=${groupName}&UserId=${userId}`
-        })
-        .then(response => {
-            response.json().then(data => {
-                if(data['message']) {
-                    setError(data['message']);
-                } else {
-                    setError('');
-                    setModalOpen(false);
-                    alert(`Group Created Successfully`);
-                }
-            }).catch(error => {
-                setError('Incorrect response format: likely due to internal error');
-            });
-        }).catch(reason => {
-            console.log(reason)
-            setError(reason.toString().split(':')[1]);
+        }
+        apiRequestRetry(url, options, 10).then(res => {
+            setModalOpen(false);
+            setCurrentAction('start');
+            if(res.groupExists) {
+                navigation.navigate("GroupList")               
+            } else {
+                navigation.navigate("GroupDetails", {
+                    "groupCode": res.GroupEntryCode,
+                    "groupId": res.id,
+                    "groupName": res.GroupName,
+                    "isGroupLeader": true
+                });    
+            }
         });
+
     }
 
     return <>
@@ -51,7 +56,7 @@ export default function CreateGroup(setModalOpen) {
                 <Text style={styles.errorText}>{error}</Text>
             }
         </View>
-        <Pressable style={styles.createGroupButton} onPress={createGroup}>
+        <Pressable style={styles.createGroupButton} onPress={() => createGroup()}>
             <Text style={styles.buttonText}>Create</Text>
         </Pressable>
     </>

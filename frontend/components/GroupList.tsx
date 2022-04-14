@@ -1,45 +1,15 @@
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ListRenderItem, FlatList, SafeAreaView, StyleSheet, Pressable, StatusBar } from "react-native";
 import Colors from '../constants/Colors';
 import { Text, View } from './Themed';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { useNavigation } from '@react-navigation/native';
-
-export interface Group {
-  groupId: string;
-  groupCode: string;  
-  groupName: string;
-  isGroupLeader: boolean;
-}
-
-const DATA: Group[] = [
-  {
-    groupId: "1",
-    groupCode: "bd7acbea",
-    groupName: "Roomies",
-    isGroupLeader: true,
-  },
-  {
-    groupId: "2",
-    groupCode: "3ac68afc",
-    groupName: "Homies",
-    isGroupLeader: true,
-  },
-  {
-    groupId: "3",
-    groupCode: "58694a0f",
-    groupName: "Dev Team",
-    isGroupLeader: false,
-  },
-  {
-    groupId: "4",
-    groupCode: "ghc69a34",
-    groupName: "Dream Team",
-    isGroupLeader: false,
-  },
-];
+import { useNavigation, useIsFocused } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Group } from '../constants/Interfaces';
+import { faCropSimple } from "@fortawesome/free-solid-svg-icons";
+import { apiRequestRetry } from "../utils/utils";
 
 const Item = (props: { 
   data : any
@@ -47,57 +17,40 @@ const Item = (props: {
   const { data } = props;
   let isLeader = data.isGroupLeader;
   let navigation = useNavigation();
-
-  if (isLeader && data.groupId != "9999999") {
-    return(
-      <Pressable 
-        onPress={() => {
-          navigation.navigate('GroupDetails')
-        }} 
-        style={styles.container}>
-        <View style={styles.spacer}>
-          <View style={styles.nameContainer}>
-            <FontAwesomeIcon style={styles.leaderIcon} icon="crown" size={26}/>
-            <Text style={styles.leaderName}>{data.groupName} </Text>
-          </View>
-          <FontAwesomeIcon style={styles.arrowIcon} icon="angle-right" size={30}/>
-        </View>
-      </Pressable>
-    )
-  } else {
-    return(
-      <Pressable 
-        onPress={() => {
-          navigation.navigate('GroupDetails')
-        }} 
-        style={styles.container}>
-        <Text style={styles.name}>{data.groupName}</Text>
-        <FontAwesomeIcon style={styles.arrowIcon} icon="angle-right" size={30}/>
-      </Pressable>
-    )
-  };
-}
+  return(<Pressable 
+    onPress={() => {
+      navigation.navigate('GroupDetails', data)
+  }} 
+    style={styles.container}>
+    {data.isGroupLeader && data.groupId !== "9999999" ? <FontAwesomeIcon style={styles.groupLeader} icon="crown" size={30}/> : null}
+    <Text style={styles.name}>{data.groupName}</Text>
+    <FontAwesomeIcon style={styles.name} icon="angle-right" size={30}/>
+  </Pressable>);
+}; 
 
 export default function GroupList() {
-  const [grouplist, setGroupList] = useState([]);
+  const [groupList, setGroupList] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
+  const isFocused = useIsFocused();
   const alone: Group[] = [  {
     groupId: "9999999",
-    groupCode: "9999999",
     groupName: "Table for One",
+    groupCode: "",
     isGroupLeader: true
   },]
   
-  let retrieveGroups = () => {
-    // fetch("//131.104.49.71:80/group/find", {
-    //   method:'GET'
-    // })
-    // .then(response =>response.json())
-    // .then(data => {
-    //   setGroupList(data.groups)
-    //   console.log(grouplist)
-    // })
-  }
+  useEffect(() => {
+    async function getUserGroups() {
+      const userId = await AsyncStorage.getItem("@userId");
+      const url = `http://131.104.49.71:80/user/${userId}/groups`;
+      const options = {headers: {'Accept': 'application/json'}}
+
+      let userGroups = await apiRequestRetry(url, options, 10);
+      setGroupList(userGroups);
+      console.log(groupList);
+    }
+    getUserGroups()
+  }, [isFocused]);
 
   const renderItem: ListRenderItem<Group> = ({ item }) => (
     <Item 
@@ -109,10 +62,9 @@ export default function GroupList() {
   return (
     <SafeAreaView style={styles.background}>
       <FlatList 
-        {...retrieveGroups}
-        data={alone.concat(DATA)}
+        data={alone.concat(groupList)}
         renderItem={renderItem}
-        keyExtractor={(item) => item.groupCode}
+        keyExtractor={(item) => item.groupId}
         extraData={selectedId}
       />
     </SafeAreaView>
@@ -135,35 +87,13 @@ const styles = StyleSheet.create({
     marginLeft: "10%",
     marginRight: "10%",
   },
-  leaderName: {
+  groupLeader: {
     fontSize: 25,
     fontWeight: 'bold',
-    justifyContent: 'space-between',
     alignSelf: "center",
     color: Colors.light.text,
-    marginLeft: "4%",
-    marginRight: "10%",
-  },
-  leaderIcon: {
-    color: "#FFC107",
-    alignSelf: "center",
-  },
-  arrowIcon: {
-    justifyContent: 'flex-end',
-    alignSelf: "center",
-    marginRight: "10%",
-  },
-  nameContainer: {
-    flex: 1,
-    flexDirection: "row",
-    marginLeft: "8%",
-  },
-  spacer: {
-    flex: 1,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignSelf: "center",
-    width: "100%",
+    marginLeft: "5%",
+    marginRight: "-5%"
   },
   container: {
     flex: 1,

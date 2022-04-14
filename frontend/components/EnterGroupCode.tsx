@@ -7,12 +7,15 @@ import {
 import { KeyboardAvoidingScrollView } from 'react-native-keyboard-avoiding-scroll-view';
 import React, { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { apiRequestRetry } from '../utils/utils';
+import { useNavigation } from '@react-navigation/native';
 
-export default function EnterGroupCode(setModalOpen) {
+export default function EnterGroupCode(setModalOpen, setCurrentAction) {
     const [groupCode, setGroupCode] = useState("");
     const [userName, setUserName] = useState("");
     const [error, setError] = useState("");
     const [userId, setUserId] = useState("");
+    let navigation = useNavigation();
 
     useEffect(() => {
         async function retrieveUserId() {
@@ -23,29 +26,28 @@ export default function EnterGroupCode(setModalOpen) {
     }, [])
 
     let submit = () => {
-        fetch('http://131.104.49.71:80/group/join', {
+        const url = 'http://131.104.49.71:80/group/join';
+        const options = {
             method: 'PUT',
             headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Accept': 'application/json'
             },
             body: `groupEntryCode=${groupCode}&UserName=${userName}&UserId=${userId}`
-        })
-        .then(response => {
-            response.json().then(data => {
-                if(data['message'] == "User added in group in database") {
-                    alert("You have successfully joined the group " + data["groupName"])
-                    setError(null);
-                    setModalOpen(false);
-                } else {
-                    setError(data['message']);
-                }
-            }).catch(error => {
-                console.log(error)
-                setError('Incorrect response format: likely due to internal error');
-            });
-        }).catch(reason => {
-            console.log(reason)
-            setError(reason.toString().split(':')[1]);
+        }
+        apiRequestRetry(url, options, 10).then(res => {
+            setModalOpen(false);
+            setCurrentAction('start');
+            if(res.message) {
+                navigation.navigate("GroupList");
+            } else {
+                navigation.navigate("GroupDetails", {
+                    "groupCode": res.GroupEntryCode,
+                    "groupId": res.id,
+                    "groupName": res.GroupName,
+                    "isGroupLeader": true
+                });    
+            }
         });
     }
     
@@ -75,7 +77,7 @@ export default function EnterGroupCode(setModalOpen) {
         </View>
         <Pressable 
             style={styles.submitButton} 
-            onPress={submit}>
+            onPress={() => submit()}>
             <Text style={styles.buttonText}>Enter</Text>
         </Pressable>
     </KeyboardAvoidingScrollView>);
