@@ -1,83 +1,56 @@
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ListRenderItem, FlatList, SafeAreaView, StyleSheet, Pressable, StatusBar } from "react-native";
 import Colors from '../constants/Colors';
-import { Text } from './Themed';
+import { Text, View } from './Themed';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useIsFocused } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Group } from '../constants/Interfaces';
+import { faCropSimple } from "@fortawesome/free-solid-svg-icons";
+import { apiRequestRetry } from "../utils/utils";
 
-export interface Group {
-  id: string;
-  name: string;
-  members: Array<any>;
-}
-
-const DATA: Group[] = [
-  {
-    id: "bd7acbea",
-    name: "Roomies",
-    members: [""],
-  },
-  {
-    id: "3ac68afc",
-    name: "Homies",
-    members: [""],
-  },
-  {
-    id: "58694a0d",
-    name: "Dev Team",
-    members: [""],
-  },
-  {
-    id: "ghc69a34",
-    name: "Dream Team",
-    members: [""],
-  },
-  {
-    id: "55578a0f",
-    name: "Michael",
-    members: [""],
-  },
-  {
-    id: "3asdfg45c",
-    name: "350 Bloor",
-    members: [""],
-  },
-];
-
-const Item = ({ data }) => {
+const Item = (props: { 
+  data : any
+  }) => {
+  const { data } = props;
+  let isLeader = data.isGroupLeader;
   let navigation = useNavigation();
   return(<Pressable 
     onPress={() => {
-      navigation.navigate('GroupDetails')
+      navigation.navigate('GroupDetails', data)
   }} 
     style={styles.container}>
-    <Text style={styles.name}>{data.name}</Text>
+    {data.isGroupLeader && data.groupId !== "9999999" ? <FontAwesomeIcon style={styles.groupLeader} icon="crown" size={30}/> : null}
+    <Text style={styles.name}>{data.groupName}</Text>
     <FontAwesomeIcon style={styles.name} icon="angle-right" size={30}/>
   </Pressable>);
 }; 
 
 export default function GroupList() {
-  const [grouplist, setGroupList] = useState([]);
+  const [groupList, setGroupList] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
+  const isFocused = useIsFocused();
   const alone: Group[] = [  {
-    id: "9999999",
-    name: "Table for One",
-    members: [""],
+    groupId: "9999999",
+    groupName: "Table for One",
+    groupCode: "",
+    isGroupLeader: true
   },]
-  let list: Group[]
   
-  let retrieveGroups = () => {
-    // fetch("//131.104.49.71:80/group/find", {
-    //   method:'GET'
-    // })
-    // .then(response =>response.json())
-    // .then(data => {
-    //   setGroupList(data.groups)
-    //   console.log(grouplist)
-    // })
-  }
+  useEffect(() => {
+    async function getUserGroups() {
+      const userId = await AsyncStorage.getItem("@userId");
+      const url = `http://131.104.49.71:80/user/${userId}/groups`;
+      const options = {headers: {'Accept': 'application/json'}}
+
+      let userGroups = await apiRequestRetry(url, options, 10);
+      setGroupList(userGroups);
+      console.log(groupList);
+    }
+    getUserGroups()
+  }, [isFocused]);
 
   const renderItem: ListRenderItem<Group> = ({ item }) => (
     <Item 
@@ -89,10 +62,9 @@ export default function GroupList() {
   return (
     <SafeAreaView style={styles.background}>
       <FlatList 
-        {...retrieveGroups}
-        data={alone.concat(DATA)}
+        data={alone.concat(groupList)}
         renderItem={renderItem}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.groupId}
         extraData={selectedId}
       />
     </SafeAreaView>
@@ -115,6 +87,14 @@ const styles = StyleSheet.create({
     marginLeft: "10%",
     marginRight: "10%",
   },
+  groupLeader: {
+    fontSize: 25,
+    fontWeight: 'bold',
+    alignSelf: "center",
+    color: Colors.light.text,
+    marginLeft: "5%",
+    marginRight: "-5%"
+  },
   container: {
     flex: 1,
     flexDirection: 'row',
@@ -129,6 +109,6 @@ const styles = StyleSheet.create({
     width: "80%",
     height: 73,
     marginHorizontal: "5%",
-  }, 
+  },  
 });
 

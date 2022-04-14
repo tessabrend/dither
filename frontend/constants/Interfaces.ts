@@ -4,8 +4,9 @@ export interface RatingProps {
 }
 
 export interface GroupMembers {
-    id: string;
-    name: string;
+    user_id?: string;
+    name?: string;
+    leader?: boolean;
 }
 
 export interface SliderProps {
@@ -27,3 +28,11 @@ export interface RestaurantQueryParams {
     rating?: number,
     maxDistance?: number,
 }
+
+export interface Group {
+    groupCode: string,
+    groupId: string,
+    groupName: string,
+    isGroupLeader: boolean,
+}
+  

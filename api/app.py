@@ -10,6 +10,8 @@ from geopy.distance import distance
 from geopy.geocoders import Nominatim
 import sendgrid
 from sendgrid.helpers.mail import *
+from argon2 import PasswordHasher
+
 
 app = Flask(__name__, static_url_path='')
 Pony(app)
@@ -42,6 +44,7 @@ def add_to_group():
                 flush()
                 group_member = GroupMembers(GroupId=group, UserId=user)
                 commit()
+                return render_object(group)
             except TransactionIntegrityError as e:
                 return {'message': f"Could not add user to group in database: {str(e).split('DETAIL:')[1]}".replace('\n', '')}, 400
         else:
@@ -78,7 +81,7 @@ def send_group_invitation():
     if not 'GroupID' in request.form.keys() or not 'InviteEmail' in request.form.keys():
         return {'message': f"Required form item(s) not present: {', '.join(set(request.form.keys()) - set(['GroupID', 'InviteEmail']))}"}, 400
     
-    user_to_invite = get(user for user in User if user.email and user.email == request.form.get('InviteEmail'))
+    user_to_invite = get(user for user in User if user.Email and user.Email == request.form.get('InviteEmail'))
     if not user_to_invite:
         return {'message': f"Sending the invitation email failed, because the user with email {request.form.get('InviteEmail')} was not found"}, 400
 
@@ -106,18 +109,27 @@ def join_group_link():
 def create_group():
     provided_fields = ['id', 'TimeLimit', 'GroupEntryCode']
     if not confirm_fields(request.form, Group, exceptions=provided_fields):
+        print("a")
+        print({'message': f"Required form item(s) not present: {', '.join(field_difference(request.form, Group, exceptions=provided_fields))}"})
         return {'message': f"Required form item(s) not present: {', '.join(field_difference(request.form, Group, exceptions=provided_fields))}"}, 400
-
     # If a time limit is not provided, use the default value of 30 minutes
-    group = Group(GroupName=request.form['GroupName'], 
-                GroupEntryCode=''.join(random.choice(string.ascii_letters) for _ in range(8)),
-                TimeLimit=request.form.get('TimeLimit', 30))
-    flush()
-    group_member = GroupMembers(GroupId=group.id, UserId=request.form.get('UserId'), GroupLeader=True)
+    try:
+        group = Group(GroupName=request.form['GroupName'], 
+                    GroupEntryCode=''.join(random.choice(string.ascii_letters) for _ in range(8)),
+                    TimeLimit=request.form.get('TimeLimit', 30))
+        flush()
+        print(request.form.get("UserId"))
+        group_member = GroupMembers(GroupId=group.id, UserId=request.form.get('UserId'), GroupLeader=True)
+    except Exception as e:
+        return {'groupExists': True}
     try:
         commit()
     except TransactionIntegrityError as e:
+        print("b")
+        print({'message': f"Could not create group in database: {str(e).split('DETAIL:')[1]}".replace('\n', '')})
         return {'message': f"Could not create group in database: {str(e).split('DETAIL:')[1]}".replace('\n', '')}, 400
+    print("c")
+    print(render_object(group))
     return render_object(group)
 
 @app.route('/group/<id>/leave/<userId>', methods=["PUT"])
@@ -292,6 +304,10 @@ def startSession():
 
 @app.route('/user/create', methods=["POST"])
 def createUser():
+    # userId = request.form.get("userId", None)
+    # print(userId)
+    # user = User.get(id=userId)
+    #if userId is None or user is None:
     try:
         user = User(Name="User", Location="", Password="NO_ACCOUNT", PhoneNumber="", Email=None)
         commit()
@@ -299,7 +315,11 @@ def createUser():
     except TransactionIntegrityError as e:
         print(e)
         return {"message": "Could not create a user"}, 400
-        
+    #elif user:
+        #print({"userId": userId})
+        #return jsonify({"userId": userId})
+
+
 @app.route('/user/<id>/groups', methods=["GET"])
 def getUserGroups(id):
     user = User[id]
@@ -312,9 +332,51 @@ def getUserGroups(id):
             "groupCode": query[group][2],
             "isGroupLeader": query[group][0]
         })
+    print(response)
+    print(request.headers)
     return jsonify(response)
+
+@app.route('/user/<uid>/register', methods=['POST'])
+def user_register(uid):
+    # In order to complete the registration process, we will need to have the user ID
+    # Here, we will associate a specific email and hashed password with our ID, allowing it to be retreived later
+    if not uid or not request.form.get('Email') or not request.form.get('Password'):
+        return { "message": "Cannot register because required form fields are missing" }, 400
+    user = User[uid]
+    if not user:
+        return { "message": "Cannot register because the user does not exist" }, 400
+    if user.Password != "NO_ACCOUNT":
+        return { "message": "Cannot register because the user is already registered" }, 400
+
+    try:
+        ph = PasswordHasher()
+        user.Email = request.form.get('Email')
+        user.Password = ph.hash(request.form.get('Password'))
+        commit()
+    except Exception as e:
+        return { "message": "Cannot register because a user with this email already exists" }, 400
+    
+    return { "message": "OK" }
+
+@app.route('/user/login', methods=['POST'])
+def user_login():
+    # This depends on the user already being registered - they will need to have an email address and hashed password associated
+    # With their account in order to log in
+    if not request.form.get('Email') or not request.form.get('Password'):
+        return { "message": "Cannot login because form fields are missing" }, 400 
+    users = list(select(user for user in User if user.Email == request.form.get('Email')))
+    if len(users) == 0:
+        return { "message": "Cannot login because the user does not exist (incorrect email)" }, 400
+    user = users[0]
+
+    ph = PasswordHasher()
+    try:
+        if ph.verify(user.Password, request.form.get('Password')):
+            return { "message": "OK" , "userID": user.id }
+    except:
+        return { "message": "Cannot login because the password is incorrect" }, 400
 
 ### End User ###
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=80, host="131.104.49.71")
