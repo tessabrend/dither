@@ -28,7 +28,8 @@ export interface RestaurantQueryParams {
     rating?: number,
     maxDistance?: number,
     sessionId?: number,
-    groupId?: number
+    groupId?: number,
+    timeLimit?: number
 }
 
 export interface Group {

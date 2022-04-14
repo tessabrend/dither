@@ -101,7 +101,7 @@ let startSession = () => {
   const distanceProps: SliderProps = {value: distance, caption: "Distance: ", unit: " km"}
   const timeLimitProps: SliderProps = {value: timeLimit, caption: "Time Limit: ", unit: " min"}
   const dropdownProps: DropdownProps = {selection: cuisineType, updateSelection: updateCuisineType}
-  const restaurantParams: RestaurantQueryParams = {cuisineType: cuisineType, diningType: diningType, priceBucket: priceBuckets, rating: rating, maxDistance: distance, coords: "43.5327,-80.2262", sessionId: sessionId, groupId: group.groupId}
+  const restaurantParams: RestaurantQueryParams = {cuisineType: cuisineType, diningType: diningType, priceBucket: priceBuckets, rating: rating, maxDistance: distance, coords: "43.5327,-80.2262", sessionId: sessionId, groupId: group.groupId, timeLimit: timeLimit}
 
   useEffect(() => {
     getLocation().then((userLocation) => setLocation(userLocation));

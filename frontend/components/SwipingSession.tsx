@@ -33,7 +33,7 @@ class Session extends Component {
         super(props);
         this.navigation = props.navigator;
         this.state.restaurantParams = this.navigation.getState()["routes"][2]["params"];
-        this.state.timeLimit = props.timeLimit ? props.timeLimit : 300;
+        this.state.timeLimit = this.navigation.getState()["routes"][2]["params"].timeLimit;
         this.state.groupId = this.navigation.getState()["routes"][2]["params"].groupId;
         this.state.sessionId = this.navigation.getState()["routes"][2]["params"].sessionId;
       }
@@ -206,7 +206,7 @@ class Session extends Component {
                 <View style={styles.timer}>
                     <CountDown
                     size={15}
-                    until={this.state.timeLimit} //time in seconds
+                    until={this.state.timeLimit * 60} //time in seconds
                     onFinish={() => {alert("Session Over")}} //neither currently working
                     digitStyle={{backgroundColor: '#FFF', borderWidth: 2, borderColor: '#000000'}}
                     digitTxtStyle={{color: '#000000'}}
