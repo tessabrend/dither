@@ -27,6 +27,8 @@ export interface RestaurantQueryParams {
     coords?: string,
     rating?: number,
     maxDistance?: number,
+    sessionId?: number,
+    groupId?: number
 }
 
 export interface Group {

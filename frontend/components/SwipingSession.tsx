@@ -31,7 +31,9 @@ class Session extends Component {
         this.navigation = props.navigator;
         this.state.restaurantParams = this.navigation.getState()["routes"][2]["params"];
         this.state.timeLimit = props.timeLimit ? props.timeLimit : 300;
-    }
+        this.state.groupId = props.groupId;
+        this.state.sessionId = props.sessionId;
+      }
 
     increment = () => {
         this.setState((state) => {
@@ -58,28 +60,27 @@ class Session extends Component {
             headers: {
                 'Accept': 'application/json'
             }
-        } 
+        }
         let json = await apiRequestRetry(url, options, 10);
         this.setState({data: json})
     }
 
-    setSelection = async (userid, restaurantid, sessionid, groupid, selection) => {
-        const url = 'http://131.104.49.71:80//session/selection';
-        const options = {
-            headers: {
-                'Content-Type': 'application/json'
+    setSelection = async (restaurantDetails, response) => {
+      console.log(restaurantDetails)
+      console.log(response)
+      console.log(this.state.groupId)
+      console.log(this.state.sessionId)
+      const url = 'http://131.104.49.71:80//session/selection';
+      const options = {
+          method: "POST",
+          headers: {
+                'Content-Type': 'application/json',
             }, 
-            body: JSON.stringify({
-                "UserId": userid,
-                "RestaurantId": restaurantid,
-                "SessionId": sessionid,
-                "GroupId": groupid,
-                "TypeOfFeedback": selection
-            })
+            body: `groupId=${this.state.groupId}&sessionId=${this.state.sessionId}&restaurantId=${restaurantDetails.id}&userId=${this.state.userId}`
         }; 
         fetch(url, options)
         .then(response => response.json())
-        .then(data => this.setState({isMatch: data.match}))
+        .then(data => this.setState({isMatch: data.match})).catch(err => console.log(err));
     }
 
     getPriceBucket = (price_bucket: any) => {
@@ -188,7 +189,7 @@ class Session extends Component {
                         this.toggleSwiping(this.swiper.verticalSwipe);
                         this.navigation.navigate('Compromise');
                     }} 
-                    onSwipedLeft={(cardIndex) => {console.log('card at index ' + cardIndex +' swiped no')}}
+                    onSwipedLeft={(cardIndex) => {this.setSelection(this.state.data[cardIndex], "no")}}
                     onSwipedRight={(cardIndex) => {console.log('card at index ' + cardIndex +' swiped like')}}
                     onSwipedTop={(cardIndex) => {console.log('card at index ' + cardIndex +' swiped crave')}}
                     onSwipedBottom={(cardIndex) => {console.log('card at index ' + cardIndex +' swiped hard no')}}
