@@ -9,6 +9,7 @@ import Star from 'react-native-star-view';
 import { useNavigation } from '@react-navigation/native';
 import { apiRequestRetry } from '../utils/utils';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Rating from './Rating';
 
 const window = Dimensions.get("window");
 const screen = Dimensions.get("screen");
@@ -23,7 +24,9 @@ class Session extends Component {
         navigator: null,
         restaurantParams: {},
         timeLimit: 300,
-        userId: " "
+        userId: " ",
+        groupId: " ",
+        sessionId: " "
     }
 
     constructor(props) {
@@ -31,8 +34,8 @@ class Session extends Component {
         this.navigation = props.navigator;
         this.state.restaurantParams = this.navigation.getState()["routes"][2]["params"];
         this.state.timeLimit = props.timeLimit ? props.timeLimit : 300;
-        this.state.groupId = props.groupId;
-        this.state.sessionId = props.sessionId;
+        this.state.groupId = this.navigation.getState()["routes"][2]["params"].groupId;
+        this.state.sessionId = this.navigation.getState()["routes"][2]["params"].sessionId;
       }
 
     increment = () => {
@@ -70,7 +73,7 @@ class Session extends Component {
       console.log(response)
       console.log(this.state.groupId)
       console.log(this.state.sessionId)
-      const url = 'http://131.104.49.71:80//session/selection';
+      const url = 'http://131.104.49.71:80/session/selection';
       const options = {
           method: "POST",
           headers: {
@@ -126,7 +129,7 @@ class Session extends Component {
         this.setState({userId: id})
      }
 
-    componentDidMount = async () => {
+    componentDidMount = () => {
         this.getRestaurants()
         this.getUser()
     }
@@ -189,10 +192,10 @@ class Session extends Component {
                         this.toggleSwiping(this.swiper.verticalSwipe);
                         this.navigation.navigate('Compromise');
                     }} 
-                    onSwipedLeft={(cardIndex) => {this.setSelection(this.state.data[cardIndex], "no")}}
-                    onSwipedRight={(cardIndex) => {console.log('card at index ' + cardIndex +' swiped like')}}
-                    onSwipedTop={(cardIndex) => {console.log('card at index ' + cardIndex +' swiped crave')}}
-                    onSwipedBottom={(cardIndex) => {console.log('card at index ' + cardIndex +' swiped hard no')}}
+                    onSwipedLeft={(cardIndex) => {this.setSelection(this.state.data[cardIndex], "no");}}
+                    onSwipedRight={(cardIndex) => {this.setSelection(this.state.data[cardIndex], "like"); console.log('card at index ' + cardIndex +' swiped like')}}
+                    onSwipedTop={(cardIndex) => {this.setSelection(this.state.data[cardIndex], "crave"); console.log('card at index ' + cardIndex +' swiped crave')}}
+                    onSwipedBottom={(cardIndex) => {this.setSelection(this.state.data[cardIndex], "hard no"); console.log('card at index ' + cardIndex +' swiped hard no')}}
                     onTapCard={(cardIndex) => {this.toggleModal(!this.state.modalVisible); this.showMoreDetails(cardIndex);}}
                     cardIndex={0}
                     backgroundColor={'#ffffff'}
