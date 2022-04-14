@@ -1,8 +1,10 @@
+import { useNavigation } from '@react-navigation/native';
 import React, { useState } from 'react';
+import { useEffect } from 'react';
 import { Pressable, StyleSheet, TextInput } from 'react-native';
 import { Text, View } from '../components/Themed';
 
-export default function AddToGroup(groupID : Number) {
+export default function AddToGroup({route, navigation}) {
 
     let [inputError, setInputError] = useState('');
     let [groupEntryCode, setGroupEntryCode] = useState('');
@@ -14,9 +16,18 @@ export default function AddToGroup(groupID : Number) {
         );
     };
 
-
     let getInviteCode = () => {
-        // fetch('http://131.104.49.71:80/group/find')
+        fetch(`http://131.104.49.71:80/group/find?GroupID=${route.params.groupID}`).then(response => {
+            response.json().then(val => {
+                if(Object.keys(val).includes("groups")) {
+                    setGroupEntryCode(val.groups[0].GroupEntryCode);
+                }
+            }).catch(err => {
+                console.log("Could not parse response, likely due to internal error");
+            });
+        }).catch(err => {
+            alert(err);
+        });
     }
 
     let sendInvitation = () => {
@@ -46,13 +57,17 @@ export default function AddToGroup(groupID : Number) {
         });
     }
 
+    useEffect(() => {
+        getInviteCode();
+    }, []);
+
     return <View style={styles.screen}>
         <Text style={styles.headerText}>Group Invitations</Text>
         <View style={{flexGrow: 1, justifyContent: 'space-around'}}>
             <View>
                 <Text style={styles.subHeaderText}>Group Entry Code</Text>
                 <View style={styles.container}>
-                    <Text style={styles.codeText}>ABC DEF</Text>    
+                    <Text style={styles.codeText}>{groupEntryCode}</Text>    
                 </View>
                 <Text>A user can join the group manually by entering this code in their side of the app. </Text>
             </View>
