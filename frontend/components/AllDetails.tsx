@@ -50,7 +50,7 @@ export default class AllDetailsCard extends Component {
   };
 
   makeCall = () => {
-    Linking.openURL(`tel:${this.restaurantData[5]}`);
+    Linking.openURL(`tel:${this.restaurantData[5]}`); //state.data[this.state.index]?.phoneNumber
   };
 
   viewInMap = () => {
