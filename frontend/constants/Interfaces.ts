@@ -26,7 +26,7 @@ export interface RestaurantQueryParams {
     priceBucket?: string[],
     coords?: string,
     rating?: number,
-    maxDistance?: number
+    maxDistance?: number,
 }
 
 export interface Group {

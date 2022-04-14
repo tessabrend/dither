@@ -2,7 +2,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import React, { useState, useEffect } from "react";
 import { ListRenderItem, FlatList, SafeAreaView, StyleSheet, Pressable, ScrollView, } from "react-native";
 import { Slider } from '@miblanchard/react-native-slider';
-import { MultiSelect } from 'react-native-element-dropdown';
 import Colors from '../constants/Colors';
 import { Text, View } from './Themed';
 import { useNavigation } from '@react-navigation/native';
@@ -10,16 +9,16 @@ import getLocation, { apiRequestRetry } from '../utils/utils';
 import Dropdown from "./Dropdown";
 import Rating from "./Rating";
 import SliderContainer from "./SliderContainer";
-import { GroupMembers, RatingProps, SliderProps, DropdownProps, RestaurantQueryParams } from "../constants/Interfaces";
+import { GroupMembers, RatingProps, SliderProps, DropdownProps, RestaurantQueryParams } from '../constants/Interfaces';
+import Modal from "react-native-modal";
 
 const Item = ({ data }: { data: GroupMembers }) => (
-  <Pressable 
-    onPress={() => {
-  }} 
+  <View
     style={data.leader ? {...styles.groupMember, ...styles.groupLeader} : {...styles.groupMember}}>
-    <Text style={styles.name}>{data.name.charAt(0)}</Text>
-  </Pressable>
-); 
+    <Text style={styles.name}>{data.name?.charAt(0)}</Text>
+  </View>
+);
+ 
 
 const renderItem: ListRenderItem<GroupMembers> = ({ item }) => (
   <Item 
@@ -32,6 +31,7 @@ export default function GroupDetails({ route }) {
   const group = route.params;
   const [groupMembers, setGroupMembers] = useState<GroupMembers[]>([]);
   const [selectedId, setSelectedId] = useState(null);
+  const [showMembers, setShowMembers] = useState(false);
 
 //temp button option
 const [diningType, setDiningType] = useState<string[]>([]);
@@ -119,6 +119,20 @@ let startSession = () => {
           keyExtractor={(item) => item.user_id}
           extraData={selectedId}
         />
+        <Pressable onPress={() => {setShowMembers(true); console.log(groupMembers)}}><Text style={{fontSize: 40}}>+</Text></Pressable>
+        <Modal
+                     coverScreen={true}
+                     isVisible={showMembers}
+                     onSwipeComplete={() => setShowMembers(false)}
+                     swipeDirection="down"
+                     >
+                     <View style={styles.modalView}>
+                       <Text style={styles.modalHeader}>All Members</Text>
+                     {groupMembers.map(function(g, idx){
+         return (<Text key={idx} style={styles.modalText}>{g.name}</Text>)
+       })}
+                     </View>
+                    </Modal>
       </View>
 
       <ScrollView style={styles.scrollBox}>
@@ -249,10 +263,39 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "12%",
     maxHeight: "12%",
-    justifyContent: "space-between",
+    //justifyContent: "space-between",
     alignItems: "center",
     backgroundColor: "transparent",
     padding: "1%",
+    paddingLeft: "20%",
+    flexDirection: "row",
+    paddingRight: "20%",
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: "white",
+    borderRadius: 5,
+    padding: 50,
+    width: "90%",
+    height: "40%",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5
+  },
+  modalText: {
+    fontSize: 20,
+    paddingBottom: 5,
+  },
+  modalHeader: {
+    fontSize: 25,
+    fontWeight: "bold",
+    paddingBottom: 10,
   },
   groupMember: {
     backgroundColor: "#eee",

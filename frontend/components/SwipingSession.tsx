@@ -20,13 +20,15 @@ class Session extends Component {
         hours: [] as any[],
         index: 0,
         navigator: null,
-        restaurantParams: {}
+        restaurantParams: {},
+        timeLimit: 300
     }
 
     constructor(props) {
         super(props);
         this.navigation = props.navigator;
         this.state.restaurantParams = this.navigation.getState()["routes"][2]["params"];
+        this.state.timeLimit = props.timeLimit;
     }
 
     increment = () => {
@@ -173,7 +175,7 @@ class Session extends Component {
                 <View style={styles.timer}>
                     <CountDown
                     size={15}
-                    until={300} //time in seconds
+                    until={this.state.timeLimit} //time in seconds
                     onFinish={() => {alert("Session Over")}} //neither currently working
                     digitStyle={{backgroundColor: '#FFF', borderWidth: 2, borderColor: '#000000'}}
                     digitTxtStyle={{color: '#000000'}}
