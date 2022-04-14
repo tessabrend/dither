@@ -28,7 +28,7 @@ const Item = (props: {
     return(
       <Pressable 
         onPress={() => {
-          navigation.navigate('GroupDetails')
+          navigation.navigate('GroupDetails', data)
         }} 
         style={styles.container}>
         <View style={styles.spacer}>
@@ -44,7 +44,7 @@ const Item = (props: {
     return(
       <Pressable 
         onPress={() => {
-          navigation.navigate('GroupDetails')
+          navigation.navigate('GroupDetails', data)
         }} 
         style={styles.container}>
         <Text style={styles.name}>{data.groupName}</Text>

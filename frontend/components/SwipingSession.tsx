@@ -28,7 +28,7 @@ class Session extends Component {
         super(props);
         this.navigation = props.navigator;
         this.state.restaurantParams = this.navigation.getState()["routes"][2]["params"];
-        this.state.timeLimit = props.timeLimit;
+        this.state.timeLimit = props.timeLimit ? props.timeLimit : 300;
     }
 
     increment = () => {
@@ -120,18 +120,18 @@ class Session extends Component {
                             {/* <Text style={styles.modalText}>{this.state.data[this.state.index]?.location}</Text> */}
                             <Text style={styles.modalText}>Hours of Operation:</Text>
                             <View style={styles.modalTextBox}>
-                              { this.state.data[this.state.index]?.hoursOfOperation.map((item)=>(
-                              <Text style={styles.infoText}> { item } </Text>)
+                              { this.state.data[this.state.index]?.hoursOfOperation.map((item: string, i: number)=>(
+                              <Text key={i} style={styles.infoText}> { item } </Text>)
                               )}
                             </View>
                             <View style={styles.tagWrap}>
-                              { this.state.data[this.state.index]?.cuisineType.map((item)=>(
-                              <Text style={styles.moreDetailsTagItem}> { item } </Text>)
+                              { this.state.data[this.state.index]?.cuisineType.map((item: string, i: number)=>(
+                              <Text key={i} style={styles.moreDetailsTagItem}> { item } </Text>)
                               )}
                             </View>
                             <View style={styles.tagWrap}>
-                              { this.state.data[this.state.index]?.dining_type.map((item)=>(
-                              <Text style={styles.moreDetailsTagItem}> { item } </Text>)
+                              { this.state.data[this.state.index]?.dining_type.map((item: "string", i: number)=>(
+                              <Text key={i} style={styles.moreDetailsTagItem}> { item } </Text>)
                               )}
                             </View>
                          </View>

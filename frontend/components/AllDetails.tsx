@@ -113,8 +113,8 @@ export default class AllDetailsCard extends Component {
               <Text style={styles.rowMember}>{this.restaurantData[2]}</Text>
             </View>
             <View style={styles.infoRow}>
-              { this.restaurantData[3].map((item)=>(
-                <Text style={styles.cuisineTypeBox}> { item } </Text>)
+              { this.restaurantData[3].map((item: string, i: number)=>(
+                <Text key={i} style={styles.cuisineTypeBox}> { item } </Text>)
               )}
             </View>
             <Image style={styles.mapbox}
