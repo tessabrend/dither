@@ -22,6 +22,7 @@ class Group(db.Entity):
     TimeLimit = Required(int)
     GroupMembers = Set('GroupMembers') # this is needed to make a foreign key in the groupmembers table
     Session = Set('SelectionSession') # this is needed to make a foreign key in the selectionsession table
+    PreviousSession = Optional('SessionSelection') 
     Selection = Set('SessionSelections') # this is needed to make a foreign key in the sessionselections table
 
 class GroupMembers(db.Entity):

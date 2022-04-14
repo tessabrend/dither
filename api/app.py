@@ -204,6 +204,7 @@ def getRestaurantInfo():
 @app.route('/session/<id>/deactivate', methods=["PUT"])
 def deactivateSession(id):
     try:
+        Group[SelectionSession[id].GroupId].PreviousSession = id
         SelectionSession[id].Active = False
         commit()
     except TransactionIntegrityError as e:
