@@ -159,9 +159,12 @@ def getGroupMembers(id):
 
 @app.route('/group/<id>/hasLiveSession', methods=["GET"])
 def hasLiveSession(id):
-    liveSession = SelectionSession.get(GroupId=id, Active=True)
-    if liveSession is not None:
-        return jsonify({"sessionId": int(liveSession.id), "hasLiveSession": True})
+    session = SelectionSession.get(GroupId=id, Active=True)
+    if session is not None:
+        return jsonify({"hasLiveSession": True, "sessionId": int(session.id), "rating": float(session.Rating),
+            "radius": int(session.Radius), "priceBuckets": list(session.PriceBucket), 
+            "cuisineType": list(session.CuisineType), "diningType": list(session.DiningType), "groupId": int(session.GroupId.id)
+        })
     else:
         return jsonify({"hasLiveSession": False})
 
@@ -304,7 +307,11 @@ def startSession():
         commit()
     except TransactionIntegrityError as e:
         return {'message': f"Could not add user choice to database: {str(e).split('DETAIL:')[1]}".replace('\n', '')}, 400
-    return { "success": True, "sessionId": int(session.id) }
+    return jsonify({ 
+        "success": True, "sessionId": int(session.id), "rating": float(session.Rating),
+        "radius": int(session.Radius), "priceBuckets": list(session.PriceBucket), 
+        "cuisineType": list(session.CuisineType), "diningType": list(session.DiningType), "groupId": int(session.GroupId.id)
+    })
 
 ### End Sessions ###
 
