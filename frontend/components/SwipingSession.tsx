@@ -266,9 +266,9 @@ const styles = StyleSheet.create({
       alignItems: "center",
       shadowColor: "#000",
       shadowOffset: {
-      width: 0,
-      height: 2
-    },
+        width: 0,
+        height: 2
+      },
       shadowOpacity: 0.25,
       shadowRadius: 4,
       elevation: 5
@@ -286,7 +286,6 @@ const styles = StyleSheet.create({
       flexWrap: "wrap",
       alignItems: "center",
       justifyContent: "flex-start",
-
     },
     moreDetailsTagItem: {
       fontSize: 15,
@@ -316,6 +315,7 @@ const styles = StyleSheet.create({
       marginBottom: Platform.OS === 'ios' ? 20 : 10,
     },
     bucketRow: {
+      backgroundColor: "transparent",
       flexDirection: "row",
       padding: 5,
     },
