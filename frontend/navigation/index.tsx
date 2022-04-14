@@ -153,11 +153,7 @@ function RootNavigator() {
             <FontAwesomeIcon size={25} style={{marginRight: 15}} icon="ellipsis"/>
           </MenuTrigger>
           <MenuOptions>
-            <MenuOption onSelect={() => navigation.navigate('AddUserToGroup')}>
-              {console.log("\n\n\n*************************************\n\n")}
-              {console.log(navigation.getCurrentRoute())}
-              {console.log("\n\n*************************************\n\n\n")}
-  
+            <MenuOption onSelect={() => navigation.navigate('AddUserToGroup', { groupID: 1 })}>  
               <Text style={{padding: 10, fontSize: 14}}>Add User</Text>
             </MenuOption>
             <MenuOption onSelect={() => {
