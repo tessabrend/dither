@@ -2,3 +2,4 @@ api/env/
 node_modules
 api/.env
 api/__pycache__
+api/data/fetched/*.json

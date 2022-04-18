@@ -7,6 +7,9 @@ import ProgressBar from "react-native-animated-progress";
 import Modal from "react-native-modal";
 import Star from 'react-native-star-view';
 import { useNavigation } from '@react-navigation/native';
+import { apiRequestRetry } from '../utils/utils';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Rating from './Rating';
 
 const window = Dimensions.get("window");
 const screen = Dimensions.get("screen");
@@ -16,15 +19,24 @@ class Session extends Component {
         progress: 0,
         modalVisible: false,
         data: [] as any[],
-        hours: [] as any[],
+        isMatch: false,
         index: 0,
-        navigator: null
+        navigator: null,
+        restaurantParams: {},
+        timeLimit: 300,
+        userId: " ",
+        groupId: " ",
+        sessionId: " "
     }
 
     constructor(props) {
         super(props);
         this.navigation = props.navigator;
-    }
+        this.state.restaurantParams = this.navigation.getState()["routes"][2]["params"];
+        this.state.timeLimit = this.navigation.getState()["routes"][2]["params"].timeLimit;
+        this.state.groupId = this.navigation.getState()["routes"][2]["params"].groupId;
+        this.state.sessionId = this.navigation.getState()["routes"][2]["params"].sessionId;
+      }
 
     increment = () => {
         this.setState((state) => {
@@ -40,62 +52,90 @@ class Session extends Component {
         this.setState({ index: index })
     }
 
-    splitHours = (string) => {
-        let days = string?.split(';')
-        this.setState({ hours: days })
-    }
-
     toggleSwiping = (swiping) => {
         //this.setState({ canSwipe: !swiping })
         swiping = false
     }
 
     getRestaurants = async () => {
-        try {
-            const response = await fetch('http://131.104.49.71:80/restaurant/query?' + new URLSearchParams({
-            "cuisine": "pub",
-            "rating": "0",
-            "price-high": "200",
-            "price-low": "19",
-            "start-index": "0",
-            "end-index": "50",
-            }))
-            const json = await response.json()
-            this.setState({ data: json.restaurants })
-        } catch(error) {
-            console.error(error)
-        }  
+        const url = 'http://131.104.49.71:80/restaurant/query?' + new URLSearchParams(this.state.restaurantParams);
+        const options = {
+            headers: {
+                'Accept': 'application/json'
+            }
+        }
+        let json = await apiRequestRetry(url, options, 10);
+        this.setState({data: json})
     }
 
-    getPriceBucket = (low, high) => {
-        if( high > 150 )
-           return (
-            <View style={styles.bucketRow}>
-            <FontAwesomeIcon icon="dollar-sign" size={15}/>
-            <FontAwesomeIcon icon="dollar-sign" size={15}/>
-            <FontAwesomeIcon icon="dollar-sign" size={15}/>
-            </View>
-           ); else if ( low > 75 && high < 150 ) 
+    setSelection = async (restaurantDetails, response) => {
+      console.log(restaurantDetails)
+      console.log(response)
+      console.log(this.state.groupId)
+      console.log(this.state.sessionId)
+      const url = 'http://131.104.49.71:80/session/selection';
+      const options = {
+          method: "POST",
+          headers: {
+                'Content-Type': 'application/json',
+            }, 
+            body: `groupId=${this.state.groupId}&sessionId=${this.state.sessionId}&restaurantId=${restaurantDetails.id}&userId=${this.state.userId}`
+        }; 
+        fetch(url, options)
+        .then(response => response.json())
+        .then(data => this.setState({isMatch: data.match})).catch(err => console.log(err));
+    }
+
+    getPriceBucket = (price_bucket: any) => {
+        switch (price_bucket) {
+          case "1":
             return (
-                <View style={styles.bucketRow}>
-                <FontAwesomeIcon icon="dollar-sign" size={15}/>
-                <FontAwesomeIcon icon="dollar-sign" size={15}/>
-                </View>
-               );
-            else 
+              <View style={styles.bucketRow}>
+                <FontAwesomeIcon icon="dollar-sign" size={18}/>
+              </View>
+            );
+          case "2":
             return (
-                <View style={styles.bucketRow}>
-                <FontAwesomeIcon icon="dollar-sign" size={15}/>
-                </View>
-               );
+              <View style={styles.bucketRow}>
+                <FontAwesomeIcon icon="dollar-sign" size={18}/>
+                <FontAwesomeIcon icon="dollar-sign" size={18}/>
+              </View>
+            );
+          case "3":
+            return (
+              <View style={styles.bucketRow}>
+                <FontAwesomeIcon icon="dollar-sign" size={18}/>
+                <FontAwesomeIcon icon="dollar-sign" size={18}/>
+                <FontAwesomeIcon icon="dollar-sign" size={18}/>
+              </View>
+            );
+          case "4":
+            return (
+              <View style={styles.bucketRow}>
+                <FontAwesomeIcon icon="dollar-sign" size={18}/>
+                <FontAwesomeIcon icon="dollar-sign" size={18}/>
+                <FontAwesomeIcon icon="dollar-sign" size={18}/>
+                <FontAwesomeIcon icon="dollar-sign" size={18}/>
+              </View>
+            );
+          default:
+            break;
+        }
         return null;
+     }
+     
+     getUser = async () => {
+         let id = await AsyncStorage.getItem("@userId")
+        this.setState({userId: id})
      }
 
     componentDidMount = () => {
         this.getRestaurants()
+        this.getUser()
     }
 
     render () {
+        
         return (
             <View style={styles.container}>
                 <View style={styles.centeredView}>
@@ -108,12 +148,23 @@ class Session extends Component {
                      >
                      <View style={styles.centeredView}>
                          <View style={styles.modalView}>
-                             <Text style={styles.modalText}>Hours of Operation:</Text>
-                            { this.state.hours?.map((item, key)=>(
-                            <Text key={key}> { item } </Text>)
-                            )}
-                            <Text style={styles.moreDetailsTagItem}>{this.state.data[this.state.index]?.cuisine}</Text>
-                            <Text style={styles.moreDetailsTagItem}>{this.state.data[this.state.index]?.dining_option}</Text>
+                            {/* <Text style={styles.modalText}>{this.state.data[this.state.index]?.location}</Text> */}
+                            <Text style={styles.modalText}>Hours of Operation:</Text>
+                            <View style={styles.modalTextBox}>
+                              { this.state.data[this.state.index]?.hoursOfOperation.map((item: string, i: number)=>(
+                              <Text key={i} style={styles.infoText}> { item } </Text>)
+                              )}
+                            </View>
+                            <View style={styles.tagWrap}>
+                              { this.state.data[this.state.index]?.cuisineType.map((item: string, i: number)=>(
+                              <Text key={i} style={styles.moreDetailsTagItem}> { item } </Text>)
+                              )}
+                            </View>
+                            <View style={styles.tagWrap}>
+                              { this.state.data[this.state.index]?.dining_type.map((item: "string", i: number)=>(
+                              <Text key={i} style={styles.moreDetailsTagItem}> { item } </Text>)
+                              )}
+                            </View>
                          </View>
                      </View>
                     </Modal>
@@ -128,14 +179,10 @@ class Session extends Component {
                     renderCard={(card) => {
                         return (
                             <View style={styles.card}>
-                                <Image
-                                style={styles.restaurantImage}
-                                source={{uri: card?.picture}}
-                                />
                                 <Text style={styles.cardName}>{card?.name}</Text>
                                 <Star score={card?.rating ? card?.rating : 0} style={styles.starStyle} />
-                                <Text>{card?.location}</Text>
-                                {this.getPriceBucket(card?.price_low, card?.price_high)}
+                                <Text style={styles.infoText}>{card?.location}</Text>
+                                <View>{this.getPriceBucket(card?.priceBucket)}</View>
                             </View>
                         )
                     }}
@@ -144,12 +191,12 @@ class Session extends Component {
                         this.toggleSwiping(this.swiper.horizontalSwipe); 
                         this.toggleSwiping(this.swiper.verticalSwipe);
                         this.navigation.navigate('Compromise');
-                    }} //this needs to change to disable swiping
-                    onSwipedLeft={(cardIndex) => {console.log('card at index ' + cardIndex +' swiped no')}}
-                    onSwipedRight={(cardIndex) => {console.log('card at index ' + cardIndex +' swiped like')}}
-                    onSwipedTop={(cardIndex) => {console.log('card at index ' + cardIndex +' swiped crave')}}
-                    onSwipedBottom={(cardIndex) => {console.log('card at index ' + cardIndex +' swiped hard no')}}
-                    onTapCard={(cardIndex) => {this.toggleModal(!this.state.modalVisible); this.showMoreDetails(cardIndex); this.splitHours(this.state.data[this.state.index]?.hours)}}
+                    }} 
+                    onSwipedLeft={(cardIndex) => {this.setSelection(this.state.data[cardIndex], "no");}}
+                    onSwipedRight={(cardIndex) => {this.setSelection(this.state.data[cardIndex], "like"); console.log('card at index ' + cardIndex +' swiped like')}}
+                    onSwipedTop={(cardIndex) => {this.setSelection(this.state.data[cardIndex], "crave"); console.log('card at index ' + cardIndex +' swiped crave')}}
+                    onSwipedBottom={(cardIndex) => {this.setSelection(this.state.data[cardIndex], "hard no"); console.log('card at index ' + cardIndex +' swiped hard no')}}
+                    onTapCard={(cardIndex) => {this.toggleModal(!this.state.modalVisible); this.showMoreDetails(cardIndex);}}
                     cardIndex={0}
                     backgroundColor={'#ffffff'}
                     stackSize= {3}
@@ -159,7 +206,7 @@ class Session extends Component {
                 <View style={styles.timer}>
                     <CountDown
                     size={15}
-                    until={300} //time in seconds
+                    until={this.state.timeLimit * 60} //time in seconds
                     onFinish={() => {alert("Session Over")}} //neither currently working
                     digitStyle={{backgroundColor: '#FFF', borderWidth: 2, borderColor: '#000000'}}
                     digitTxtStyle={{color: '#000000'}}
@@ -214,85 +261,107 @@ const styles = StyleSheet.create({
       backgroundColor: "transparent",
     },
     buttonRow: {
-        justifyContent: "space-between",
-        flexDirection: "row",
-        marginTop: Platform.OS === 'ios' ? screen.width + 160 : screen.width,
-        paddingRight: 30,
-        paddingLeft: 30,
+      justifyContent: "space-between",
+      flexDirection: "row",
+      marginTop: Platform.OS === 'ios' ? screen.width + 160 : screen.width,
+      paddingRight: 30,
+      paddingLeft: 30,
+      marginVertical: "3%"
     },
     progressBar: {
-        justifyContent: "center",
-        //alignItems: "center",
-        marginTop: 20,
-        marginRight: 20,
-        marginLeft: 20,
+      justifyContent: "center",
+      //alignItems: "center",
+      bottom: screen.height/8,
+      marginTop: 20,
+      marginRight: 20,
+       marginLeft: 20,
     },
     timer: {
-        justifyContent: "center",
-        alignItems: "flex-end",
-        marginTop: 10,
-        marginRight: 20
+      justifyContent: "center",
+      alignItems: "flex-end",
+      marginTop: 10,
+      marginRight: 20,
+      bottom: screen.height/8
     },
     centeredView: {
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        marginTop: 22
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      marginTop: 22
+    },
+    modalView: {
+      margin: 20,
+      backgroundColor: "white",
+      borderRadius: 5,
+      padding: "8%",
+      width: screen.width - 50,
+      minHeight: screen.height / 2,
+      alignItems: "center",
+      shadowColor: "#000",
+      shadowOffset: {
+        width: 0,
+        height: 2
       },
-      modalView: {
-        margin: 20,
-        backgroundColor: "white",
-        borderRadius: 5,
-        padding: 50,
-        width: screen.width - 50,
-        height: screen.height / 2,
-        alignItems: "center",
-        shadowColor: "#000",
-        shadowOffset: {
-          width: 0,
-          height: 2
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 4,
-        elevation: 5
-      },
-      modalText: {
-        marginBottom: 15,
-        textAlign: "center"
-      },
-      cardName: {
-          fontSize: 50,
-      },
-      moreDetailsTagItem: {
-        backgroundColor: '#B3B3B3',
-       width: 70,
-        height: 40,
-        borderColor: '#000000',
-        borderWidth: 2,
-        alignItems: "center",
-        textAlign: "center",
-        marginBottom: 30
-      },
-      moreDetailsTags: {
-        flex: 1,
-        flexDirection: "row",
-        justifyContent: "space-evenly",
-        padding: 20,
-      },
-      restaurantImage: {
-          borderColor: '#000000',
-          borderWidth: 2,
-          width: 320,
-          height: Platform.OS === 'ios' ? screen.height - 650 : screen.height - 600,
-          alignSelf: "center",
-          marginBottom: Platform.OS === 'ios' ? 20 : 10,
-      },
-      bucketRow: {
-        flexDirection: "row",
-        padding: 5,
-      },
-      starStyle: {
-        width: 100,
-        height: 20,
-      },
+      shadowOpacity: 0.25,
+      shadowRadius: 4,
+      elevation: 5
+    },
+    modalText: {
+      fontSize: 18,
+      fontWeight: "bold",
+      textAlign: "center"
+    },
+    cardName: {
+      fontSize: 50,
+    },
+    tagWrap: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      alignItems: "center",
+      justifyContent: "flex-start",
+    },
+    moreDetailsTagItem: {
+      fontSize: 15,
+      backgroundColor: '#B3B3B3',
+      minWidth: 70,
+      minHeight: 35,
+      borderColor: '#000000',
+      borderWidth: 1.4,
+      borderRadius: 10,
+      textAlign: "center",
+      justifyContent: "space-around",
+      padding: "2%",
+      margin: "2%"
+    },
+    moreDetailsTags: {
+      flex: 1,
+      flexDirection: "row",
+      justifyContent: "space-evenly",
+      padding: 20,
+    },
+    restaurantImage: {
+      borderColor: '#000000',
+      borderWidth: 2,
+      width: 320,
+      height: Platform.OS === 'ios' ? screen.height - 650 : screen.height - 600,
+      alignSelf: "center",
+      marginBottom: Platform.OS === 'ios' ? 20 : 10,
+    },
+    bucketRow: {
+      backgroundColor: "transparent",
+      flexDirection: "row",
+      padding: 5,
+    },
+    starStyle: {
+      width: 100,
+      height: 20,
+    },
+    infoText: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      fontSize: 16,
+    },
+    modalTextBox: {
+      marginVertical: "2%"
+    }
   });

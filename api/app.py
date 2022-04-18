@@ -6,11 +6,16 @@ from itsdangerous import json
 from models import *
 from util import *
 from pony.flask import Pony
+from geopy.distance import distance
+from geopy.geocoders import Nominatim
 import sendgrid
 from sendgrid.helpers.mail import *
+from argon2 import PasswordHasher
+
 
 app = Flask(__name__, static_url_path='')
 Pony(app)
+geolocator = Nominatim(user_agent="Dither")
 sg = sendgrid.SendGridAPIClient(api_key=os.environ.get('SENDGRID_API_KEY'))
 
 SERVER_URL = "http://131.104.49.71"
@@ -39,6 +44,7 @@ def add_to_group():
                 flush()
                 group_member = GroupMembers(GroupId=group, UserId=user)
                 commit()
+                return render_object(group)
             except TransactionIntegrityError as e:
                 return {'message': f"Could not add user to group in database: {str(e).split('DETAIL:')[1]}".replace('\n', '')}, 400
         else:
@@ -75,7 +81,7 @@ def send_group_invitation():
     if not 'GroupID' in request.form.keys() or not 'InviteEmail' in request.form.keys():
         return {'message': f"Required form item(s) not present: {', '.join(set(request.form.keys()) - set(['GroupID', 'InviteEmail']))}"}, 400
     
-    user_to_invite = get(user for user in User if user.email and user.email == request.form.get('InviteEmail'))
+    user_to_invite = get(user for user in User if user.Email and user.Email == request.form.get('InviteEmail'))
     if not user_to_invite:
         return {'message': f"Sending the invitation email failed, because the user with email {request.form.get('InviteEmail')} was not found"}, 400
 
@@ -103,19 +109,64 @@ def join_group_link():
 def create_group():
     provided_fields = ['id', 'TimeLimit', 'GroupEntryCode']
     if not confirm_fields(request.form, Group, exceptions=provided_fields):
+        print("a")
+        print({'message': f"Required form item(s) not present: {', '.join(field_difference(request.form, Group, exceptions=provided_fields))}"})
         return {'message': f"Required form item(s) not present: {', '.join(field_difference(request.form, Group, exceptions=provided_fields))}"}, 400
-
     # If a time limit is not provided, use the default value of 30 minutes
-    group = Group(GroupName=request.form['GroupName'], 
-                GroupEntryCode=''.join(random.choice(string.ascii_letters) for _ in range(8)),
-                TimeLimit=request.form.get('TimeLimit', 30))
-    flush()
-    group_member = GroupMembers(GroupId=group.id, UserId=request.form.get('UserId'), GroupLeader=True)
+    try:
+        group = Group(GroupName=request.form['GroupName'], 
+                    GroupEntryCode=''.join(random.choice(string.ascii_letters) for _ in range(8)),
+                    TimeLimit=request.form.get('TimeLimit', 30))
+        flush()
+        print(request.form.get("UserId"))
+        group_member = GroupMembers(GroupId=group.id, UserId=request.form.get('UserId'), GroupLeader=True)
+    except Exception as e:
+        return {'groupExists': True}
     try:
         commit()
     except TransactionIntegrityError as e:
+        print("b")
+        print({'message': f"Could not create group in database: {str(e).split('DETAIL:')[1]}".replace('\n', '')})
         return {'message': f"Could not create group in database: {str(e).split('DETAIL:')[1]}".replace('\n', '')}, 400
+    print("c")
+    print(render_object(group))
     return render_object(group)
+
+@app.route('/group/<id>/leave/<userId>', methods=["PUT"])
+def leaveGroup(id, userId):
+    membership = GroupMembers.get(GroupId=id, UserId=userId)
+    if not membership:
+        return { "message": "The user is not in the group. Invalid request" }, 400
+    if membership.GroupLeader:
+        GroupMembers.select(GroupId=id).delete(bulk=True)
+        Group.get(id=id).delete() 
+        return { "status": "delete all" }
+    else:
+        membership.delete()
+        return { "status": "delete" }
+
+@app.route('/group/<id>/members', methods=["GET"])
+def getGroupMembers(id):
+    group = Group.get(id=id)
+    if group is None:
+        return { "message": "invalid group" }, 400
+    else:
+        groupMembers = GroupMembers.select(GroupId=id)
+        response = []
+        for gm in groupMembers:
+            response.append({"user_id": gm.UserId.id, "name": gm.UserId.Name, "leader": gm.GroupLeader})
+        return jsonify(response)
+
+@app.route('/group/<id>/hasLiveSession', methods=["GET"])
+def hasLiveSession(id):
+    session = SelectionSession.get(GroupId=id, Active=True)
+    if session is not None:
+        return jsonify({"hasLiveSession": True, "sessionId": int(session.id), "rating": float(session.Rating),
+            "radius": int(session.Radius), "priceBuckets": list(session.PriceBucket), 
+            "cuisineType": list(session.CuisineType), "diningType": list(session.DiningType), "groupId": int(session.GroupId.id)
+        })
+    else:
+        return jsonify({"hasLiveSession": False})
 
 ### End Groups ###
 
@@ -123,19 +174,28 @@ def create_group():
 
 @app.route('/restaurant/query', methods=["GET"])
 def getRestaurantInfo():
+    # optional params priceBucket, rating, cuisineType, diningType, coords, maxDistance
+    cuisineTypes = request.args.get("cuisineType", '''African,South American,Chinese,Indian,Middle Eastern,Fast Food,Italian,Mexican,Pub,Japanese''').split(",")
+    diningTypes = request.args.get("diningType", 'dine in,take out,delivery').split(',')
+    priceLevels = request.args.get("priceBucket", '0,1,2,3,4').split(',')
+    coords = eval(request.args.get("coords", (0,0)))
+    priceLevels = ['1', '2', '3', '4'] if priceLevels == '' or priceLevels == [''] else priceLevels
+    diningTypes = ['dine in', 'take out', 'delivery'] if diningTypes == '' or diningTypes == [''] else diningTypes
+    cuisineTypes = ['African', 'South American', 'Chinese', 'Indian', 'Middle Eastern', 'Fast Food', 'Italian', 'Mexican', 'Pub', 'Japanese'] if cuisineTypes == '' or cuisineTypes == [''] else cuisineTypes
     to_return = []
-    restaurants = select(restaurant for restaurant in Restaurant if restaurant.PriceHigh <= float(request.args.get('price-high')) \
-        and restaurant.PriceLow >= float(request.args.get('price-low')) and restaurant.Rating >= float(request.args.get('rating')) \
-        and request.args.get('cuisine') in restaurant.CuisineType)[int(request.args.get('start-index')):int(request.args.get('end-index'))]
-
-    for restaurant in restaurants:
-        i = 0
-        to_return.append({"id": i, "name": restaurant.Name, "location": restaurant.Location, "hours": restaurant.HoursOfOperation,
-         "website": restaurant.Website, "phone": restaurant.PhoneNumber, "dining_option": restaurant.DiningType, "bookingsite": restaurant.BookingSite,
-         "picture": restaurant.PictureLocation, "sponsored": restaurant.Sponsored, "cuisine": restaurant.CuisineType, "rating": restaurant.Rating, 
-         "price_low": restaurant.PriceLow, "price_high": restaurant.PriceHigh,})
-        i = i + 1
-    return {"restaurants": to_return}
+    query = f'''SELECT id, Name, Location, Website, Rating, HoursOfOperation, 
+    NumberOfRatings, PriceBucket, PhoneNumber, CuisineType, DiningType, Coordinates 
+    from Restaurant WHERE Rating >= {request.args.get("rating", 0, float)} 
+    and (PriceBucket in ({str(priceLevels)[1:-1]}) OR PriceBucket = 'N/A')
+    and CuisineType && '{{{str(cuisineTypes)[1:-1].replace("'", '"')}}}'
+    and DiningType && '{{{str(diningTypes)[1:-1].replace("'", '"')}}}';'''
+    restaurants = db.execute(query).fetchall()
+    for r in restaurants:
+        if distance(eval(r[11]), coords).km < request.args.get("maxDistance", 5, float):
+            to_return.append({"id": r[0], "name": r[1], "location": r[2], "website": r[3], "rating": r[4],
+            "hoursOfOperation": r[5], "numberOfRatings": r[6], "priceBucket": r[7], "phoneNumber": r[8],
+            "cuisineType": r[9], "dining_type": r[10]})
+    return jsonify(to_return)
 
 ### End Restaurants ###
 
@@ -225,6 +285,33 @@ def pollForMatch(id):
         })
     return jsonify({"match": False})
 
+@app.route("/session/start", methods=["POST"])
+def startSession():
+    groupId = request.form.get("groupId", 0, int)
+    if groupId == 0:
+        return { "message": "Invalid Group ID" }, 400
+    activeSession = SelectionSession.get(GroupId=groupId, Active=True)
+    if(activeSession):
+        activeSession.Active = False
+        flush()
+    cuisineTypes = request.form.get("cuisineType", ['African', 'South American', 'Chinese', 'Indian', 'Middle Eastern', 'Fast Food', 'Italian', 'Mexican', 'Pub', 'Japanese'])
+    cuisineTypes = cuisineTypes.split(",") if type(cuisineTypes) == str else cuisineTypes
+    diningTypes = request.form.get("diningType", ['dine in', 'take out', 'delivery'])
+    diningTypes = diningTypes.split(",") if type(diningTypes) == str else diningTypes
+    priceBucket = request.form.get("priceBucket", [0,1,2,3,4], str)
+    priceBucket = priceBucket.split(",") if type(priceBucket) == str else priceBucket
+    session = SelectionSession(Rating=request.form.get("rating", 0.0, float), 
+    Radius=request.form.get("radius", 5, int), 
+    PriceBucket=priceBucket, CuisineType=cuisineTypes, DiningType=diningTypes, GroupId=groupId, Active=True)
+    try:
+        commit()
+    except TransactionIntegrityError as e:
+        return {'message': f"Could not add user choice to database: {str(e).split('DETAIL:')[1]}".replace('\n', '')}, 400
+    return jsonify({ 
+        "success": True, "sessionId": int(session.id), "rating": float(session.Rating),
+        "radius": int(session.Radius), "priceBuckets": list(session.PriceBucket), 
+        "cuisineType": list(session.CuisineType), "diningType": list(session.DiningType), "groupId": int(session.GroupId.id)
+    })
 
 ### End Sessions ###
 
@@ -232,6 +319,10 @@ def pollForMatch(id):
 
 @app.route('/user/create', methods=["POST"])
 def createUser():
+    # userId = request.form.get("userId", None)
+    # print(userId)
+    # user = User.get(id=userId)
+    #if userId is None or user is None:
     try:
         user = User(Name="User", Location="", Password="NO_ACCOUNT", PhoneNumber="", Email=None)
         commit()
@@ -239,7 +330,11 @@ def createUser():
     except TransactionIntegrityError as e:
         print(e)
         return {"message": "Could not create a user"}, 400
-        
+    #elif user:
+        #print({"userId": userId})
+        #return jsonify({"userId": userId})
+
+
 @app.route('/user/<id>/groups', methods=["GET"])
 def getUserGroups(id):
     user = User[id]
@@ -252,9 +347,51 @@ def getUserGroups(id):
             "groupCode": query[group][2],
             "isGroupLeader": query[group][0]
         })
+    print(response)
+    print(request.headers)
     return jsonify(response)
+
+@app.route('/user/<uid>/register', methods=['POST'])
+def user_register(uid):
+    # In order to complete the registration process, we will need to have the user ID
+    # Here, we will associate a specific email and hashed password with our ID, allowing it to be retreived later
+    if not uid or not request.form.get('Email') or not request.form.get('Password'):
+        return { "message": "Cannot register because required form fields are missing" }, 400
+    user = User[uid]
+    if not user:
+        return { "message": "Cannot register because the user does not exist" }, 400
+    if user.Password != "NO_ACCOUNT":
+        return { "message": "Cannot register because the user is already registered" }, 400
+
+    try:
+        ph = PasswordHasher()
+        user.Email = request.form.get('Email')
+        user.Password = ph.hash(request.form.get('Password'))
+        commit()
+    except Exception as e:
+        return { "message": "Cannot register because a user with this email already exists" }, 400
+    
+    return { "message": "OK" }
+
+@app.route('/user/login', methods=['POST'])
+def user_login():
+    # This depends on the user already being registered - they will need to have an email address and hashed password associated
+    # With their account in order to log in
+    if not request.form.get('Email') or not request.form.get('Password'):
+        return { "message": "Cannot login because form fields are missing" }, 400 
+    users = list(select(user for user in User if user.Email == request.form.get('Email')))
+    if len(users) == 0:
+        return { "message": "Cannot login because the user does not exist (incorrect email)" }, 400
+    user = users[0]
+
+    ph = PasswordHasher()
+    try:
+        if ph.verify(user.Password, request.form.get('Password')):
+            return { "message": "OK" , "userID": user.id }
+    except:
+        return { "message": "Cannot login because the password is incorrect" }, 400
 
 ### End User ###
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=80, host="131.104.49.71")
